@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transistores Pringaillo</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .problem-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            min-height: 60px;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .circuit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+            gap: 1.5rem;
+        }
+
+        .circuit-image {
+            width: 100%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--primary);
+        }
+
+        .board-mode {
+            background: #f1f5f9;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .board-steps {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .board-steps.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 3px solid var(--primary);
+        }
+
+        .step h4 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .formula {
+            background: #dbeafe;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.8rem 0;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .calculation {
+            background: #dcfce7;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin: 0.8rem 0;
+        }
+
+        .solution-highlight {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 2px solid var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-back {
+            background: var(--gray);
+        }
+
+        .btn-back:hover {
+            background: #475569;
+        }
+
+        .btn-board {
+            background: var(--accent);
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .btn-board:hover {
+            background: #7c3aed;
+            transform: scale(1.03);
+        }
+
+        .problem-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .problem-statement {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--primary);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .home-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .problem-container {
+                padding: 1.5rem;
+            }
+            
+            .btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .home-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .problem-card h3 {
+                font-size: 1.3rem;
+            }
+            
+            .btn-large {
+                width: 100%;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Boletín EAN10: Transistores nivel "pringaíllo"</h1>
+            <p class="subtitle">I.E.S. Virgen de Villadiego (Peñaflor, Sevilla) - Departamento de Tecnología</p>
+        </header>
+
+        <main>
+            <!-- Home Page -->
+            <section id="home" class="content active">
+                <h2 style="text-align: center; color: var(--primary); margin-bottom: 1.5rem; font-size: 1.8rem;">Selecciona un problema para ver su resolución</h2>
+                <div class="home-grid">
+                    <div class="problem-card" onclick="showProblem(1)">
+                        <h3>Problema 1</h3>
+                        <p>Resuelve el transistor de la figura 1 con V<sub>BB</sub>=1V, V<sub>CC</sub>=5V, R<sub>B</sub>=15K, R<sub>C</sub>=1K, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(2)">
+                        <h3>Problema 2</h3>
+                        <p>Resuelve el transistor de la figura 1 con V<sub>BB</sub>=1V, V<sub>CC</sub>=6V, R<sub>B</sub>=12K, R<sub>C</sub>=1K5, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(3)">
+                        <h3>Problema 3</h3>
+                        <p>Resuelve el transistor de la figura 1 con V<sub>BB</sub>=2V, V<sub>CC</sub>=6V, R<sub>B</sub>=40K, R<sub>C</sub>=1K2, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(4)">
+                        <h3>Problema 4</h3>
+                        <p>En el transistor de la figura 1: V<sub>BB</sub>=2V, V<sub>CC</sub>=8V, R<sub>B</sub>=2K0, R<sub>C</sub>=5K0, V<sub>BE</sub>=0.65V, β=100. ¿En qué estado trabaja?</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(5)">
+                        <h3>Problema 5</h3>
+                        <p>Resuelve el transistor de la figura 2 con V<sub>BB</sub>=2V, V<sub>CC</sub>=6V, R<sub>C</sub>=2K0, R<sub>E</sub>=3K0, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(6)">
+                        <h3>Problema 6</h3>
+                        <p>Resuelve el transistor de la figura 2 con V<sub>BB</sub>=1V, V<sub>CC</sub>=7V, R<sub>C</sub>=1K3, R<sub>E</sub>=1K0, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(7)">
+                        <h3>Problema 7</h3>
+                        <p>Resuelve el transistor de la figura 2 con V<sub>BB</sub>=3V, V<sub>CC</sub>=12V, R<sub>C</sub>=2K0, R<sub>E</sub>=2K0, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(8)">
+                        <h3>Problema 8</h3>
+                        <p>Transistor figura 2: V<sub>BB</sub>=5V, V<sub>CC</sub>=7V, R<sub>C</sub>=5K0, R<sub>E</sub>=1K0, V<sub>BE</sub>=0.65V, β=100. ¿En qué estado trabaja?</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(9)">
+                        <h3>Problema 9</h3>
+                        <p>Resuelve el transistor de la figura 3 con V<sub>BB</sub>=1V, V<sub>CC</sub>=5V, R<sub>B</sub>=1K2, R<sub>C</sub>=1K0, R<sub>E</sub>=0K1, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(10)">
+                        <h3>Problema 10</h3>
+                        <p>Resuelve el transistor de la figura 3 con V<sub>BB</sub>=1.5V, V<sub>CC</sub>=6V, R<sub>B</sub>=5K, R<sub>C</sub>=1K0, R<sub>E</sub>=0K3, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(11)">
+                        <h3>Problema 11</h3>
+                        <p>Resuelve el transistor de la figura 3 con V<sub>BB</sub>=2.5V, V<sub>CC</sub>=5V, R<sub>B</sub>=5K0, R<sub>C</sub>=0K5, R<sub>E</sub>=0K5, V<sub>BE</sub>=0.65V, β=100</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(12)">
+                        <h3>Problema 12</h3>
+                        <p>Transistor figura 1: R<sub>B</sub>=10K0, R<sub>C</sub>=0K3, V<sub>BB</sub>=3V, V<sub>CC</sub>=6V, V<sub>BE</sub>=0.65V. ¿En qué estado se encuentra?</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(13)">
+                        <h3>Problema 13</h3>
+                        <p>Transistor figura 1: R<sub>B</sub>=3K0, R<sub>C</sub>=0K5, V<sub>BB</sub>=1V, V<sub>CC</sub>=5V, V<sub>BE</sub>=0.65V, V<sub>CE</sub>=0.2V en saturación</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(14)">
+                        <h3>Problema 14</h3>
+                        <p>Transistor figura 2: V<sub>BB</sub>=3V, V<sub>CC</sub>=3V, R<sub>C</sub>=2K5, R<sub>E</sub>=1K5, V<sub>BE</sub>=0.65V, V<sub>CE</sub>=0.2V en saturación</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(15)">
+                        <h3>Problema 15</h3>
+                        <p>Transistor figura 3: V<sub>BB</sub>=3V, V<sub>CC</sub>=2V, R<sub>B</sub>=R<sub>C</sub>=R<sub>E</sub>=1K0, V<sub>BE</sub>=0.65V, V<sub>CE</sub>=0.2V en saturación</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 1 -->
+            <section id="problem1" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 1</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 1 con los siguientes datos: V<sub>BB</sub>= 1 V; V<sub>CC</sub>= 5 V; R<sub>B</sub>= 15 K; R<sub>C</sub>= 1 K; V<sub>BE</sub>= 0,65 V; β= 100</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 1</h3>
+                        <img src="Figura1.jpg" alt="Figura 1" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(1)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board1">
+                            <div class="step">
+                                <h4> Paso 1: Análisis de la malla de entrada (Base-Emisor) </h4>
+                                <p>Aplicamos la ley de Kirchhoff para la malla de entrada:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub></div>
+                                <p>Sustituimos los valores conocidos:</p>
+                                <div class="formula">1V = I<sub>B</sub> × 15kΩ + 0.65V</div>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="calculation">I<sub>B</sub> = (1V - 0.65V) / 15kΩ = 0.35V / 15000Ω = 0.0233 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de la corriente de colector (I<sub>C</sub>) </h4>
+                                <p>Utilizamos la relación de corrientes en el transistor:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub></div>
+                                <p>Sustituimos los valores:</p>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.0233 mA = 2.333 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de la corriente de emisor (I<sub>E</sub>) </h4>
+                                <p>Por la ley de corrientes en el transistor:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>C</sub> + I<sub>B</sub></div>
+                                <p>Sustituimos los valores:</p>
+                                <div class="calculation">I<sub>E</sub> = 2.333 mA + 0.0233 mA = 2.356 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Análisis de la malla de salida (Colector-Emisor) </h4>
+                                <p>Aplicamos la ley de Kirchhoff para la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub></div>
+                                <p>Despejamos V<sub>CE</sub>:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - (I<sub>C</sub> × R<sub>C</sub>)</div>
+                                <p>Sustituimos los valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 5V - (2.333 mA × 1kΩ) = 5V - 2.333V = 2.667 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.023 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 2.333 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 2.356 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 2.67 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en zona activa (V<sub>CE</sub> > V<sub>CE_sat</sub>)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(2)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 2 -->
+            <section id="problem2" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 2</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 1, en el que se dan los datos: V<sub>BB</sub>= 1 V; V<sub>CC</sub>= 6 V; R<sub>B</sub>= 12K; R<sub>C</sub>= 1K5; V<sub>BE</sub>= 0,65 V; β= 100. ¿En qué estado trabaja el transistor?</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 1</h3>
+                        <img src="Figura1.jpg" alt="Figura 1" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(2)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board2">
+                            <div class="step">
+                                <h4> Paso 1: Análisis de la malla de entrada (Base-Emisor) </h4>
+                                <p>Aplicamos la ley de Kirchhoff:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">1V = I<sub>B</sub> × 12kΩ + 0.65V</div>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="calculation">I<sub>B</sub> = (1V - 0.65V) / 12kΩ = 0.35V / 12000Ω = 0.0292 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de la corriente de colector (I<sub>C</sub>) </h4>
+                                <p>Utilizamos la ganancia de corriente:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.0292 mA = 2.92 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Verificación del estado del transistor </h4>
+                                <p>Calculamos la corriente máxima posible en saturación (I<sub>C_sat</sub>):</p>
+                                <div class="formula">I<sub>C_sat</sub> ≈ V<sub>CC</sub> / R<sub>C</sub> = 6V / 1.5kΩ = 4 mA</div>
+                                <p>Comparamos I<sub>C</sub> calculado con I<sub>C_sat</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = 2.92 mA < I<sub>C_sat</sub> = 4 mA</div>
+                                <p>Como I<sub>C</sub> < I<sub>C_sat</sub>, el transistor NO está saturado.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub></div>
+                                <p>Despejamos V<sub>CE</sub>:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - (I<sub>C</sub> × R<sub>C</sub>)</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 6V - (2.92 mA × 1.5kΩ) = 6V - 4.38V = 1.62 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.029 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 2.92 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = I<sub>C</sub> + I<sub>B</sub> = 2.949 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 1.62 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA (V<sub>CE</sub> > V<sub>CE_sat</sub> y I<sub>C</sub> < I<sub>C_sat</sub>)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(1)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(3)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 3 -->
+            <section id="problem3" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 3</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 1, en el que se dan los datos: V<sub>BB</sub>= 2 V; V<sub>CC</sub>= 6 V; R<sub>B</sub>= 40 K; R<sub>C</sub>= 1K2; V<sub>BE</sub>= 0,65 V; β= 100</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 1</h3>
+                        <img src="Figura1.jpg" alt="Figura 1" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(3)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board3">
+                            <div class="step">
+                                <h4> Paso 1: Análisis de la malla de entrada (Base-Emisor) </h4>
+                                <p>Aplicamos la ley de Kirchhoff:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">2V = I<sub>B</sub> × 40kΩ + 0.65V</div>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="calculation">I<sub>B</sub> = (2V - 0.65V) / 40kΩ = 1.35V / 40000Ω = 0.0338 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de la corriente de colector (I<sub>C</sub>) </h4>
+                                <p>Utilizamos la ganancia de corriente:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.0338 mA = 3.375 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de la corriente de emisor (I<sub>E</sub>) </h4>
+                                <p>Por la ley de corrientes en el transistor:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>C</sub> + I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>E</sub> = 3.375 mA + 0.0338 mA = 3.409 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub></div>
+                                <p>Despejamos V<sub>CE</sub>:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - (I<sub>C</sub> × R<sub>C</sub>)</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 6V - (3.375 mA × 1.2kΩ) = 6V - 4.05V = 1.95 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.034 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 3.375 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 3.409 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 1.95 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA (V<sub>CE</sub> > V<sub>CE_sat</sub>)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(2)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(4)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 4 -->
+            <section id="problem4" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 4</h2>
+                    <p class="problem-statement">En un transistor como el de la figura 1, se ajustan los parámetros a los siguientes valores: V<sub>BB</sub>= 2 V; V<sub>CC</sub>= 8 V; R<sub>B</sub>= 2K0; R<sub>C</sub>= 5K0; V<sub>BE</sub>= 0,65 V; β= 100. Se pide: a) ¿en qué estado se encuentra?; b) calcula todas las intensidades y V<sub>CE</sub>.</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 1</h3>
+                        <img src="Figura1.jpg" alt="Figura 1" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(4)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board4">
+                            <div class="step">
+                                <h4> Paso 1: Análisis de la malla de entrada (Base-Emisor) </h4>
+                                <p>Aplicamos la ley de Kirchhoff:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">2V = I<sub>B</sub> × 2kΩ + 0.65V</div>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="calculation">I<sub>B</sub> = (2V - 0.65V) / 2kΩ = 1.35V / 2000Ω = 0.675 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de la corriente de colector teórica (I<sub>C</sub>) </h4>
+                                <p>Utilizamos la ganancia de corriente:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.675 mA = 67.5 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de la corriente máxima en saturación (I<sub>C_sat</sub>) </h4>
+                                <p>En saturación, el transistor no puede conducir más corriente que:</p>
+                                <div class="formula">I<sub>C_sat</sub> ≈ V<sub>CC</sub> / R<sub>C</sub> = 8V / 5kΩ = 1.6 mA</div>
+                                <p>Comparamos I<sub>C</sub> teórico con I<sub>C_sat</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = 67.5 mA >> I<sub>C_sat</sub> = 1.6 mA</div>
+                                <p>Como I<sub>C</sub> teórico es mucho mayor que I<sub>C_sat</sub>, el transistor está en SATURACIÓN</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de corrientes en saturación </h4>
+                                <p>En saturación, V<sub>CE</sub> ≈ 0V y I<sub>C</sub> = I<sub>C_sat</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = 1.6 mA</div>
+                                <p>Para calcular I<sub>E</sub>, usamos:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></div>
+                                <div class="calculation">I<sub>E</sub> = 0.675 mA + 1.6 mA = 2.275 mA</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>a) El transistor se encuentra en SATURACIÓN</strong></p>
+                                <p><strong>b) I<sub>B</sub> = 0.675 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 1.6 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 2.275 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> ≈ 0 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--warning); font-weight: bold;">En saturación, V<sub>CE</sub> es prácticamente cero y I<sub>C</sub> está limitada por R<sub>C</sub></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(3)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(5)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 5 -->
+            <section id="problem5" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 5</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 2, en el que se dan los datos: V<sub>BB</sub>= 2 V; V<sub>CC</sub>= 6 V; R<sub>C</sub>= 2K0; R<sub>E</sub>= 3K0; V<sub>BE</sub>= 0,65 V; β= 100.</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 2</h3>
+                        <img src="Figura2.jpg" alt="Figura 2" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(5)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board5">
+                            <div class="step">
+                                <h4> Paso 1: Análisis de la malla de entrada (Base-Emisor) </h4>
+                                <p>Para este circuito con resistencia de emisor (R<sub>E</sub>), aplicamos:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Como no tenemos R<sub>B</sub> explícitamente, debemos encontrar otra forma. En este caso, asumimos que V<sub>BB</sub> está conectado directamente a la base.</p>
+                                <p>Relación entre corrientes:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub> = I<sub>B</sub> + β×I<sub>B</sub> = I<sub>B</sub>(1+β) ≈ β×I<sub>B</sub> (cuando β es grande)</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Ecuación de la malla de entrada completa </h4>
+                                <p>Reorganizando la ecuación de la malla de entrada:</p>
+                                <div class="formula">V<sub>BB</sub> = V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">2V = 0.65V + I<sub>E</sub> × 3kΩ</div>
+                                <p>Despejamos I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>E</sub> = (2V - 0.65V) / 3kΩ = 1.35V / 3000Ω = 0.45 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de I<sub>B</sub> e I<sub>C</sub> </h4>
+                                <p>Usamos la relación entre corrientes:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub>(1+β)</div>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="formula">I<sub>B</sub> = I<sub>E</sub> / (1+β)</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = 0.45 mA / (1+100) = 0.45 mA / 101 = 0.00446 mA</div>
+                                <p>Calculamos I<sub>C</sub>:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub> = I<sub>E</sub> - I<sub>B</sub></div>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.00446 mA = 0.446 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Despejamos V<sub>CE</sub>:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - I<sub>C</sub> × R<sub>C</sub> - I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 6V - (0.446 mA × 2kΩ) - (0.45 mA × 3kΩ)</div>
+                                <div class="calculation">V<sub>CE</sub> = 6V - 0.892V - 1.35V = 3.758 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.004 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 0.446 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 0.45 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 3.76 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA (V<sub>CE</sub> > V<sub>CE_sat</sub>)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(4)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(6)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 6 -->
+            <section id="problem6" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 6</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 2, en el que se dan los datos: V<sub>BB</sub>= 1 V; V<sub>CC</sub>= 7 V; R<sub>C</sub>= 1K3; R<sub>E</sub>= 1K0; V<sub>BE</sub>= 0,65 V; β= 100. ¿En qué zona trabaja el transistor?</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 2</h3>
+                        <img src="Figura2.jpg" alt="Figura 2" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(6)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board6">
+                            <div class="step">
+                                <h4> Paso 1: Ecuación de la malla de entrada </h4>
+                                <p>Para este circuito con resistencia de emisor (R<sub>E</sub>):</p>
+                                <div class="formula">V<sub>BB</sub> = V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">1V = 0.65V + I<sub>E</sub> × 1kΩ</div>
+                                <p>Despejamos I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>E</sub> = (1V - 0.65V) / 1kΩ = 0.35V / 1000Ω = 0.35 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>B</sub> e I<sub>C</sub> </h4>
+                                <p>Usamos la relación entre corrientes:</p>
+                                <div class="formula">I<sub>B</sub> = I<sub>E</sub> / (1+β)</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = 0.35 mA / (1+100) = 0.35 mA / 101 = 0.00347 mA</div>
+                                <p>Calculamos I<sub>C</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = β × I<sub>B</sub> = 100 × 0.00347 mA = 0.347 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Despejamos V<sub>CE</sub>:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - I<sub>C</sub> × R<sub>C</sub> - I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 7V - (0.347 mA × 1.3kΩ) - (0.35 mA × 1kΩ)</div>
+                                <div class="calculation">V<sub>CE</sub> = 7V - 0.451V - 0.35V = 6.199 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Verificación del estado del transistor </h4>
+                                <p>Verificamos si el transistor está en zona activa:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>V<sub>CE</sub> = 6.2 V > V<sub>CE_sat</sub> (≈0.2V) ✓</li>
+                                    <li>I<sub>B</sub> > 0 ✓</li>
+                                    <li>V<sub>BE</sub> = 0.65V (valor típico para unión base-emisor polarizada en directa) ✓</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.003 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 0.347 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 0.350 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 6.2 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(5)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(7)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 7 -->
+            <section id="problem7" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 7</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 2, en el que se dan los datos: V<sub>BB</sub>= 3 V; V<sub>CC</sub>= 12 V; R<sub>C</sub>= 2K0; R<sub>E</sub>= 2K0; V<sub>BE</sub>= 0,65 V; β= 100.</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 2</h3>
+                        <img src="Figura2.jpg" alt="Figura 2" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(7)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board7">
+                            <div class="step">
+                                <h4> Paso 1: Ecuación de la malla de entrada </h4>
+                                <p>Para este circuito con resistencia de emisor (R<sub>E</sub>):</p>
+                                <div class="formula">V<sub>BB</sub> = V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">3V = 0.65V + I<sub>E</sub> × 2kΩ</div>
+                                <p>Despejamos I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>E</sub> = (3V - 0.65V) / 2kΩ = 2.35V / 2000Ω = 1.175 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>B</sub> e I<sub>C</sub> </h4>
+                                <p>Usamos la relación entre corrientes:</p>
+                                <div class="formula">I<sub>B</sub> = I<sub>E</sub> / (1+β)</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = 1.175 mA / (1+100) = 1.175 mA / 101 = 0.0116 mA</div>
+                                <p>Calculamos I<sub>C</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = β × I<sub>B</sub> = 100 × 0.0116 mA = 1.163 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Despejamos V<sub>CE</sub>:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - I<sub>C</sub> × R<sub>C</sub> - I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 12V - (1.163 mA × 2kΩ) - (1.175 mA × 2kΩ)</div>
+                                <div class="calculation">V<sub>CE</sub> = 12V - 2.326V - 2.35V = 7.324 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.012 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 1.163 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 1.175 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 7.32 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(6)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(8)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 8 -->
+            <section id="problem8" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 8</h2>
+                    <p class="problem-statement">Resuelve un transistor como el de la figura 2, en el que se dan los datos: V<sub>BB</sub>= 5 V; V<sub>CC</sub>= 7 V; R<sub>C</sub>= 5K0; R<sub>E</sub>= 1K0; V<sub>BE</sub>= 0,65 V; β= 100. ¿En qué estado trabaja el transistor?</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 2</h3>
+                        <img src="Figura2.jpg" alt="Figura 2" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(8)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board8">
+                            <div class="step">
+                                <h4> Paso 1: Ecuación de la malla de entrada </h4>
+                                <p>Para este circuito con resistencia de emisor (R<sub>E</sub>):</p>
+                                <div class="formula">V<sub>BB</sub> = V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">5V = 0.65V + I<sub>E</sub> × 1kΩ</div>
+                                <p>Despejamos I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>E</sub> = (5V - 0.65V) / 1kΩ = 4.35V / 1000Ω = 4.35 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>B</sub> e I<sub>C</sub> teórico </h4>
+                                <p>Usamos la relación entre corrientes:</p>
+                                <div class="formula">I<sub>B</sub> = I<sub>E</sub> / (1+β)</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = 4.35 mA / (1+100) = 4.35 mA / 101 = 3.82 mA</div>
+                                <p>Calculamos I<sub>C</sub> teórico:</p>
+                                <div class="calculation">I<sub>C</sub> = β × I<sub>B</sub> = 100 × 3.82 mA = 382 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de la corriente máxima en saturación </h4>
+                                <p>Calculamos I<sub>C_sat</sub> (corriente máxima posible en saturación):</p>
+                                <div class="formula">I<sub>C_sat</sub> ≈ V<sub>CC</sub> / (R<sub>C</sub> + R<sub>E</sub>) = 7V / (5kΩ + 1kΩ) = 7V / 6kΩ = 1.167 mA</div>
+                                <p>Comparamos I<sub>C</sub> teórico con I<sub>C_sat</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> teórico = 382 mA >> I<sub>C_sat</sub> = 1.167 mA</div>
+                                <p>Como I<sub>C</sub> teórico es mucho mayor que I<sub>C_sat</sub>, el transistor está en SATURACIÓN</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de corrientes en saturación </h4>
+                                <p>En saturación, usamos V<sub>CE</sub> ≈ 0.2V (valor típico) y calculamos I<sub>C</sub>:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Como I<sub>E</sub> ≈ I<sub>C</sub> en saturación (I<sub>B</sub> es grande):</p>
+                                <div class="formula">V<sub>CC</sub> ≈ I<sub>C</sub> × (R<sub>C</sub> + R<sub>E</sub>) + V<sub>CE</sub></div>
+                                <p>Despejamos I<sub>C</sub>:</p>
+                                <div class="formula">I<sub>C</sub> = (V<sub>CC</sub> - V<sub>CE</sub>) / (R<sub>C</sub> + R<sub>E</sub>)</div>
+                                <p>Sustituimos valores (V<sub>CE</sub> = 0.2V):</p>
+                                <div class="calculation">I<sub>C</sub> = (7V - 0.2V) / (5kΩ + 1kΩ) = 6.8V / 6kΩ = 1.133 mA</div>
+                                <p>Como I<sub>E</sub> ≈ I<sub>C</sub> en saturación:</p>
+                                <div class="calculation">I<sub>E</sub> ≈ 1.133 mA</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>El transistor trabaja en SATURACIÓN</strong></p>
+                                <p><strong>I<sub>B</sub> = 3.82 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 0.53 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 4.35 mA</strong></p>
+                                <p style="margin-top: 10px; color: var(--warning); font-weight: bold;">Nota: En saturación, I<sub>C</sub> está limitada por los componentes externos y no por β×I<sub>B</sub></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(7)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(9)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 9 -->
+            <section id="problem9" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 9</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 3, en el que se dan los datos: V<sub>BB</sub>= 1 V; V<sub>CC</sub>= 5 V; R<sub>B</sub>= 1K2; R<sub>C</sub>= 1K0; R<sub>E</sub>= 0K1. V<sub>BE</sub>= 0,65 V; β= 100. ¿En qué estado trabaja el transistor?</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 3</h3>
+                        <img src="Figura3.jpg" alt="Figura 3" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(9)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board9">
+                            <div class="step">
+                                <h4> Paso 1: Análisis de la malla de entrada </h4>
+                                <p>Para este circuito con resistencia de base y emisor:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Relación entre corrientes:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub> = I<sub>B</sub> + β×I<sub>B</sub> = I<sub>B</sub>(1+β)</div>
+                                <p>Sustituimos en la ecuación:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub> + I<sub>B</sub>(1+β) × R<sub>E</sub></div>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub>[R<sub>B</sub> + (1+β)R<sub>E</sub>] + V<sub>BE</sub></div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>B</sub> </h4>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="formula">I<sub>B</sub> = (V<sub>BB</sub> - V<sub>BE</sub>) / [R<sub>B</sub> + (1+β)R<sub>E</sub>]</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = (1V - 0.65V) / [1.2kΩ + (1+100)×0.1kΩ]</div>
+                                <div class="calculation">I<sub>B</sub> = 0.35V / [1.2kΩ + 101×0.1kΩ] = 0.35V / [1.2kΩ + 10.1kΩ] = 0.35V / 11.3kΩ = 0.031 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de I<sub>C</sub> e I<sub>E</sub> </h4>
+                                <p>Calculamos I<sub>C</sub>:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub></div>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.031 mA = 3.097 mA</div>
+                                <p>Calculamos I<sub>E</sub>:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub> = I<sub>B</sub>(1+β)</div>
+                                <div class="calculation">I<sub>E</sub> = 0.031 mA + 3.097 mA = 3.128 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Despejamos V<sub>CE</sub>:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - I<sub>C</sub> × R<sub>C</sub> - I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 5V - (3.097 mA × 1kΩ) - (3.128 mA × 0.1kΩ)</div>
+                                <div class="calculation">V<sub>CE</sub> = 5V - 3.097V - 0.3128V = 1.5902 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 5: Verificación del estado del transistor </h4>
+                                <p>Verificamos si el transistor está en zona activa:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>V<sub>CE</sub> = 1.59 V > V<sub>CE_sat</sub> (≈0.2V) ✓</li>
+                                    <li>I<sub>B</sub> > 0 ✓</li>
+                                    <li>V<sub>BE</sub> = 0.65V (valor típico para unión base-emisor polarizada en directa) ✓</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.031 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 3.097 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 3.128 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 1.59 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(8)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(10)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 10 -->
+            <section id="problem10" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 10</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 3, en el que se dan los datos: V<sub>BB</sub>= 1'5 V; V<sub>CC</sub>= 6 V; R<sub>B</sub>= 5K; R<sub>C</sub>= 1K0; R<sub>E</sub>= 0K3. V<sub>BE</sub>= 0,65 V; β= 100. ¿En qué estado trabaja el transistor?</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 3</h3>
+                        <img src="Figura3.jpg" alt="Figura 3" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(10)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board10">
+                            <div class="step">
+                                <h4> Paso 1: Cálculo de I<sub>B</sub> </h4>
+                                <p>Usamos la fórmula para este tipo de circuito:</p>
+                                <div class="formula">I<sub>B</sub> = (V<sub>BB</sub> - V<sub>BE</sub>) / [R<sub>B</sub> + (1+β)R<sub>E</sub>]</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = (1.5V - 0.65V) / [5kΩ + (1+100)×0.3kΩ]</div>
+                                <div class="calculation">I<sub>B</sub> = 0.85V / [5kΩ + 101×0.3kΩ] = 0.85V / [5kΩ + 30.3kΩ] = 0.85V / 35.3kΩ = 0.0241 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>C</sub> e I<sub>E</sub> </h4>
+                                <p>Calculamos I<sub>C</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = β × I<sub>B</sub> = 100 × 0.0241 mA = 2.408 mA</div>
+                                <p>Calculamos I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub> = 0.0241 mA + 2.408 mA = 2.432 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - I<sub>C</sub> × R<sub>C</sub> - I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 6V - (2.408 mA × 1kΩ) - (2.432 mA × 0.3kΩ)</div>
+                                <div class="calculation">V<sub>CE</sub> = 6V - 2.408V - 0.7296V = 2.8624 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Verificación del estado </h4>
+                                <p>Verificamos si el transistor está en zona activa:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>V<sub>CE</sub> = 2.86 V > V<sub>CE_sat</sub> (≈0.2V) ✓</li>
+                                    <li>I<sub>B</sub> > 0 ✓</li>
+                                    <li>V<sub>BE</sub> = 0.65V adecuado ✓</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.024 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 2.408 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 2.432 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 2.86 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(9)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(11)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 11 -->
+            <section id="problem11" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 11</h2>
+                    <p class="problem-statement">Resuelve el transistor de la figura 3, en el que se dan los datos: V<sub>BB</sub>= 2'5 V; V<sub>CC</sub>= 5 V; R<sub>B</sub>= 5K0; R<sub>C</sub>= 0K5; R<sub>E</sub>= 0K5. V<sub>BE</sub>= 0,65 V; β= 100. ¿En qué estado trabaja el transistor?</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 3</h3>
+                        <img src="Figura3.jpg" alt="Figura 3" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(11)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board11">
+                            <div class="step">
+                                <h4> Paso 1: Cálculo de I<sub>B</sub> </h4>
+                                <p>Usamos la fórmula para este tipo de circuito:</p>
+                                <div class="formula">I<sub>B</sub> = (V<sub>BB</sub> - V<sub>BE</sub>) / [R<sub>B</sub> + (1+β)R<sub>E</sub>]</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = (2.5V - 0.65V) / [5kΩ + (1+100)×0.5kΩ]</div>
+                                <div class="calculation">I<sub>B</sub> = 1.85V / [5kΩ + 101×0.5kΩ] = 1.85V / [5kΩ + 50.5kΩ] = 1.85V / 55.5kΩ = 0.0333 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>C</sub> e I<sub>E</sub> </h4>
+                                <p>Calculamos I<sub>C</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = β × I<sub>B</sub> = 100 × 0.0333 mA = 3.333 mA</div>
+                                <p>Calculamos I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub> = 0.0333 mA + 3.333 mA = 3.3663 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de V<sub>CE</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CE</sub> = V<sub>CC</sub> - I<sub>C</sub> × R<sub>C</sub> - I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">V<sub>CE</sub> = 5V - (3.333 mA × 0.5kΩ) - (3.3663 mA × 0.5kΩ)</div>
+                                <div class="calculation">V<sub>CE</sub> = 5V - 1.6665V - 1.68315V = 1.65035 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Verificación del estado </h4>
+                                <p>Verificamos si el transistor está en zona activa:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>V<sub>CE</sub> = 1.65 V > V<sub>CE_sat</sub> (≈0.2V) ✓</li>
+                                    <li>I<sub>B</sub> > 0 ✓</li>
+                                    <li>V<sub>BE</sub> = 0.65V adecuado ✓</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>I<sub>B</sub> = 0.033 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 3.333 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 3.367 mA</strong></p>
+                                <p><strong>V<sub>CE</sub> = 1.65 V</strong></p>
+                                <p style="margin-top: 10px; color: var(--success); font-weight: bold;">El transistor trabaja en ZONA ACTIVA</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(10)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(12)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 12 -->
+            <section id="problem12" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 12</h2>
+                    <p class="problem-statement">En el transistor de la figura 1, se introduce R<sub>B</sub>= 10K0 y R<sub>C</sub>= 0K3. Si se polariza con V<sub>BB</sub>= 3 V y V<sub>CC</sub>= 6 V, se pide: a) ¿en qué estado se encuentra el transistor?; b) calcula las corrientes de base, de emisor y de colector. Datos: V<sub>BE</sub>= 0'65 V.</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 1</h3>
+                        <img src="Figura1.jpg" alt="Figura 1" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(12)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board12">
+                            <div class="step">
+                                <h4> Paso 1: Cálculo de I<sub>B</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff para la malla de entrada:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">3V = I<sub>B</sub> × 10kΩ + 0.65V</div>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="calculation">I<sub>B</sub> = (3V - 0.65V) / 10kΩ = 2.35V / 10000Ω = 0.235 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>C</sub> teórico </h4>
+                                <p>Calculamos I<sub>C</sub> teórico usando β=100:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub></div>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.235 mA = 23.5 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de I<sub>C_sat</sub> </h4>
+                                <p>Calculamos la corriente máxima posible en saturación:</p>
+                                <div class="formula">I<sub>C_sat</sub> ≈ V<sub>CC</sub> / R<sub>C</sub> = 6V / 0.3kΩ = 20 mA</div>
+                                <p>Comparamos I<sub>C</sub> teórico con I<sub>C_sat</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> teórico = 23.5 mA > I<sub>C_sat</sub> = 20 mA</div>
+                                <p>Como I<sub>C</sub> teórico > I<sub>C_sat</sub>, el transistor está en SATURACIÓN</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de corrientes en saturación </h4>
+                                <p>En saturación, V<sub>CE</sub> ≈ 0V y I<sub>C</sub> = I<sub>C_sat</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> = 20 mA</div>
+                                <p>Para calcular I<sub>E</sub> en saturación, usamos:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></div>
+                                <div class="calculation">I<sub>E</sub> = 0.235 mA + 20 mA = 20.235 mA</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>a) El transistor se encuentra en SATURACIÓN</strong></p>
+                                <p><strong>b) I<sub>B</sub> = 0.235 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 20 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 20.235 mA</strong></p>
+                                <p style="margin-top: 10px; color: var(--warning); font-weight: bold;">En saturación, I<sub>C</sub> está determinado por los componentes externos, no por β×I<sub>B</sub></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(11)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(13)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 13 -->
+            <section id="problem13" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 13</h2>
+                    <p class="problem-statement">En el transistor de la figura 1, se introduce R<sub>B</sub>= 3K0 y R<sub>C</sub>= 0K5. Si se polariza con V<sub>BB</sub>= 1 V y V<sub>CC</sub>= 5 V, se pide: a) ¿en qué estado se encuentra el transistor?; b) calcula las corrientes de base, de emisor y de colector. Datos: V<sub>BE</sub>= 0'65 V; considera V<sub>CE</sub>= 0'2 V en saturación.</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 1</h3>
+                        <img src="Figura1.jpg" alt="Figura 1" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(13)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board13">
+                            <div class="step">
+                                <h4> Paso 1: Cálculo de I<sub>B</sub> </h4>
+                                <p>Aplicamos la ley de Kirchhoff para la malla de entrada:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="formula">1V = I<sub>B</sub> × 3kΩ + 0.65V</div>
+                                <p>Despejamos I<sub>B</sub>:</p>
+                                <div class="calculation">I<sub>B</sub> = (1V - 0.65V) / 3kΩ = 0.35V / 3000Ω = 0.117 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>C</sub> teórico </h4>
+                                <p>Calculamos I<sub>C</sub> teórico usando β=100:</p>
+                                <div class="formula">I<sub>C</sub> = β × I<sub>B</sub></div>
+                                <div class="calculation">I<sub>C</sub> = 100 × 0.117 mA = 11.7 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de I<sub>C_sat</sub> </h4>
+                                <p>Calculamos la corriente máxima posible en saturación:</p>
+                                <div class="formula">I<sub>C_sat</sub> = (V<sub>CC</sub> - V<sub>CE_sat</sub>) / R<sub>C</sub></div>
+                                <p>Dado que V<sub>CE_sat</sub> = 0.2V:</p>
+                                <div class="calculation">I<sub>C_sat</sub> = (5V - 0.2V) / 0.5kΩ = 4.8V / 500Ω = 9.6 mA</div>
+                                <p>Comparamos I<sub>C</sub> teórico con I<sub>C_sat</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> teórico = 11.7 mA > I<sub>C_sat</sub> = 9.6 mA</div>
+                                <p>Como I<sub>C</sub> teórico > I<sub>C_sat</sub>, el transistor está en SATURACIÓN</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo de corrientes en saturación </h4>
+                                <p>En saturación:</p>
+                                <div class="calculation">I<sub>C</sub> = I<sub>C_sat</sub> = 9.6 mA</div>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></div>
+                                <div class="calculation">I<sub>E</sub> = 0.117 mA + 9.6 mA = 9.717 mA</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>a) El transistor se encuentra en SATURACIÓN</strong></p>
+                                <p><strong>b) I<sub>B</sub> = 0.117 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 9.6 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 9.717 mA</strong></p>
+                                <p style="margin-top: 10px; color: var(--warning); font-weight: bold;">En saturación, V<sub>CE</sub> = 0.2V y I<sub>C</sub> está determinado por los componentes externos y V<sub>CE_sat</sub></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(12)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(14)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 14 -->
+            <section id="problem14" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 14</h2>
+                    <p class="problem-statement">En el transistor de la figura 2, se polariza con V<sub>BB</sub>= 3 V y V<sub>CC</sub>= 3 V, y se monta R<sub>C</sub>= 2K5 y R<sub>E</sub>= 1K5. Se pide: a) ¿en qué estado se encuentra el transistor?; b) calcula las corrientes de base, de emisor y de colector. Datos: V<sub>BE</sub>= 0'65 V; considera V<sub>CE</sub>= 0'2 V en saturación.</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 2</h3>
+                        <img src="Figura2.jpg" alt="Figura 2" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(14)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board14">
+                            <div class="step">
+                                <h4> Paso 1: Ecuación para I<sub>E</sub> en saturación </h4>
+                                <p>En saturación, V<sub>CE</sub> = 0.2V. Aplicamos la ley de Kirchhoff en la malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>En saturación, I<sub>C</sub> ≈ I<sub>E</sub> (porque β es bajo en saturación):</p>
+                                <div class="formula">V<sub>CC</sub> ≈ I<sub>E</sub> × (R<sub>C</sub> + R<sub>E</sub>) + V<sub>CE</sub></div>
+                                <p>Despejamos I<sub>E</sub>:</p>
+                                <div class="formula">I<sub>E</sub> = (V<sub>CC</sub> - V<sub>CE</sub>) / (R<sub>C</sub> + R<sub>E</sub>)</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>E</sub> = (3V - 0.2V) / (2.5kΩ + 1.5kΩ) = 2.8V / 4kΩ = 0.7 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>C</sub> en saturación </h4>
+                                <p>En saturación, I<sub>C</sub> ≈ I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>C</sub> ≈ 0.7 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Cálculo de I<sub>B</sub> usando la malla de entrada </h4>
+                                <p>Aplicamos la ley de Kirchhoff en la malla de entrada:</p>
+                                <div class="formula">V<sub>BB</sub> = V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">3V = 0.65V + I<sub>E</sub> × 1.5kΩ</div>
+                                <div class="calculation">I<sub>E</sub> = (3V - 0.65V) / 1.5kΩ = 2.35V / 1500Ω = 1.567 mA</div>
+                                <p>Como este valor de I<sub>E</sub> (1.567 mA) es mayor que el calculado en saturación (0.7 mA), el transistor está en SATURACIÓN.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo preciso de corrientes en saturación </h4>
+                                <p>Usamos I<sub>E</sub> = 1.567 mA (de la malla de entrada) para hallar I<sub>C</sub> en saturación:</p>
+                                <p>De la malla de salida con V<sub>CE</sub> = 0.2V:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <div class="formula">3V = I<sub>C</sub> × 2.5kΩ + 0.2V + 1.567 mA × 1.5kΩ</div>
+                                <div class="formula">3V = I<sub>C</sub> × 2.5kΩ + 0.2V + 2.3505V</div>
+                                <div class="formula">I<sub>C</sub> × 2.5kΩ = 3V - 0.2V - 2.3505V = 0.4495V</div>
+                                <div class="calculation">I<sub>C</sub> = 0.4495V / 2.5kΩ = 0.18 mA</div>
+                                <p>Finalmente, calculamos I<sub>B</sub>:</p>
+                                <div class="formula">I<sub>B</sub> = I<sub>E</sub> - I<sub>C</sub></div>
+                                <div class="calculation">I<sub>B</sub> = 1.567 mA - 0.18 mA = 1.387 mA</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>a) El transistor se encuentra en SATURACIÓN</strong></p>
+                                <p><strong>b) I<sub>B</sub> = 1.387 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 0.180 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 1.567 mA</strong></p>
+                                <p style="margin-top: 10px; color: var(--warning); font-weight: bold;">En saturación, el transistor no sigue la relación I<sub>C</sub> = β×I<sub>B</sub></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(13)">← Problema anterior</button>
+                        <button class="btn" onclick="showProblem(15)">Siguiente problema →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problem 15 -->
+            <section id="problem15" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Problema 15</h2>
+                    <p class="problem-statement">En el transistor de la figura 3, se polariza con V<sub>BB</sub>= 3 V y V<sub>CC</sub>= 2 V, y se montan R<sub>B</sub>= R<sub>C</sub>= R<sub>E</sub>= 1K0. Se pide: a) ¿en qué estado se encuentra el transistor?; b) calcula las corrientes de base, de emisor y de colector. Datos: V<sub>BE</sub>= 0'65 V; considera V<sub>CE</sub>= 0'2 V en saturación.</p>
+                    
+                    <div class="circuit-container">
+                        <h3 style="color: var(--primary);">Figura 3</h3>
+                        <img src="Figura3.jpg" alt="Figura 3" class="circuit-image">
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(15)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board15">
+                            <div class="step">
+                                <h4> Paso 1: Cálculo de I<sub>B</sub> asumiendo activa </h4>
+                                <p>Usamos la fórmula para este tipo de circuito:</p>
+                                <div class="formula">I<sub>B</sub> = (V<sub>BB</sub> - V<sub>BE</sub>) / [R<sub>B</sub> + (1+β)R<sub>E</sub>]</div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>B</sub> = (3V - 0.65V) / [1kΩ + (1+100)×1kΩ] = 2.35V / [1kΩ + 101kΩ] = 2.35V / 102kΩ = 0.023 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 2: Cálculo de I<sub>C</sub> teórico </h4>
+                                <p>Calculamos I<sub>C</sub> teórico:</p>
+                                <div class="calculation">I<sub>C</sub> = β × I<sub>B</sub> = 100 × 0.023 mA = 2.3 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 3: Verificación con V<sub>CC</sub> </h4>
+                                <p>Verificamos si este I<sub>C</sub> es posible con el voltaje de alimentación:</p>
+                                <p>Máximo I<sub>C</sub> posible (asumiendo V<sub>CE</sub> = 0):</p>
+                                <div class="formula">IC_max = V<sub>CC</sub> / (R<sub>C</sub> + R<sub>E</sub>) = 2V / (1kΩ + 1kΩ) = 1 mA</div>
+                                <p>Como I<sub>C</sub> teórico (2.3 mA) > I<sub>C_max</sub> (1 mA), el transistor está en SATURACIÓN</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 4: Cálculo en saturación </h4>
+                                <p>En saturación, V<sub>CE</sub> = 0.2V. Aplicamos ley de Kirchhoff en malla de salida:</p>
+                                <div class="formula">V<sub>CC</sub> = I<sub>C</sub> × R<sub>C</sub> + V<sub>CE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <p>Como I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub>:</p>
+                                <div class="formula">2V = I<sub>C</sub> × 1kΩ + 0.2V + (I<sub>B</sub> + I<sub>C</sub>) × 1kΩ</div>
+                                <div class="formula">2V = I<sub>C</sub> × 1kΩ + 0.2V + I<sub>B</sub> × 1kΩ + I<sub>C</sub> × 1kΩ</div>
+                                <div class="formula">1.8V = I<sub>B</sub> × 1kΩ + I<sub>C</sub> × 2kΩ</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 5: Ecuación de la malla de entrada en saturación </h4>
+                                <p>Aplicamos ley de Kirchhoff en malla de entrada:</p>
+                                <div class="formula">V<sub>BB</sub> = I<sub>B</sub> × R<sub>B</sub> + V<sub>BE</sub> + I<sub>E</sub> × R<sub>E</sub></div>
+                                <div class="formula">3V = I<sub>B</sub> × 1kΩ + 0.65V + (I<sub>B</sub> + I<sub>C</sub>) × 1kΩ</div>
+                                <div class="formula">3V = I<sub>B</sub> × 1kΩ + 0.65V + I<sub>B</sub> × 1kΩ + I<sub>C</sub> × 1kΩ</div>
+                                <div class="formula">2.35V = I<sub>B</sub> × 2kΩ + I<sub>C</sub> × 1kΩ</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Paso 6: Resolución del sistema de ecuaciones </h4>
+                                <p>Tenemos el sistema:</p>
+                                <div class="formula">1.8V = I<sub>B</sub> × 1kΩ + I<sub>C</sub> × 2kΩ</div>
+                                <div class="formula">2.35V = I<sub>B</sub> × 2kΩ + I<sub>C</sub> × 1kΩ</div>
+                                <p>Resolviendo el sistema (multiplicando la primera ecuación por 2 y restando):</p>
+                                <div class="calculation">3.6V = I<sub>B</sub> × 2kΩ + I<sub>C</sub> × 4kΩ</div>
+                                <div class="calculation">2.35V = I<sub>B</sub> × 2kΩ + I<sub>C</sub> × 1kΩ</div>
+                                <div class="calculation">1.25V = I<sub>C</sub> × 3kΩ</div>
+                                <div class="calculation">I<sub>C</sub> = 1.25V / 3kΩ = 0.417 mA</div>
+                                <p>Sustituyendo en la segunda ecuación:</p>
+                                <div class="calculation">2.35V = I<sub>B</sub> × 2kΩ + 0.417 mA × 1kΩ</div>
+                                <div class="calculation">2.35V = I<sub>B</sub> × 2kΩ + 0.417V</div>
+                                <div class="calculation">I<sub>B</sub> × 2kΩ = 1.933V</div>
+                                <div class="calculation">I<sub>B</sub> = 1.933V / 2kΩ = 0.967 mA</div>
+                                <p>Calculamos I<sub>E</sub>:</p>
+                                <div class="calculation">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub> = 0.967 mA + 0.417 mA = 1.384 mA</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final:</h3>
+                                <p><strong>a) El transistor se encuentra en SATURACIÓN</strong></p>
+                                <p><strong>b) I<sub>B</sub> = 0.967 mA</strong></p>
+                                <p><strong>I<sub>C</sub> = 0.417 mA</strong></p>
+                                <p><strong>I<sub>E</sub> = 1.383 mA</strong></p>
+                                <p style="margin-top: 10px; color: var(--warning); font-weight: bold;">En saturación, el transistor no sigue I<sub>C</sub> = β×I<sub>B</sub> debido a la limitación de voltaje</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(14)">← Problema anterior</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function showHome() {
+            // Hide all content sections
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Show home section
+            document.getElementById('home').classList.add('active');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function showProblem(problemNumber) {
+            // Hide all content sections
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Show selected problem section
+            document.getElementById('problem' + problemNumber).classList.add('active');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function toggleBoard(problemNumber) {
+            const board = document.getElementById('board' + problemNumber);
+            if (board) {
+                board.classList.toggle('active');
+                
+                // Change button text based on state
+                const button = event.target;
+                if (board.classList.contains('active')) {
+                    button.textContent = 'Ocultar resolución';
+                    button.style.background = '#1e40af';
+                } else {
+                    button.textContent = 'Modo Pizarra - Ver resolución paso a paso';
+                    button.style.background = '';
+                }
+            }
+        }
+        
+        // Initialize with home section active
+        document.addEventListener('DOMContentLoaded', function() {
+            showHome();
+        });
+    </script>
+</body>
+</html>
