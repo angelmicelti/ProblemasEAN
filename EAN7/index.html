@@ -145,32 +145,53 @@
             gap: 1.5rem;
         }
 
-        /* Generic placeholder for images since we don't have the files */
-        .circuit-placeholder {
-            width: 100%;
-            max-width: 500px;
-            height: 300px;
-            background-color: #f3f4f6;
-            border: 2px dashed var(--gray);
-            border-radius: var(--border-radius);
+        .circuit-row {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             justify-content: center;
-            color: var(--gray);
-            font-weight: bold;
-            position: relative;
-        }
-        
-        .circuit-placeholder::after {
-            content: "Imagen del circuito (Consultar PDF original)";
-            position: absolute;
-            bottom: 10px;
-            font-size: 0.8rem;
+            gap: 20px;
+            width: 100%;
         }
 
         .circuit-image {
-            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--primary);
+        }
+
+        .circuit-single {
             max-width: 500px;
+            width: 100%;
+        }
+
+        .circuit-small {
+            max-width: 250px;
+            width: 100%;
+        }
+
+        .circuit-multiple {
+            max-width: 200px;
+            width: 100%;
+        }
+
+        .display-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .display-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .display-image {
+            max-width: 250px;
+            width: 100%;
             border-radius: var(--border-radius);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 2px solid var(--primary);
@@ -344,6 +365,31 @@
             .btn {
                 width: 100%;
             }
+            .circuit-multiple {
+                max-width: 150px;
+            }
+            .circuit-small {
+                max-width: 200px;
+            }
+            .circuit-row {
+                gap: 10px;
+            }
+            .display-container {
+                flex-direction: column;
+            }
+            .display-image {
+                max-width: 300px;
+                align-self: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .circuit-multiple {
+                max-width: 120px;
+            }
+            .circuit-small {
+                max-width: 180px;
+            }
         }
     </style>
 </head>
@@ -466,8 +512,11 @@
                     <p class="problem-statement">En los siguientes circuitos, indica qué sucede con las bombillas que aparecen en ellos, teniendo en cuenta la posición de los diodos.</p>
                     
                     <div class="circuit-container">
-                        <div class="circuit-placeholder" style="background-image: url('Circuito1.jpg'); background-size: contain; background-repeat: no-repeat; background-position: center;">
-                            <span>(Ver Figura Circuito 1, a, b, c, d en PDF)</span>
+                        <div class="circuit-row">
+                            <img src="img/EAN7_Ca.jpg" alt="Circuito a" class="circuit-image circuit-multiple">
+                            <img src="img/EAN7_Cb.jpg" alt="Circuito b" class="circuit-image circuit-multiple">
+                            <img src="img/EAN7_Cc.jpg" alt="Circuito c" class="circuit-image circuit-multiple">
+                            <img src="img/EAN7_Cd.jpg" alt="Circuito d" class="circuit-image circuit-multiple">
                         </div>
                     </div>
                     
@@ -480,20 +529,25 @@
                                 <p>Un diodo permite el paso de corriente solo cuando está <strong>polarizado en directa</strong> (Ánodo positivo, Cátodo negativo). Si está en inversa, actúa como un interruptor abierto.</p>
                             </div>
                             <div class="step">
-                                <h4>Análisis Circuito 1</h4>
+                                <h4>Análisis Circuito "a"</h4>
                                 <p><strong>Rama Izquierda:</strong> El diodo D1 está en inversa (el positivo de la pila de 9V llega al cátodo/barra). No pasa corriente por BL1.</p>
                                 <p><strong>Rama Derecha:</strong> El diodo D2 está en directa (positivo al ánodo/triángulo). Pasa corriente por BL2.</p>
                                 <div class="calculation">Resultado: Solo se enciende BL2.</div>
                             </div>
                             <div class="step">
-                                <h4>Análisis Circuito "a"</h4>
+                                <h4>Análisis Circuito "b"</h4>
                                 <p>Es un circuito serie. D1 está en directa, pero D2 está en inversa.</p>
                                 <div class="calculation">Resultado: No se enciende ninguna bombilla (circuito abierto por D2).</div>
                             </div>
-                             <div class="step">
-                                <h4>Análisis Circuito "c" (Paralelo)</h4>
+                            <div class="step">
+                                <h4>Análisis Circuito "c"</h4>
                                 <p>La corriente se divide. D1 está en directa. D2 está en inversa.</p>
                                 <div class="calculation">Resultado: Se enciende BL1. BL2 permanece apagada.</div>
+                            </div>
+                            <div class="step">
+                                <h4>Análisis Circuito "d"</h4>
+                                <p>Ambos diodos están en paralelo con sus respectivas bombillas y ambos están polarizados en directa.</p>
+                                <div class="calculation">Resultado: Se encienden ambas bombillas BL1 y BL2.</div>
                             </div>
                         </div>
                     </div>
@@ -556,6 +610,10 @@
                     <h2 class="problem-title">Problema 3</h2>
                     <p class="problem-statement">En el circuito 2 se ha colocado un diodo de silicio (V<sub>d</sub>=0,7V), fuente de 9V y resistencia de 10K. ¿Cuál es la intensidad que lo atraviesa? ¿Qué tensión hay en la resistencia?</p>
                     
+                    <div class="circuit-container">
+                        <img src="img/EAN7_C2.jpg" alt="Circuito 2" class="circuit-image circuit-small">
+                    </div>
+
                     <button class="btn btn-board" onclick="toggleBoard(3)">Modo Pizarra - Ver resolución paso a paso</button>
                     
                     <div class="board-mode">
@@ -601,6 +659,10 @@
                     <h2 class="problem-title">Problema 4</h2>
                     <p class="problem-statement">Si en el mismo circuito que en el ejercicio anterior colocamos dos diodos más en serie (Total: 3 diodos de silicio), ¿cuál será ahora la intensidad que pase por el circuito?</p>
                     
+                    <div class="circuit-container">
+                        <img src="img/EAN7_C2.jpg" alt="Circuito 2" class="circuit-image circuit-small">
+                    </div>
+
                     <button class="btn btn-board" onclick="toggleBoard(4)">Modo Pizarra - Ver resolución paso a paso</button>
                     
                     <div class="board-mode">
@@ -644,7 +706,7 @@
                     <p class="problem-statement">Calcula la intensidad que pasa por el circuito 3, si hemos colocado en él un diodo de germanio (V<sub>diodo</sub>=0,4V). Datos del esquema: Fuente 6V, R1=4.7K, R2=2.2K en serie.</p>
                     
                     <div class="circuit-container">
-                        <div class="circuit-placeholder"><span>Ver "Circuito 3" en PDF</span></div>
+                        <img src="img/EAN7_C3.jpg" alt="Circuito 3" class="circuit-image circuit-small">
                     </div>
 
                     <button class="btn btn-board" onclick="toggleBoard(5)">Modo Pizarra - Ver resolución paso a paso</button>
@@ -734,7 +796,7 @@
                     <p class="problem-statement">Resuelve el circuito 4, en el que se ha colocado un diodo de germanio y un LED verde. Datos: Vcc=6V. Rama 1: R=500Ω + LED Verde. Rama 2: R=3.3K + R=1.1K + Diodo Germanio.</p>
                     
                     <div class="circuit-container">
-                        <div class="circuit-placeholder"><span>Ver "Circuito 4" en PDF</span></div>
+                        <img src="img/EAN7_C4.jpg" alt="Circuito 4" class="circuit-image circuit-single">
                     </div>
 
                     <button class="btn btn-board" onclick="toggleBoard(7)">Modo Pizarra - Ver resolución paso a paso</button>
@@ -782,8 +844,12 @@
              <section id="problem8" class="content">
                 <div class="problem-container">
                     <h2 class="problem-title">Problema 8 (Semáforo)</h2>
-                    <p class="problem-statement">El circuito 5 corresponde a un semáforo (Vcc=4.5V). Calcula la intensidad que pasa por cada LED y la potencia suministrada por la pila si todos se encienden a la vez. <br>Datos: Rojo (R=160Ω), Amarillo (R=150Ω), Verde (R=120Ω).</p>
+                    <p class="problem-statement">El montaje del circuito 5 corresponde a un semáforo que vuestros compañeros de 3º van a construir en su último proyecto. Calcula la intensidad que pasa por cada LED, así como la potencia suministrada por la pila si las tres luces se encendieran simultáneamente.</p>
                     
+                    <div class="circuit-container">
+                        <img src="img/EAN7_C5.jpg" alt="Circuito 5 - Semáforo" class="circuit-image circuit-single">
+                    </div>
+
                     <button class="btn btn-board" onclick="toggleBoard(8)">Modo Pizarra - Ver resolución paso a paso</button>
                     
                     <div class="board-mode">
@@ -846,8 +912,14 @@
             <section id="problem9" class="content">
                 <div class="problem-container">
                     <h2 class="problem-title">Problema 9</h2>
-                    <p class="problem-statement">Un display de 7 segmentos está formado por 7 LEDs rojos, con resistencias de 380Ω cada uno. ¿Cuál será la potencia consumida por este display conectado a 9V?</p>
                     
+                    <div class="display-container">
+                        <div class="display-text">
+                            <p class="problem-statement">Un display de 7 segmentos está formado por siete ledes de color rojo, protegidos por otras tantas resistencias de polarización de 380 Ω. ¿Cuál será la potencia consumida por este display cuando se conecta a una fuente de alimentación de 9 voltios?</p>
+                        </div>
+                        <img src="img/Display7Segmentos.jpg" alt="Display de 7 segmentos" class="display-image">
+                    </div>
+
                     <button class="btn btn-board" onclick="toggleBoard(9)">Modo Pizarra - Ver resolución paso a paso</button>
                     
                     <div class="board-mode">
@@ -887,8 +959,12 @@
              <section id="problem10" class="content">
                 <div class="problem-container">
                     <h2 class="problem-title">Problema 10</h2>
-                    <p class="problem-statement">Circuito 6: Calcula intensidades. Vcc=6V. Bombilla (BL1) en serie con un bloque paralelo que tiene: Rama Izq (R=2Ω), Rama Der (LED Amarillo + R=200Ω). ¿Cuál es la resistencia mínima para que no se queme el LED?</p>
+                    <p class="problem-statement">Calcula las intensidades que pasan por los diferentes puntos del circuito 6. ¿Cuál es la resistencia mínima que habría que colocar para que no se quemara el LED amarillo?</p>
                     
+                    <div class="circuit-container">
+                        <img src="img/EAN7_C6.jpg" alt="Circuito 6" class="circuit-image circuit-single">
+                    </div>
+
                     <button class="btn btn-board" onclick="toggleBoard(10)">Modo Pizarra - Ver resolución paso a paso</button>
                     
                     <div class="board-mode">
@@ -928,8 +1004,12 @@
              <section id="problem11" class="content">
                 <div class="problem-container">
                     <h2 class="problem-title">Problema 11</h2>
-                    <p class="problem-statement">En el circuito 7 (Fuente 9V, LED Rojo), ¿qué resistencia habrá que colocar para que no se queme el LED?</p>
+                    <p class="problem-statement">En el circuito 7, ¿qué resistencia habrá que colocar para que no se queme el LED rojo?</p>
                     
+                    <div class="circuit-container">
+                        <img src="img/EAN7_C7.jpg" alt="Circuito 7" class="circuit-image circuit-single">
+                    </div>
+
                     <button class="btn btn-board" onclick="toggleBoard(11)">Modo Pizarra - Ver resolución paso a paso</button>
                     
                     <div class="board-mode">
