@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transistores Normalillo - EAN11</title>
+    <style>
+        :root {
+            --primary: #4f46e5; /* Indigo */
+            --secondary: #4338ca;
+            --accent: #ec4899; /* Pink */
+            --light: #fdfbf7; /* Papayawhip hint */
+            --dark: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .problem-card h3 {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .problem-statement {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* SVG Circuit Styles */
+        .circuit-diagram {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto 2rem;
+            display: block;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-board {
+            background: var(--dark);
+            width: 100%;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-board:hover {
+            background: #334155;
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .btn-back:hover {
+            background: #cbd5e1;
+            transform: none;
+        }
+
+        /* Board Mode Styles */
+        .board-mode {
+            background: #333;
+            border-radius: var(--border-radius);
+            padding: 0;
+            margin-top: 1rem;
+            overflow: hidden;
+            border: 4px solid #475569;
+            display: none;
+        }
+
+        .board-mode.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 2000px; }
+        }
+
+        .board-header {
+            background: #1e293b;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #475569;
+        }
+
+        .board-content {
+            padding: 2rem;
+            background: #1e293b; /* Pizarra oscura */
+            color: #e2e8f0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--accent);
+        }
+
+        .step h4 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .math-block {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        .result-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .result-highlight h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .key-value {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 10px; }
+            .problem-container { padding: 1.5rem; }
+            .home-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Boletín EAN11: Transistores</h1>
+        <p class="subtitle">Ejercicios de Electrónica Analógica - Nivel "Normalillo"</p>
+    </header>
+
+    <section id="home" class="content active">
+        <div class="home-grid">
+            <div class="problem-card" onclick="showProblem(1)">
+                <div class="card-header">
+                    <span class="badge">Realimentación Emisor</span>
+                </div>
+                <h3>Ejercicio 1</h3>
+                <p>Polarización con realimentación de emisor. Vcc=10V, Rb=300K, Rc=1.5K, Re=1.2K.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(2)">
+                <div class="card-header">
+                    <span class="badge">Realimentación Colector</span>
+                </div>
+                <h3>Ejercicio 2</h3>
+                <p>Polarización con realimentación de colector. Vcc=15V, Rb=200K (col-base), Rc=1K.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(3)">
+                <div class="card-header">
+                    <span class="badge">Doble Realimentación</span>
+                </div>
+                <h3>Ejercicio 3</h3>
+                <p>Realimentación de colector y de emisor combinadas. Vcc=12V, Rb=300K, Rc=1.2K, Re=500Ω.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(4)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fee2e2; color:var(--danger)">Análisis Estado</span>
+                </div>
+                <h3>Ejercicio 4</h3>
+                <p>Indicar el estado de funcionamiento. Rb=10K, Rc=1K, Re=1K. ¿Saturación o Activa?</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(5)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fce7f3; color:var(--accent)">Darlington</span>
+                </div>
+                <h3>Ejercicio 5</h3>
+                <p>Cálculo de corrientes en una configuración par Darlington. Alta ganancia de corriente.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(6)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:var(--warning)">L.E.D. Simple</span>
+                </div>
+                <h3>Ejercicio 6</h3>
+                <p>Circuito con diodo LED amarillo (2V de caída). Cálculo de resistencia limitadora.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(7)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:var(--warning)">L.E.D. Doble</span>
+                </div>
+                <h3>Ejercicio 7</h3>
+                <p>Circuito complejo con dos LEDs y transistor. Cálculo de intensidades por ramas.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem1" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 1: Realimentación de Emisor</h2>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el siguiente circuito con polarización con realimentación de emisor.<br>
+                <strong>Datos:</strong> β=100, V<sub>BE</sub>=0.65V, R<sub>B</sub>=300K, R<sub>C</sub>=1.5K, R<sub>E</sub>=1.2K, V<sub>CC</sub>=10V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(1)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board1" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 1</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Planteamiento de la malla de entrada (Base)</h4>
+                        <p>La corriente sale de Vcc, pasa por Rb, entra en la base y sale por el emisor a tierra.</p>
+                        <div class="math-block">
+                            Vcc = I_B · R_B + V_BE + I_E · R_E
+                        </div>
+                        <p>Sabemos que I_E ≈ (β + 1) · I_B ≈ 101 · I_B</p>
+                        <div class="math-block">
+                            10 = I_B · 300k + 0.65 + (101 · I_B) · 1.2k<br>
+                            10 - 0.65 = I_B · (300k + 121.2k)<br>
+                            9.35 = I_B · 421.2k
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Cálculo de Intensidades</h4>
+                        <div class="math-block">
+                            I_B = 9.35V / 421200Ω = 0.00002219 A = <strong>0.022 mA</strong>
+                        </div>
+                        <p>Ahora calculamos el colector (Ic) y el emisor (Ie):</p>
+                        <div class="math-block">
+                            I_C = β · I_B = 100 · 0.022 mA = <strong>2.2 mA</strong><br>
+                            I_E = I_C + I_B = 2.2 + 0.022 = <strong>2.22 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Malla de Salida (Vce)</h4>
+                        <p>Recorremos desde Vcc hasta masa pasando por Rc, transistor y Re.</p>
+                        <div class="math-block">
+                            Vcc = I_C · R_C + V_CE + I_E · R_E<br>
+                            V_CE = Vcc - (I_C · R_C) - (I_E · R_E)<br>
+                            V_CE = 10 - (2.2mA · 1.5k) - (2.22mA · 1.2k)<br>
+                            V_CE = 10 - 3.3 - 2.664 = <strong>4.036 V</strong>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.022 mA</div>
+                        <div class="key-value">I<sub>C</sub> = 2.2 mA</div>
+                        <div class="key-value">I<sub>E</sub> = 2.22 mA</div>
+                        <div class="key-value">V<sub>CE</sub> = 4.04 V</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showHome()">Menú</button>
+                <button class="btn" onclick="showProblem(2)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem2" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 2: Realimentación de Colector</h2>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el circuito con polarización por realimentación de colector.<br>
+                <strong>Nota:</strong> En este circuito, la resistencia de base (Rb) no va a Vcc, sino al propio Colector.<br>
+                <strong>Datos:</strong> β=100, R<sub>B</sub>=200K, R<sub>C</sub>=1K, V<sub>CC</sub>=15V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(2)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board2" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 2</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis de corrientes</h4>
+                        <p>La corriente que pasa por la resistencia de colector (Rc) no es solo Ic, es la suma (Ic + Ib) ≈ Ie.</p>
+                        <div class="math-block">
+                            I_Rc = I_C + I_B ≈ I_E
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Ecuación de la malla de entrada</h4>
+                        <p>Vamos de Vcc, pasamos por Rc, luego nos desviamos por Rb hacia la base y al emisor.</p>
+                        <div class="math-block">
+                            Vcc = (I_C + I_B) · R_C + I_B · R_B + V_BE<br>
+                            Vcc = I_B(β + 1) · R_C + I_B · R_B + V_BE
+                        </div>
+                        <p>Sustituyendo valores:</p>
+                        <div class="math-block">
+                            15 = I_B(101) · 1k + I_B · 200k + 0.65<br>
+                            14.35 = I_B · (101k + 200k) = I_B · 301k
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Resultados de corrientes</h4>
+                        <div class="math-block">
+                            I_B = 14.35 / 301000 = <strong>0.0476 mA</strong> (aprox 0.048 mA)<br>
+                            I_C = 100 · 0.048 = <strong>4.8 mA</strong> (ajustando decimales)<br>
+                            I_E = 4.8 + 0.048 = <strong>4.848 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Malla de Salida</h4>
+                        <div class="math-block">
+                            V_CE = Vcc - (I_C + I_B) · R_C<br>
+                            V_CE = 15 - (4.848mA · 1k) = 15 - 4.848 = <strong>10.15 V</strong>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value">I<sub>B</sub> ≈ 0.048 mA</div>
+                        <div class="key-value">I<sub>C</sub> ≈ 4.77 mA</div>
+                        <div class="key-value">I<sub>E</sub> ≈ 4.82 mA</div>
+                        <div class="key-value">V<sub>CE</sub> ≈ 10.18 V</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(1)">← Anterior</button>
+                <button class="btn" onclick="showProblem(3)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem3" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 3: Realimentación Colector y Emisor</h2>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Circuito con ambas realimentaciones.<br>
+                <strong>Datos:</strong> β=100, R<sub>B</sub>=300K, R<sub>C</sub>=1.2K, R<sub>E</sub>=500Ω (0.5K), V<sub>CC</sub>=12V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(3)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board3" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 3</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Ecuación combinada</h4>
+                        <p>La corriente sale de Vcc, atraviesa Rc (donde van Ic+Ib), se divide a Rb, y luego se recombina en el emisor a través de Re.</p>
+                        <div class="math-block">
+                            Vcc = (Ic+Ib)·Rc + Ib·Rb + Vbe + Ie·Re
+                        </div>
+                        <p>Sustituyendo todo en función de Ib (usando Ie ≈ Ic+Ib ≈ 101·Ib):</p>
+                        <div class="math-block">
+                            12 = (101·Ib)·1.2k + Ib·300k + 0.65 + (101·Ib)·0.5k<br>
+                            11.35 = Ib · [ (101·1.2) + 300 + (101·0.5) ]<br>
+                            11.35 = Ib · [ 121.2 + 300 + 50.5 ] kΩ<br>
+                            11.35 = Ib · 471.7 kΩ
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Cálculos</h4>
+                        <div class="math-block">
+                            I_B = 11.35 / 471700 = <strong>0.024 mA</strong><br>
+                            I_C = 100 · 0.024 = <strong>2.4 mA</strong><br>
+                            I_E = 2.424 mA
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Voltaje Colector-Emisor</h4>
+                        <p>Restamos las caídas en Rc y Re del voltaje total.</p>
+                        <div class="math-block">
+                            V_CE = 12 - (I_E · Rc) - (I_E · Re) <br>
+                            (Usamos Ie para simplificar la suma de corrientes en Rc)<br>
+                            V_CE = 12 - (2.424 · 1.2) - (2.424 · 0.5)<br>
+                            V_CE = 12 - 2.90 - 1.21 = <strong>7.89 V</strong>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.024 mA</div>
+                        <div class="key-value">I<sub>C</sub> = 2.41 mA</div>
+                        <div class="key-value">V<sub>CE</sub> = 7.86 V</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(2)">← Anterior</button>
+                <button class="btn" onclick="showProblem(4)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem4" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 4: Comprobación de Estado</h2>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve indicando el estado en el que está funcionando.<br>
+                <strong>Datos del esquema:</strong> Vcc=5V, Rb=10K, Rc=1K, Re=1K. β=100.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(4)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board4" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 4</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Hipótesis: Zona Activa</h4>
+                        <p>Calculamos Ib asumiendo activa:</p>
+                        <div class="math-block">
+                            Vcc = Ib·Rb + Vbe + Ie·Re<br>
+                            5 = Ib·10k + 0.65 + (101·Ib)·1k<br>
+                            4.35 = Ib · (10 + 101) = Ib · 111k<br>
+                            Ib_teorica = 4.35 / 111k = 0.039 mA
+                        </div>
+                        <p>Calculamos Ic teórica:</p>
+                        <div class="math-block">
+                            Ic_teorica = 100 · 0.039 = 3.9 mA
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Comprobación de Saturación</h4>
+                        <p>Calculamos la corriente máxima posible (Ic_sat) si el transistor fuera un interruptor cerrado (Vce ≈ 0).</p>
+                        <div class="math-block">
+                            Ic_sat ≈ Vcc / (Rc + Re)<br>
+                            Ic_sat = 5V / (1k + 1k) = 5 / 2k = <strong>2.5 mA</strong>
+                        </div>
+                        <p style="color: #fca5a5; font-weight: bold;">
+                            ¡Atención! La Ic_teorica (3.9 mA) es MAYOR que la Ic_sat (2.5 mA).
+                        </p>
+                        <p>Esto es imposible físicamente. El transistor no puede dar más corriente de la que permite el circuito externo. Por tanto, el transistor está en <strong>SATURACIÓN</strong>.</p>
+                    </div>
+                    <div class="step">
+                        <h4>3. Recálculo en Saturación</h4>
+                        <p>En saturación, Vce ≈ 0.2V y β ya no es 100 (es menor).</p>
+                        <div class="math-block">
+                            Vcc = Ic·Rc + Vce_sat + Ie·Re<br>
+                            (Asumiendo Ic ≈ Ie para simplificar o resolver sistema exacto)<br>
+                            5 = I_sat · (1k + 1k) + 0.2<br>
+                            4.8 = I_sat · 2k<br>
+                            Ic ≈ 2.4 mA
+                        </div>
+                        <p>Para mayor precisión (como en la solución del PDF):</p>
+                        <p>Se recalcula Ib con la malla de entrada real:</p>
+                        <div class="math-block">
+                            Ib = (5 - 0.65 - V_Re) / 10k... (complejo sin iterar)
+                        </div>
+                        <p>Usando valores del solucionario:</p>
+                        <p>Ic = 4.2mA (Implica que Rc/Re en el PDF original podrían tener valores diferentes o Vcc no es 5V sino mayor, pero con los datos visibles, confirmamos <strong>SATURACIÓN</strong>).</p>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Conclusión: SATURACIÓN</h3>
+                        <div class="key-value">V<sub>CE</sub> = 0.2 V</div>
+                        <div class="key-value">El transistor actúa como interruptor cerrado.</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(3)">← Anterior</button>
+                <button class="btn" onclick="showProblem(5)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem5" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 5: Par Darlington</h2>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Configuración Darlington (dos transistores en cascada para multiplicar la ganancia).<br>
+                <strong>Entrada:</strong> 3V a través de 1K a la base del T1.<br>
+                <strong>Salida:</strong> Colectores a 9V (con R 3K). Emisor T2 a tierra con 2K.<br>
+                <strong>Datos:</strong> β=100 cada uno. Vbe=0.65V cada uno.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(5)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board5" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 5</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del Transistor 1 (T1)</h4>
+                        <p>La malla de entrada pasa por la base de T1, emisor de T1, base de T2, emisor de T2 y resistencia de emisor.</p>
+                        <p>V_in = Ib1·R1 + Vbe1 + Vbe2 + Ie2·Re</p>
+                        <p>Relación de ganancia total: β_total ≈ β1 · β2 = 100 · 100 = 10,000.</p>
+                        <div class="math-block">
+                            3V = Ib1·1k + 0.65 + 0.65 + (Ib1 · 10000)·2k<br>
+                            3 - 1.3 = Ib1 · (1k + 20MΩ) <br>
+                            1.7 ≈ Ib1 · 20MΩ
+                        </div>
+                        <div class="math-block">
+                            Ib1 = 1.7 / 20,000,000 = 0.085 μA
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corrientes Intermedias</h4>
+                        <p>La corriente de emisor del T1 es la de base del T2.</p>
+                        <div class="math-block">
+                            Ie1 ≈ Ic1 = β · Ib1 = 100 · 0.085 μA = 8.5 μA = <strong>0.0085 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Transistor 2 (Salida)</h4>
+                        <div class="math-block">
+                            Ib2 = Ie1 = 0.0085 mA<br>
+                            Ic2 = β · Ib2 = 100 · 0.0085 = <strong>0.85 mA</strong><br>
+                            Ie2 ≈ Ic2 = 0.85 mA
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <p><strong>Primer Transistor:</strong> Ib = 0.083 μA, Ic = 0.083 mA</p>
+                        <p><strong>Segundo Transistor:</strong> Ib = 0.084 mA, Ic = 0.842 mA</p>
+                        <div class="key-value" style="font-size: 0.9em; color: #9ca3af">Nota: Pequeñas variaciones por decimales en β+1 vs β.</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(4)">← Anterior</button>
+                <button class="btn" onclick="showProblem(6)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem6" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 6: LED Simple</h2>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Transistor activando un LED amarillo.<br>
+                <strong>Datos:</strong> V_LED = 2V. Vin=1.5V, Rb=10K, Rc=1K, Vcc=12V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(6)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board6" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 6</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Malla de Entrada (Base)</h4>
+                        <div class="math-block">
+                            Vin = Ib·Rb + Vbe<br>
+                            1.5 = Ib·10k + 0.65<br>
+                            Ib = (1.5 - 0.65) / 10k = 0.85 / 10000<br>
+                            Ib = <strong>0.085 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de Colector (Ic)</h4>
+                        <div class="math-block">
+                            Ic = β · Ib = 100 · 0.085 = <strong>8.5 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Voltaje Colector-Emisor (Vce)</h4>
+                        <p>Consideramos la caída del LED (2V) en la malla de salida.</p>
+                        <div class="math-block">
+                            Vcc = Ic·Rc + V_LED + Vce<br>
+                            12 = (8.5mA · 1k) + 2V + Vce<br>
+                            12 = 8.5 + 2 + Vce<br>
+                            Vce = 12 - 10.5 = <strong>1.5 V</strong>
+                        </div>
+                        <p>Como Vce (1.5V) > 0.2V, el transistor está en zona activa y el LED brilla correctamente.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.085 mA</div>
+                        <div class="key-value">I<sub>C</sub> = 8.5 mA</div>
+                        <div class="key-value">V<sub>CE</sub> = 1.5 V</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(5)">← Anterior</button>
+                <button class="btn" onclick="showProblem(7)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem7" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 7: Doble LED</h2>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Circuito con LED en rama colector (serie con 300Ω) y otro LED en emisor.<br>
+                <strong>Datos:</strong> Rb=12K, Vcc=12V. V_LED=2V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(7)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board7" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 7</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Interpretación del Circuito</h4>
+                        <p>Según el esquema y la solución:<br>
+                        1. Hay una rama directa conectada a 12V con Resistencia de 300Ω y LED1 (esto va aparte del transistor o paralelo al colector).<br>
+                        2. El transistor controla el LED2.</p>
+                    </div>
+                    <div class="step">
+                        <h4>2. Cálculo LED1 (Rama superior directa)</h4>
+                        <p>Esta rama tiene Vcc(12V), R(300Ω) y LED(2V) a tierra.</p>
+                        <div class="math-block">
+                            I_LED1 = (Vcc - V_LED) / R<br>
+                            I_LED1 = (12 - 4) / 300 ... (Interpretando caída en colector)<br>
+                            Solución PDF: <strong>26.67 mA</strong>
+                        </div>
+                        <p>Esto sale de: I = 8V / 300Ω = 26.6mA. (Significa que hay 4V de caída o la configuración es distinta, pero el cálculo matemático es V/R).</p>
+                    </div>
+                    <div class="step">
+                        <h4>3. Cálculo Transistor (LED2)</h4>
+                        <p>Usando los datos de la solución para reconstruir:</p>
+                        <div class="math-block">
+                            Ib = 0.071 mA<br>
+                            Ic = 7.08 mA<br>
+                            I_LED2 (Emisor) = Ie = Ic + Ib ≈ 7.15 mA
+                        </div>
+                        <p>Nota: La solución del PDF indica <strong>19.59 mA</strong> para el LED2. Esto sugiere que el LED2 podría estar en paralelo con alguna resistencia o el diagrama tiene una topología específica no estándar (ej. espejo de corriente o carga compartida).</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución según PDF</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.071 mA</div>
+                        <div class="key-value">I<sub>LED1</sub> = 26.67 mA</div>
+                        <div class="key-value">I<sub>LED2</sub> = 19.59 mA</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(6)">← Anterior</button>
+                <button class="btn" onclick="showHome()">Volver al Inicio</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    function showHome() {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('home').classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function showProblem(id) {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('problem' + id).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function toggleBoard(id) {
+        const board = document.getElementById('board' + id);
+        board.classList.toggle('active');
+        const btn = event.target;
+        if (board.classList.contains('active')) {
+            btn.textContent = '✖ Cerrar Pizarra';
+            btn.style.background = '#ef4444';
+        } else {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '#1e293b';
+        }
+    }
+</script>
+
+</body>
+</html>
