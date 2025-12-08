@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transistores - Identificación de Estados</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #8b5cf6;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .problem-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            min-height: 60px;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .board-mode {
+            background: #f1f5f9;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .board-steps {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .board-steps.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 3px solid var(--primary);
+        }
+
+        .step h4 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .formula {
+            background: #dbeafe;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.8rem 0;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .calculation {
+            background: #dcfce7;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin: 0.8rem 0;
+        }
+
+        .state-highlight {
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 2px solid var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .state-corte {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .state-activa {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-color: #10b981;
+        }
+
+        .state-saturacion {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
+        .key-concept {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-back {
+            background: var(--gray);
+        }
+
+        .btn-back:hover {
+            background: #475569;
+        }
+
+        .btn-board {
+            background: var(--accent);
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .btn-board:hover {
+            background: #7c3aed;
+            transform: scale(1.03);
+        }
+
+        .problem-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .problem-statement {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--primary);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .home-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .problem-container {
+                padding: 1.5rem;
+            }
+            
+            .btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .home-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .problem-card h3 {
+                font-size: 1.3rem;
+            }
+            
+            .btn-large {
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .navigation .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Boletín EAN9: Transistores (estados)</h1>
+            <p class="subtitle">I.E.S. Virgen de Villadiego (Peñaflor, Sevilla) - Departamento de Tecnología</p>
+            <p class="subtitle">Revisado marzo 2023</p>
+        </header>
+
+        <main>
+            <!-- Home Page -->
+            <section id="home" class="content active">
+                <h2 style="text-align: center; color: var(--primary); margin-bottom: 1.5rem; font-size: 1.8rem;">Identificación del estado de transistores</h2>
+                <p style="text-align: center; margin-bottom: 2rem; color: var(--gray); max-width: 800px; margin-left: auto; margin-right: auto;">
+                    Selecciona un problema para analizar las medidas realizadas en un transistor y determinar en qué estado se encuentra: <strong>Corte</strong>, <strong>Zona Activa</strong> o <strong>Saturación</strong>.
+                </p>
+                
+                <div class="key-concept">
+                    <h3 style="color: var(--accent); margin-bottom: 1rem;">Conceptos clave para identificar el estado:</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: var(--warning);">Corte</h4>
+                            <p>I<sub>B</sub> ≈ 0 μA, I<sub>C</sub> ≈ 0, V<sub>CE</sub> ≈ V<sub>CC</sub></p>
+                        </div>
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: var(--success);">Zona Activa</h4>
+                            <p>I<sub>C</sub> = β × I<sub>B</sub>, V<sub>CE</sub> > V<sub>CE_sat</sub> (≈0.2V)</p>
+                        </div>
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: var(--danger);">Saturación</h4>
+                            <p>I<sub>C</sub> < β × I<sub>B</sub>, V<sub>CE</sub> ≈ V<sub>CE_sat</sub> (0.1-0.3V)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="home-grid">
+                    <!-- Tabla 1, Circuitos 1-6 -->
+                    <div class="problem-card" onclick="showProblem(1)">
+                        <h3>Circuito 1</h3>
+                        <p>I<sub>B</sub> = 0,05 μA</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 1</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(2)">
+                        <h3>Circuito 2</h3>
+                        <p>V<sub>CE</sub> = 1,5 V; V<sub>CC</sub> = 6 V</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 1</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(3)">
+                        <h3>Circuito 3</h3>
+                        <p>I<sub>B</sub> = 1,5 mA; I<sub>E</sub> = 3 mA</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 1</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(4)">
+                        <h3>Circuito 4</h3>
+                        <p>I<sub>B</sub> = 0,03 mA; I<sub>C</sub> = 3 mA</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 1</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(5)">
+                        <h3>Circuito 5</h3>
+                        <p>V<sub>CE</sub> = 0,1 V; V<sub>CC</sub> = 6 V</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 1</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(6)">
+                        <h3>Circuito 6</h3>
+                        <p>V<sub>CE</sub> = 6V; V<sub>CC</sub> = 6 V</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 1</p>
+                    </div>
+                    
+                    <!-- Tabla 2, Circuitos 7-12 -->
+                    <div class="problem-card" onclick="showProblem(7)">
+                        <h3>Circuito 7</h3>
+                        <p>V<sub>CE</sub> = 0,05 V; V<sub>CC</sub> = 4 V</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 2</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(8)">
+                        <h3>Circuito 8</h3>
+                        <p>I<sub>B</sub> = 2 mA; I<sub>E</sub> = 4,1 mA</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 2</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(9)">
+                        <h3>Circuito 9</h3>
+                        <p>I<sub>B</sub> = 0,07 μA</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 2</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(10)">
+                        <h3>Circuito 10</h3>
+                        <p>V<sub>CE</sub> = 8,9 V; V<sub>CC</sub> = 9 V</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 2</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(11)">
+                        <h3>Circuito 11</h3>
+                        <p>V<sub>CE</sub> = 2 V; V<sub>CC</sub> = 4,5 V</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 2</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(12)">
+                        <h3>Circuito 12</h3>
+                        <p>I<sub>B</sub> = 0,05 mA; I<sub>C</sub> = 5 mA</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--accent);">Tabla 2</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 1 -->
+            <section id="problem1" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 1 - Tabla 1</h2>
+                    <p class="problem-statement">Se ha realizado una medida en un transistor y se ha obtenido: <strong>I<sub>B</sub> = 0,05 μA</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(1)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board1">
+                            <div class="step">
+                                <h4>Paso 1: Análisis del dato proporcionado</h4>
+                                <p>Nos dan únicamente el valor de la corriente de base: I<sub>B</sub> = 0,05 μA = 0,00005 mA.</p>
+                                <p>Este valor es extremadamente pequeño (cercano a cero).</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Interpretación del valor de I<sub>B</sub></h4>
+                                <p>En un transistor bipolar:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Si I<sub>B</sub> ≈ 0 → El transistor está en <strong>CORTE</strong></li>
+                                    <li>Si I<sub>B</sub> > 0 y V<sub>BE</sub> ≈ 0,7V → Transistor conducirá</li>
+                                    <li>Si I<sub>B</sub> es suficiente → Puede estar en activa o saturación</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Comparación con valores típicos</h4>
+                                <p>Para transistores en zona activa, I<sub>B</sub> suele estar en el rango de:</p>
+                                <div class="calculation">I<sub>B_activa</sub> típico: 0,01 mA a 1 mA (10 μA a 1000 μA)</div>
+                                <p>0,05 μA = 0,00005 mA es 200 veces menor que el límite inferior (0,01 mA).</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Conclusión</h4>
+                                <p>Con una corriente de base tan pequeña (prácticamente cero), el transistor no puede estar conduciendo. Por lo tanto:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-corte">
+                                <h3>Estado del transistor: CORTE</h3>
+                                <p>I<sub>B</sub> ≈ 0 μA → Transistor no conduce</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Comprobación adicional</h4>
+                                <p>En corte:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>I<sub>C</sub> ≈ 0</li>
+                                    <li>I<sub>E</sub> ≈ 0</li>
+                                    <li>V<sub>CE</sub> ≈ V<sub>CC</sub> (no hay caída en R<sub>C</sub>)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(2)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 2 -->
+            <section id="problem2" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 2 - Tabla 1</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>V<sub>CE</sub> = 1,5 V</strong>; <strong>V<sub>CC</sub> = 6 V</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(2)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board2">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de los voltajes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">V<sub>CE</sub> = 1,5 V</div>
+                                <div class="calculation">V<sub>CC</sub> = 6 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Interpretación de V<sub>CE</sub></h4>
+                                <p>El voltaje colector-emisor nos indica el estado del transistor:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Si V<sub>CE</sub> ≈ V<sub>CC</sub> → <strong>CORTE</strong> (no hay corriente)</li>
+                                    <li>Si V<sub>CE</sub> > V<sub>CE_sat</sub> (≈0,2-0,3V) → <strong>ZONA ACTIVA</strong></li>
+                                    <li>Si V<sub>CE</sub> ≈ V<sub>CE_sat</sub> (0,1-0,3V) → <strong>SATURACIÓN</strong></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Comparación con V<sub>CC</sub></h4>
+                                <p>V<sub>CE</sub> = 1,5 V es significativamente menor que V<sub>CC</sub> = 6 V.</p>
+                                <p>Esto indica que hay una caída de voltaje en R<sub>C</sub>, por lo que hay corriente circulando.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Determinación del estado</h4>
+                                <p>1,5 V es mucho mayor que el voltaje de saturación típico (0,2-0,3V).</p>
+                                <p>Por lo tanto, el transistor no está saturado.</p>
+                                <p>Como V<sub>CE</sub> > V<sub>CE_sat</sub> y V<sub>CE</sub> < V<sub>CC</sub>, el transistor está en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-activa">
+                                <h3>Estado del transistor: ZONA ACTIVA</h3>
+                                <p>V<sub>CE</sub> = 1,5 V > V<sub>CE_sat</sub> → Transistor en zona activa</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Cálculo de la caída en R<sub>C</sub></h4>
+                                <p>Si V<sub>CC</sub> = 6 V y V<sub>CE</sub> = 1,5 V, la caída en R<sub>C</sub> es:</p>
+                                <div class="calculation">V<sub>RC</sub> = V<sub>CC</sub> - V<sub>CE</sub> = 6 V - 1,5 V = 4,5 V</div>
+                                <p>Esta caída indica que hay una corriente I<sub>C</sub> significativa circulando.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(1)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(3)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 3 -->
+            <section id="problem3" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 3 - Tabla 1</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>I<sub>B</sub> = 1,5 mA</strong>; <strong>I<sub>E</sub> = 3 mA</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(3)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board3">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de las corrientes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">I<sub>B</sub> = 1,5 mA</div>
+                                <div class="calculation">I<sub>E</sub> = 3 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Cálculo de I<sub>C</sub></h4>
+                                <p>Por la ley de corrientes en un transistor:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></div>
+                                <p>Despejamos I<sub>C</sub>:</p>
+                                <div class="formula">I<sub>C</sub> = I<sub>E</sub> - I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>C</sub> = 3 mA - 1,5 mA = 1,5 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Cálculo de β (ganancia de corriente)</h4>
+                                <p>La relación entre I<sub>C</sub> e I<sub>B</sub> nos da β:</p>
+                                <div class="formula">β = I<sub>C</sub> / I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">β = 1,5 mA / 1,5 mA = 1</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Interpretación del valor de β</h4>
+                                <p>Para un transistor en zona activa, β suele estar entre 50 y 300.</p>
+                                <p>Un valor de β = 1 es extremadamente bajo para zona activa.</p>
+                                <p>Cuando β es mucho menor que el β nominal del transistor, significa que está en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-saturacion">
+                                <h3>Estado del transistor: SATURACIÓN</h3>
+                                <p>β = 1 << β_nominal → Transistor saturado</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Verificación adicional</h4>
+                                <p>En saturación:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>I<sub>C</sub> no sigue la relación I<sub>C</sub> = β<sub>nominal</sub> × I<sub>B</sub></li>
+                                    <li>I<sub>C</sub> está limitado por los componentes externos</li>
+                                    <li>V<sub>CE</sub> ≈ 0,1-0,3 V</li>
+                                    <li>La relación I<sub>C</sub>/I<sub>B</sub> es menor que β<sub>nominal</sub></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(2)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(4)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 4 -->
+            <section id="problem4" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 4 - Tabla 1</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>I<sub>B</sub> = 0,03 mA</strong>; <strong>I<sub>C</sub> = 3 mA</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(4)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board4">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de las corrientes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">I<sub>B</sub> = 0,03 mA = 30 μA</div>
+                                <div class="calculation">I<sub>C</sub> = 3 mA = 3000 μA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Cálculo de β</h4>
+                                <p>Calculamos la ganancia de corriente:</p>
+                                <div class="formula">β = I<sub>C</sub> / I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">β = 3 mA / 0,03 mA = 100</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Interpretación del valor de β</h4>
+                                <p>β = 100 es un valor típico para transistores en zona activa.</p>
+                                <p>Para determinar si está en zona activa o saturación, necesitaríamos conocer V<sub>CE</sub>.</p>
+                                <p>Sin embargo, con β = 100 (valor típico de β nominal), es probable que esté en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-activa">
+                                <h3>Estado del transistor: ZONA ACTIVA</h3>
+                                <p>β = 100 (valor típico) → Probablemente en zona activa</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Verificación con condiciones típicas</h4>
+                                <p>En zona activa:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>I<sub>C</sub> = β × I<sub>B</sub> (se cumple con β = 100)</li>
+                                    <li>V<sub>BE</sub> ≈ 0,6-0,7 V</li>
+                                    <li>V<sub>CE</sub> > V<sub>CE_sat</sub> (típicamente > 0,5 V)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Posible verificación adicional</h4>
+                                <p>Si tuviéramos V<sub>CE</sub>:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Si V<sub>CE</sub> > 0,3 V → Zona activa ✓</li>
+                                    <li>Si V<sub>CE</sub> ≈ 0,1-0,3 V → Saturación</li>
+                                </ul>
+                                <p>Con los datos disponibles y β = 100, la conclusión más probable es zona activa.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(3)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(5)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 5 -->
+            <section id="problem5" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 5 - Tabla 1</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>V<sub>CE</sub> = 0,1 V</strong>; <strong>V<sub>CC</sub> = 6 V</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(5)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board5">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de los voltajes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">V<sub>CE</sub> = 0,1 V</div>
+                                <div class="calculation">V<sub>CC</sub> = 6 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Interpretación de V<sub>CE</sub></h4>
+                                <p>V<sub>CE</sub> = 0,1 V es un valor muy pequeño.</p>
+                                <p>Comparación con valores típicos:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>V<sub>CE_sat</sub> (saturación): 0,1 - 0,3 V</li>
+                                    <li>V<sub>CE_activa</sub> (zona activa): > 0,5 V (normalmente 1-5 V)</li>
+                                    <li>V<sub>CE_corte</sub> (corte): ≈ V<sub>CC</sub></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Determinación del estado</h4>
+                                <p>V<sub>CE</sub> = 0,1 V está dentro del rango de saturación.</p>
+                                <p>Además, V<sub>CE</sub> es mucho menor que V<sub>CC</sub>, lo que indica que hay corriente circulando.</p>
+                            </div>
+                            
+                            <div class="state-highlight state-saturacion">
+                                <h3>Estado del transistor: SATURACIÓN</h3>
+                                <p>V<sub>CE</sub> = 0,1 V ≈ V<sub>CE_sat</sub> → Transistor saturado</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Comprobación adicional</h4>
+                                <p>En saturación:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>V<sub>CE</sub> ≈ 0,1-0,3 V</li>
+                                    <li>I<sub>C</sub> está limitado por los componentes del circuito</li>
+                                    <li>I<sub>C</sub> < β<sub>nominal</sub> × I<sub>B</sub></li>
+                                    <li>El transistor actúa como un interruptor cerrado</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Cálculo de la caída en R<sub>C</sub></h4>
+                                <p>Si V<sub>CC</sub> = 6 V y V<sub>CE</sub> = 0,1 V:</p>
+                                <div class="calculation">V<sub>RC</sub> = V<sub>CC</sub> - V<sub>CE</sub> = 6 V - 0,1 V = 5,9 V</div>
+                                <p>Esta gran caída indica que hay una corriente I<sub>C</sub> significativa circulando, limitada solo por R<sub>C</sub>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(4)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(6)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 6 -->
+            <section id="problem6" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 6 - Tabla 1</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>V<sub>CE</sub> = 6 V</strong>; <strong>V<sub>CC</sub> = 6 V</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(6)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board6">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de los voltajes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">V<sub>CE</sub> = 6 V</div>
+                                <div class="calculation">V<sub>CC</sub> = 6 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Comparación de V<sub>CE</sub> con V<sub>CC</sub></h4>
+                                <p>V<sub>CE</sub> = V<sub>CC</sub> = 6 V</p>
+                                <p>Esto significa que no hay caída de voltaje en la resistencia de colector R<sub>C</sub>.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Interpretación física</h4>
+                                <p>Si no hay caída en R<sub>C</sub>, entonces no circula corriente por el colector:</p>
+                                <div class="formula">I<sub>C</sub> = 0</div>
+                                <p>Si I<sub>C</sub> = 0, el transistor no está conduciendo.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Determinación del estado</h4>
+                                <p>Cuando V<sub>CE</sub> ≈ V<sub>CC</sub>, el transistor está en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-corte">
+                                <h3>Estado del transistor: CORTE</h3>
+                                <p>V<sub>CE</sub> = V<sub>CC</sub> → No hay corriente → Transistor en corte</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Comprobación adicional</h4>
+                                <p>En corte:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>I<sub>B</sub> ≈ 0</li>
+                                    <li>I<sub>C</sub> ≈ 0</li>
+                                    <li>I<sub>E</sub> ≈ 0</li>
+                                    <li>V<sub>CE</sub> ≈ V<sub>CC</sub></li>
+                                    <li>El transistor actúa como un interruptor abierto</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(5)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(7)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 7 -->
+            <section id="problem7" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 7 - Tabla 2</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>V<sub>CE</sub> = 0,05 V</strong>; <strong>V<sub>CC</sub> = 4 V</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(7)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board7">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de los voltajes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">V<sub>CE</sub> = 0,05 V (muy pequeño)</div>
+                                <div class="calculation">V<sub>CC</sub> = 4 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Interpretación de V<sub>CE</sub></h4>
+                                <p>V<sub>CE</sub> = 0,05 V es un valor extremadamente bajo.</p>
+                                <p>Comparación con valores típicos:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Saturación profunda: V<sub>CE</sub> ≈ 0,05-0,1 V</li>
+                                    <li>Saturación normal: V<sub>CE</sub> ≈ 0,1-0,3 V</li>
+                                    <li>Zona activa: V<sub>CE</sub> > 0,5 V</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Determinación del estado</h4>
+                                <p>0,05 V está claramente en el rango de saturación.</p>
+                                <p>Además, V<sub>CE</sub> << V<sub>CC</sub>, lo que indica que hay una corriente significativa circulando.</p>
+                            </div>
+                            
+                            <div class="state-highlight state-saturacion">
+                                <h3>Estado del transistor: SATURACIÓN PROFUNDA</h3>
+                                <p>V<sub>CE</sub> = 0,05 V → Transistor profundamente saturado</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Cálculo de la caída en R<sub>C</sub></h4>
+                                <p>Si V<sub>CC</sub> = 4 V y V<sub>CE</sub> = 0,05 V:</p>
+                                <div class="calculation">V<sub>RC</sub> = V<sub>CC</sub> - V<sub>CE</sub> = 4 V - 0,05 V = 3,95 V</div>
+                                <p>Casi todo el voltaje de alimentación cae en R<sub>C</sub>, lo que produce una corriente I<sub>C</sub> máxima.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(6)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(8)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 8 -->
+            <section id="problem8" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 8 - Tabla 2</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>I<sub>B</sub> = 2 mA</strong>; <strong>I<sub>E</sub> = 4,1 mA</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(8)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board8">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de las corrientes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">I<sub>B</sub> = 2 mA</div>
+                                <div class="calculation">I<sub>E</sub> = 4,1 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Cálculo de I<sub>C</sub></h4>
+                                <p>Por la ley de corrientes en un transistor:</p>
+                                <div class="formula">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></div>
+                                <p>Despejamos I<sub>C</sub>:</p>
+                                <div class="formula">I<sub>C</sub> = I<sub>E</sub> - I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">I<sub>C</sub> = 4,1 mA - 2 mA = 2,1 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Cálculo de β</h4>
+                                <p>La relación entre I<sub>C</sub> e I<sub>B</sub> nos da β:</p>
+                                <div class="formula">β = I<sub>C</sub> / I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">β = 2,1 mA / 2 mA = 1,05 ≈ 1</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Interpretación del valor de β</h4>
+                                <p>β ≈ 1 es extremadamente bajo para un transistor en zona activa.</p>
+                                <p>Cuando β es cercano a 1, el transistor está en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-saturacion">
+                                <h3>Estado del transistor: SATURACIÓN</h3>
+                                <p>β ≈ 1 << β_nominal → Transistor saturado</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Análisis adicional</h4>
+                                <p>En este caso, I<sub>B</sub> es casi igual a I<sub>C</sub>, lo que es característico de saturación profunda.</p>
+                                <p>El transistor está actuando como un interruptor cerrado con muy baja resistencia entre colector y emisor.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(7)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(9)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 9 -->
+            <section id="problem9" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 9 - Tabla 2</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>I<sub>B</sub> = 0,07 μA</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(9)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board9">
+                            <div class="step">
+                                <h4>Paso 1: Análisis del dato proporcionado</h4>
+                                <p>Nos dan únicamente el valor de la corriente de base: I<sub>B</sub> = 0,07 μA = 0,00007 mA.</p>
+                                <p>Este valor es extremadamente pequeño (cercano a cero).</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Interpretación del valor de I<sub>B</sub></h4>
+                                <p>En un transistor bipolar:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Si I<sub>B</sub> ≈ 0 → El transistor está en <strong>CORTE</strong></li>
+                                    <li>Si I<sub>B</sub> > 0 y V<sub>BE</sub> ≈ 0,7V → Transistor conducirá</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Comparación con valores típicos</h4>
+                                <p>Para transistores en zona activa, I<sub>B</sub> suele estar en el rango de:</p>
+                                <div class="calculation">I<sub>B_activa</sub> típico: 0,01 mA a 1 mA (10 μA a 1000 μA)</div>
+                                <p>0,07 μA = 0,00007 mA es más de 100 veces menor que el límite inferior (0,01 mA).</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Conclusión</h4>
+                                <p>Con una corriente de base tan pequeña (prácticamente cero), el transistor no puede estar conduciendo.</p>
+                            </div>
+                            
+                            <div class="state-highlight state-corte">
+                                <h3>Estado del transistor: CORTE</h3>
+                                <p>I<sub>B</sub> ≈ 0 μA → Transistor no conduce</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(8)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(10)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 10 -->
+            <section id="problem10" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 10 - Tabla 2</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>V<sub>CE</sub> = 8,9 V</strong>; <strong>V<sub>CC</sub> = 9 V</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(10)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board10">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de los voltajes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">V<sub>CE</sub> = 8,9 V</div>
+                                <div class="calculation">V<sub>CC</sub> = 9 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Comparación de V<sub>CE</sub> con V<sub>CC</sub></h4>
+                                <p>V<sub>CE</sub> es muy cercano a V<sub>CC</sub>:</p>
+                                <div class="calculation">V<sub>CE</sub> = 8,9 V ≈ V<sub>CC</sub> = 9 V</div>
+                                <p>La diferencia es solo de 0,1 V.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Interpretación física</h4>
+                                <p>Si V<sub>CE</sub> ≈ V<sub>CC</sub>, significa que hay muy poca caída en R<sub>C</sub>:</p>
+                                <div class="formula">V<sub>RC</sub> = V<sub>CC</sub> - V<sub>CE</sub> = 9 V - 8,9 V = 0,1 V</div>
+                                <p>Una caída tan pequeña indica que la corriente I<sub>C</sub> es muy pequeña.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Determinación del estado</h4>
+                                <p>Con I<sub>C</sub> muy pequeña y V<sub>CE</sub> ≈ V<sub>CC</sub>, el transistor está en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-corte">
+                                <h3>Estado del transistor: CORTE (o muy cerca del corte)</h3>
+                                <p>V<sub>CE</sub> ≈ V<sub>CC</sub> → I<sub>C</sub> ≈ 0 → Transistor en corte</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Posible estado intermedio</h4>
+                                <p>La pequeña caída de 0,1 V en R<sub>C</sub> podría indicar:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>Transistor en corte con pequeña corriente de fuga</li>
+                                    <li>O en el límite justo entre corte y activa</li>
+                                </ul>
+                                <p>Pero dado que V<sub>CE</sub> es casi igual a V<sub>CC</sub>, el estado más apropiado es <strong>CORTE</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(9)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(11)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 11 -->
+            <section id="problem11" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 11 - Tabla 2</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>V<sub>CE</sub> = 2 V</strong>; <strong>V<sub>CC</sub> = 4,5 V</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(11)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board11">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de los voltajes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">V<sub>CE</sub> = 2 V</div>
+                                <div class="calculation">V<sub>CC</sub> = 4,5 V</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Interpretación de V<sub>CE</sub></h4>
+                                <p>V<sub>CE</sub> = 2 V es un valor intermedio:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>No es cercano a V<sub>CC</sub> (4,5 V), por lo que no está en corte</li>
+                                    <li>No es cercano a 0 V, por lo que no está en saturación</li>
+                                    <li>Está en un valor intermedio (> 0,5 V)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Cálculo de la caída en R<sub>C</sub></h4>
+                                <p>La caída en la resistencia de colector es:</p>
+                                <div class="formula">V<sub>RC</sub> = V<sub>CC</sub> - V<sub>CE</sub></div>
+                                <div class="calculation">V<sub>RC</sub> = 4,5 V - 2 V = 2,5 V</div>
+                                <p>Esta caída significativa indica que hay una corriente I<sub>C</sub> apreciable.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Determinación del estado</h4>
+                                <p>Con V<sub>CE</sub> = 2 V (> 0,5 V) y una caída apreciable en R<sub>C</sub>, el transistor está en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-activa">
+                                <h3>Estado del transistor: ZONA ACTIVA</h3>
+                                <p>V<sub>CE</sub> = 2 V > V<sub>CE_sat</sub> → Transistor en zona activa</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Verificación con valores típicos</h4>
+                                <p>En zona activa típica:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li>V<sub>CE</sub> suele estar entre 1 V y V<sub>CC</sub>/2</li>
+                                    <li>V<sub>BE</sub> ≈ 0,6-0,7 V</li>
+                                    <li>I<sub>C</sub> = β × I<sub>B</sub></li>
+                                </ul>
+                                <p>2 V es un valor típico para un transistor en zona activa.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(10)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(12)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Problema 12 -->
+            <section id="problem12" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Circuito 12 - Tabla 2</h2>
+                    <p class="problem-statement">Medidas realizadas: <strong>I<sub>B</sub> = 0,05 mA</strong>; <strong>I<sub>C</sub> = 5 mA</strong>. Determina en qué estado se encuentra el transistor.</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(12)">Modo Pizarra - Ver análisis paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board12">
+                            <div class="step">
+                                <h4>Paso 1: Análisis de las corrientes</h4>
+                                <p>Datos proporcionados:</p>
+                                <div class="calculation">I<sub>B</sub> = 0,05 mA = 50 μA</div>
+                                <div class="calculation">I<sub>C</sub> = 5 mA = 5000 μA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Cálculo de β</h4>
+                                <p>Calculamos la ganancia de corriente:</p>
+                                <div class="formula">β = I<sub>C</sub> / I<sub>B</sub></div>
+                                <p>Sustituimos valores:</p>
+                                <div class="calculation">β = 5 mA / 0,05 mA = 100</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Interpretación del valor de β</h4>
+                                <p>β = 100 es un valor típico para transistores en zona activa.</p>
+                                <p>Para estar seguro del estado, necesitaríamos conocer V<sub>CE</sub>.</p>
+                                <p>Sin embargo, con β = 100 (valor típico de β nominal), es probable que esté en:</p>
+                            </div>
+                            
+                            <div class="state-highlight state-activa">
+                                <h3>Estado del transistor: ZONA ACTIVA</h3>
+                                <p>β = 100 (valor típico) → Probablemente en zona activa</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Análisis de posibles estados</h4>
+                                <p>Con los datos disponibles:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px;">
+                                    <li><strong>Si V<sub>CE</sub> > 0,5 V</strong> → Zona activa (más probable con β = 100)</li>
+                                    <li><strong>Si V<sub>CE</sub> ≈ 0,1-0,3 V</strong> → Saturación (poco probable con β = 100)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 5: Conclusión final</h4>
+                                <p>Dado que β = 100 es exactamente el valor típico de muchos transistores, y sin evidencia de saturación (no se menciona V<sub>CE</sub> bajo), la conclusión más razonable es que el transistor está en <strong>ZONA ACTIVA</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(11)">← Circuito anterior</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function showHome() {
+            // Hide all content sections
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Show home section
+            document.getElementById('home').classList.add('active');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function showProblem(problemNumber) {
+            // Hide all content sections
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Show selected problem section
+            document.getElementById('problem' + problemNumber).classList.add('active');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function toggleBoard(problemNumber) {
+            const board = document.getElementById('board' + problemNumber);
+            if (board) {
+                board.classList.toggle('active');
+                
+                // Change button text based on state
+                const button = event.target;
+                if (board.classList.contains('active')) {
+                    button.textContent = 'Ocultar análisis';
+                    button.style.background = '#1e40af';
+                } else {
+                    button.textContent = 'Modo Pizarra - Ver análisis paso a paso';
+                    button.style.background = '';
+                }
+            }
+        }
+        
+        // Initialize with home section active
+        document.addEventListener('DOMContentLoaded', function() {
+            showHome();
+        });
+    </script>
+</body>
+</html>
