@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boletín EAN8: Condensadores</title>
+    <style>
+        :root {
+            /* Cambio ligero a tonos cian/verde azulado para diferenciar del tema de transistores */
+            --primary: #0ea5e9; 
+            --secondary: #0284c7;
+            --accent: #6366f1;
+            --light: #f0f9ff;
+            --dark: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .problem-card h3 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            min-height: 50px;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .circuit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+            gap: 1.5rem;
+        }
+
+        .circuit-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .circuit-item {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .circuit-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); */
+        }
+
+        .board-mode {
+            background: #f0fdf4; /* Tono verdoso muy suave */
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--success);
+        }
+
+        .board-steps {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .board-steps.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 3px solid var(--primary);
+        }
+
+        .step h4 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+
+        .formula {
+            background: #e0f2fe;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.8rem 0;
+            font-weight: bold;
+            color: #0369a1;
+        }
+
+        .calculation {
+            background: #f1f5f9;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin: 0.8rem 0;
+            border-left: 4px solid var(--gray);
+        }
+
+        .note {
+            font-size: 0.9em;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .solution-highlight {
+            background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 2px solid var(--success);
+            color: #0f5132;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-back {
+            background: var(--gray);
+            box-shadow: none;
+        }
+
+        .btn-back:hover {
+            background: #475569;
+        }
+
+        .btn-board {
+            background: var(--accent);
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            margin: 1.5rem 0;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-board:hover {
+            background: #4f46e5;
+            transform: scale(1.01);
+        }
+
+        .problem-title {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+
+        .problem-statement {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--secondary);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Utility for units */
+        .unit {
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .home-grid {
+                grid-template-columns: 1fr;
+            }
+            .circuit-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Boletín EAN8: Condensadores</h1>
+            <p class="subtitle">I.E.S. Virgen de Villadiego - Tecnología y Electrónica</p>
+        </header>
+
+        <main>
+            <section id="home" class="content active">
+                <h2 style="text-align: center; color: var(--secondary); margin-bottom: 1.5rem; font-size: 1.8rem;">Selecciona un ejercicio</h2>
+                <div class="home-grid">
+                    <div class="problem-card" onclick="showProblem(1)">
+                        <h3>Ejercicio 1</h3>
+                        <p>Teoría básica: Asociación Serie vs Paralelo de dos condensadores (40µF y 60µF).</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(2)">
+                        <h3>Ejercicio 2</h3>
+                        <p>Cálculo de 4 asociaciones en paralelo (Asociaciones 2.1, 2.2, 2.3 y 2.4).</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(3)">
+                        <h3>Ejercicio 3</h3>
+                        <p>Cálculo de 3 asociaciones en serie con cambios de unidades (Asociaciones 3.1, 3.2 y 3.3).</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(4)">
+                        <h3>Ejercicio 4</h3>
+                        <p>Circuitos Mixtos: Combinación de serie y paralelo (Asociaciones 4.1, 4.2 y 4.3).</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(5)">
+                        <h3>Ejercicio 5</h3>
+                        <p>Tiempo de carga (Tau). Cálculos de t = 5·R·C modificando componentes.</p>
+                    </div>
+                    <div class="problem-card" onclick="showProblem(6)">
+                        <h3>Ejercicio 6</h3>
+                        <p>Diseño: Construcción de capacidades específicas a partir de valores dados.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="problem1" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1: Serie y Paralelo</h2>
+                    <p class="problem-statement">Acabamos de comprar dos condensadores, uno de <strong>40 µF</strong> y otro de <strong>60 µF</strong>.<br>
+                    1. ¿A cuánto equivalen si los unimos consecutivamente (serie)?<br>
+                    2. ¿Y si conectamos los terminales de la izquierda entre sí y los de la derecha entre sí (paralelo)?</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(1)">Ver Solución Explicada</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board1">
+                            <div class="step">
+                                <h4> Caso 1: Conexión en Serie ("consecutivamente")</h4>
+                                <p>En serie, la capacidad total disminuye (es como aumentar la distancia entre placas). La fórmula es la inversa de la suma de las inversas:</p>
+                                <div class="formula">1/C<sub>eq</sub> = 1/C<sub>1</sub> + 1/C<sub>2</sub></div>
+                                <p>O para dos condensadores:</p>
+                                <div class="formula">C<sub>eq</sub> = (C<sub>1</sub> · C<sub>2</sub>) / (C<sub>1</sub> + C<sub>2</sub>)</div>
+                                <div class="calculation">
+                                    C<sub>eq</sub> = (40 · 60) / (40 + 60) = 2400 / 100 = <strong>24 µF</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Caso 2: Conexión en Paralelo</h4>
+                                <p>En paralelo, las capacidades se suman directamente (es como aumentar el área de las placas):</p>
+                                <div class="formula">C<sub>eq</sub> = C<sub>1</sub> + C<sub>2</sub></div>
+                                <div class="calculation">
+                                    C<sub>eq</sub> = 40 + 60 = <strong>100 µF</strong>
+                                </div>
+                            </div>
+
+                            <div class="solution-highlight">
+                                <h3>Resultados:</h3>
+                                <p>Serie: <strong>24 µF</strong></p>
+                                <p>Paralelo: <strong>100 µF</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al menú</button>
+                        <button class="btn" onclick="showProblem(2)">Siguiente Ejercicio →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="problem2" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 2: Asociaciones en Paralelo</h2>
+                    <p class="problem-statement">Calcula la capacidad equivalente de las siguientes asociaciones (todas están en paralelo, por lo que las capacidades se suman).</p>
+                    
+                    <div class="circuit-container">
+                        <div class="circuit-group">
+                            <div class="circuit-item">
+                                <strong>Asociación 2.1</strong>
+                                <img src="Asociacion2_1.jpg" alt="Asociación 2.1" class="circuit-image">
+                                <p>100 nF || 20 nF</p>
+                            </div>
+                            <div class="circuit-item">
+                                <strong>Asociación 2.2</strong>
+                                <img src="Asociacion2_2.jpg" alt="Asociación 2.2" class="circuit-image">
+                                <p>1 mF || 500 µF</p>
+                            </div>
+                            <div class="circuit-item">
+                                <strong>Asociación 2.3</strong>
+                                <img src="Asociacion2_3.jpg" alt="Asociación 2.3" class="circuit-image">
+                                <p>100µF || 20µF || 30µF</p>
+                            </div>
+                            <div class="circuit-item">
+                                <strong>Asociación 2.4</strong>
+                                <img src="Asociacion2_4.jpg" alt="Asociación 2.4" class="circuit-image">
+                                <p>100µF || 2mF || 500µF</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(2)">Ver Cálculos Paso a Paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board2">
+                            <div class="step">
+                                <h4> Asociación 2.1 (Suma directa)</h4>
+                                <div class="formula">C<sub>T</sub> = C<sub>1</sub> + C<sub>2</sub></div>
+                                <div class="calculation">C<sub>T</sub> = 100 nF + 20 nF = <strong>120 nF</strong></div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Asociación 2.2 (Unificar unidades)</h4>
+                                <p class="note">Nota: 1 mF = 1000 µF</p>
+                                <div class="calculation">C<sub>T</sub> = 1000 µF + 500 µF = <strong>1500 µF</strong></div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Asociación 2.3</h4>
+                                <div class="formula">C<sub>T</sub> = C<sub>1</sub> + C<sub>2</sub> + C<sub>3</sub></div>
+                                <div class="calculation">C<sub>T</sub> = 100 µF + 20 µF + 30 µF = <strong>150 µF</strong></div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Asociación 2.4 (Unificar unidades)</h4>
+                                <p class="note">Nota: 2 mF = 2000 µF</p>
+                                <div class="calculation">
+                                    C<sub>T</sub> = 100 µF + 2000 µF + 500 µF = <strong>2600 µF</strong>
+                                </div>
+                            </div>
+
+                            <div class="solution-highlight">
+                                <h3>Soluciones:</h3>
+                                <p>2.1: <strong>120 nF</strong></p>
+                                <p>2.2: <strong>1500 µF</strong></p>
+                                <p>2.3: <strong>150 µF</strong></p>
+                                <p>2.4: <strong>2600 µF</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al menú</button>
+                        <button class="btn" onclick="showProblem(1)">← Anterior</button>
+                        <button class="btn" onclick="showProblem(3)">Siguiente →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="problem3" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 3: Asociaciones en Serie</h2>
+                    <p class="problem-statement">Calcula la capacidad equivalente en serie. Recuerda la fórmula general: 1/C<sub>T</sub> = 1/C<sub>1</sub> + 1/C<sub>2</sub> + ...</p>
+                    
+                    <div class="circuit-container">
+                        <div class="circuit-group">
+                            <div class="circuit-item">
+                                <strong>Asociación 3.1</strong>
+                                <img src="Asociacion3_1.jpg" alt="Asociación 3.1" class="circuit-image">
+                                <p>200µF -- 300µF</p>
+                            </div>
+                            <div class="circuit-item">
+                                <strong>Asociación 3.2</strong>
+                                <img src="Asociacion3_2.jpg" alt="Asociación 3.2" class="circuit-image">
+                                <p>200nF -- 250nF -- 300nF</p>
+                            </div>
+                            <div class="circuit-item">
+                                <strong>Asociación 3.3</strong>
+                                <img src="Asociacion3_3.jpg" alt="Asociación 3.3" class="circuit-image">
+                                <p>125µF -- 300µF -- 3mF</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(3)">Ver Cálculos Paso a Paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board3">
+                            <div class="step">
+                                <h4> Asociación 3.1 (Dos condensadores)</h4>
+                                <div class="formula">C<sub>T</sub> = (C<sub>1</sub> · C<sub>2</sub>) / (C<sub>1</sub> + C<sub>2</sub>)</div>
+                                <div class="calculation">
+                                    C<sub>T</sub> = (200 · 300) / (200 + 300) = 60000 / 500 = <strong>120 µF</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Asociación 3.2 (Tres condensadores)</h4>
+                                <div class="formula">1/C<sub>T</sub> = 1/200 + 1/250 + 1/300</div>
+                                <div class="calculation">
+                                    1/C<sub>T</sub> = 0.005 + 0.004 + 0.00333... = 0.01233...<br>
+                                    C<sub>T</sub> = 1 / 0.01233... = <strong>81.08 nF</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Asociación 3.3 (Cuidado con las unidades)</h4>
+                                <p class="note">Convertimos todo a µF: 3 mF = 3000 µF</p>
+                                <div class="formula">1/C<sub>T</sub> = 1/125 + 1/300 + 1/3000</div>
+                                <div class="calculation">
+                                    1/C<sub>T</sub> = 0.008 + 0.00333 + 0.00033 = 0.01166...<br>
+                                    C<sub>T</sub> = 1 / 0.01166... = <strong>85.71 µF</strong>
+                                </div>
+                            </div>
+
+                            <div class="solution-highlight">
+                                <h3>Soluciones:</h3>
+                                <p>3.1: <strong>120 µF</strong></p>
+                                <p>3.2: <strong>81.08 nF</strong></p>
+                                <p>3.3: <strong>85.71 µF</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al menú</button>
+                        <button class="btn" onclick="showProblem(2)">← Anterior</button>
+                        <button class="btn" onclick="showProblem(4)">Siguiente →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="problem4" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 4: Asociaciones Mixtas</h2>
+                    <p class="problem-statement">Calcula la capacidad equivalente resolviendo primero los bloques paralelos y luego las series resultantes.</p>
+                    
+                    <div class="circuit-container">
+                        <div class="circuit-group">
+                            <div class="circuit-item">
+                                <strong>Asociación 4.1</strong>
+                                <img src="Asociacion4_1.jpg" alt="Asociación 4.1" class="circuit-image">
+                            </div>
+                            <div class="circuit-item">
+                                <strong>Asociación 4.2</strong>
+                                <img src="Asociacion4_2.jpg" alt="Asociación 4.2" class="circuit-image">
+                            </div>
+                            <div class="circuit-item">
+                                <strong>Asociación 4.3</strong>
+                                <img src="Asociacion4_3.jpg" alt="Asociación 4.3" class="circuit-image">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(4)">Ver Resolución Mixta</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board4">
+                            <div class="step">
+                                <h4> Asociación 4.1</h4>
+                                <p>1. Bloque derecha (paralelo): 5µF + 10µF = <strong>15µF</strong>.<br>
+                                2. Ahora tenemos el condensador de entrada (10µF) en <strong>serie</strong> con el bloque calculado (15µF).</p>
+                                <div class="calculation">
+                                    C<sub>T</sub> = (10 · 15) / (10 + 15) = 150 / 25 = <strong>6 µF</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Asociación 4.2</h4>
+                                <p>1. Bloque izquierdo (paralelo): 10µF + 10µF = <strong>20µF</strong>.<br>
+                                2. Bloque derecho (paralelo): 5µF + 10µF = <strong>15µF</strong>.<br>
+                                3. Ambos bloques quedan en <strong>serie</strong>.</p>
+                                <div class="calculation">
+                                    C<sub>T</sub> = (20 · 15) / (20 + 15) = 300 / 35 = <strong>8.57 µF</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Asociación 4.3</h4>
+                                <p>1. Bloque izquierdo (paralelo): 15µF + 10µF = <strong>25µF</strong>.<br>
+                                2. Bloque derecho (paralelo): 6µF + 8µF = <strong>14µF</strong>.<br>
+                                3. Tenemos tres elementos en serie: Bloque Izq (25) -- Central (5) -- Bloque Der (14).</p>
+                                <div class="formula">1/C<sub>T</sub> = 1/25 + 1/5 + 1/14</div>
+                                <div class="calculation">
+                                    1/C<sub>T</sub> = 0.04 + 0.2 + 0.0714... = 0.3114...<br>
+                                    C<sub>T</sub> = 1 / 0.3114... = <strong>3.21 µF</strong>
+                                </div>
+                            </div>
+
+                            <div class="solution-highlight">
+                                <h3>Soluciones:</h3>
+                                <p>4.1: <strong>6 µF</strong></p>
+                                <p>4.2: <strong>8.57 µF</strong></p>
+                                <p>4.3: <strong>3.21 µF</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al menú</button>
+                        <button class="btn" onclick="showProblem(3)">← Anterior</button>
+                        <button class="btn" onclick="showProblem(5)">Siguiente →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="problem5" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 5: Tiempo de Carga</h2>
+                    <p class="problem-statement">Calcula cuánto tiempo tardará en cargarse el condensador del montaje.<br>
+                    Se considera que un condensador está cargado aproximadamente en <strong>5 · τ</strong> (5 veces la constante de tiempo).</p>
+                    
+                    <div class="circuit-container">
+                        <img src="Circuito5.jpg" alt="Circuito RC" class="circuit-image" style="max-width: 300px;">
+                        <p class="note">Datos iniciales visuales: R = 10 kΩ, C = 200 µF</p>
+                    </div>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(5)">Ver Cálculos de Tiempo</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board5">
+                            <div class="step">
+                                <h4> Caso 1: Datos originales</h4>
+                                <p>R = 10 kΩ = 10,000 Ω<br>C = 200 µF = 0.0002 F</p>
+                                <div class="formula">τ (Tau) = R · C</div>
+                                <div class="calculation">
+                                    τ = 10,000 · 0.0002 = 2 segundos.<br>
+                                    Tiempo total (5τ) = 5 · 2s = <strong>10 s</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Caso 2: Cambiando la resistencia</h4>
+                                <p>Nueva R = 4k7 = 4,700 Ω<br>C = 200 µF</p>
+                                <div class="calculation">
+                                    τ = 4,700 · 0.0002 = 0.94 segundos.<br>
+                                    Tiempo total (5τ) = 5 · 0.94s = <strong>4.7 s</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Caso 3: Cambiando R y C</h4>
+                                <p>R = 4k7 = 4,700 Ω<br>Nuevo C = 100 µF = 0.0001 F</p>
+                                <div class="calculation">
+                                    τ = 4,700 · 0.0001 = 0.47 segundos.<br>
+                                    Tiempo total (5τ) = 5 · 0.47s = <strong>2.35 s</strong>
+                                </div>
+                            </div>
+
+                            <div class="solution-highlight">
+                                <h3>Tiempos de carga total:</h3>
+                                <p>t<sub>1</sub> = <strong>10 s</strong></p>
+                                <p>t<sub>2</sub> = <strong>4.7 s</strong></p>
+                                <p>t<sub>3</sub> = <strong>2.35 s</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al menú</button>
+                        <button class="btn" onclick="showProblem(4)">← Anterior</button>
+                        <button class="btn" onclick="showProblem(6)">Siguiente →</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="problem6" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 6: Diseño de Condensadores</h2>
+                    <p class="problem-statement">Desafío de lógica de circuitos:<br>
+                    1. ¿Cómo construir un condensador de <strong>10 µF</strong> teniendo solo condensadores de <strong>30 µF</strong>?<br>
+                    2. ¿Y a partir de condensadores de <strong>100 µF</strong>?</p>
+                    
+                    <button class="btn btn-board" onclick="toggleBoard(6)">Ver Estrategia</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board6">
+                            <div class="step">
+                                <h4> Caso 1: Objetivo 10µF usando piezas de 30µF</h4>
+                                <p>Sabemos que al poner condensadores iguales en <strong>serie</strong>, la capacidad se divide por el número de condensadores (C_eq = C / n).</p>
+                                <p>Queremos pasar de 30 a 10. Dividimos por 3.</p>
+                                <div class="formula">30µF / 3 = 10µF</div>
+                                <div class="solution-highlight" style="margin: 10px 0; padding: 1rem;">
+                                    <strong>Solución:</strong> Conectar 3 condensadores de 30µF en serie.
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4> Caso 2: Objetivo 10µF usando piezas de 100µF</h4>
+                                <p>Mismo principio. Queremos pasar de 100 a 10. Necesitamos dividir por 10.</p>
+                                <div class="formula">100µF / 10 = 10µF</div>
+                                <div class="solution-highlight" style="margin: 10px 0; padding: 1rem;">
+                                    <strong>Solución:</strong> Conectar 10 condensadores de 100µF en serie.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al menú</button>
+                        <button class="btn" onclick="showProblem(5)">← Anterior</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function showHome() {
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('home').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        
+        function showProblem(problemNumber) {
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('problem' + problemNumber).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        
+        function toggleBoard(problemNumber) {
+            const board = document.getElementById('board' + problemNumber);
+            if (board) {
+                board.classList.toggle('active');
+                
+                const button = event.target;
+                if (board.classList.contains('active')) {
+                    button.textContent = 'Ocultar Solución';
+                    button.style.background = '#0284c7';
+                } else {
+                    // Restaurar texto original según el botón
+                    if(problemNumber === 5) button.textContent = 'Ver Cálculos de Tiempo';
+                    else if(problemNumber === 6) button.textContent = 'Ver Estrategia';
+                    else button.textContent = 'Ver Resolución Paso a Paso';
+                    
+                    button.style.background = '';
+                }
+            }
+        }
+        
+        // Iniciar en home
+        document.addEventListener('DOMContentLoaded', function() {
+            showHome();
+        });
+    </script>
+</body>
+</html>
