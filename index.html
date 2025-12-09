@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problemas de Electrónica Analógica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin: 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            color: #4b5563;
+            margin: 10px 0 0 0;
+            font-weight: 300;
+            font-size: 1.5rem;
+            background-color: #e5e7eb;
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 20px;
+        }
+
+        /* Diseño de cuadrícula (Grid) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Estilo de las tarjetas/botones */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            text-decoration: none;
+            color: var(--text-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-color);
+        }
+
+        .card:hover i {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        /* Estilo de los iconos */
+        .icon-container {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .ean-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.75rem;
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* Colores específicos para grupos de temas (opcional) */
+        .group-transistors i { color: #d97706; }
+        .group-basic i { color: #059669; }
+        .group-advanced i { color: #7c3aed; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>PROBLEMAS DE ELECTRÓNICA ANALÓGICA</h1>
+        <h2>4º ESO</h2>
+    </header>
+
+    <div class="grid-container">
+        
+        <a href="EAN1/index.html" class="card group-basic">
+            <span class="ean-tag">EAN1</span>
+            <div class="icon-container"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="card-title">Diagrama V / I</div>
+        </a>
+
+        <a href="EAN2/index.html" class="card group-basic">
+            <span class="ean-tag">EAN2</span>
+            <div class="icon-container"><i class="fa-solid fa-palette"></i></div>
+            <div class="card-title">Colores Resistencias</div>
+        </a>
+
+        <a href="EAN3/index.html" class="card group-basic">
+            <span class="ean-tag">EAN3</span>
+            <div class="icon-container"><i class="fa-solid fa-arrows-to-circle"></i></div>
+            <div class="card-title">Asociación de Resistencias</div>
+        </a>
+
+        <a href="EAN4/index.html" class="card group-basic">
+            <span class="ean-tag">EAN4</span>
+            <div class="icon-container"><i class="fa-solid fa-bolt"></i></div>
+            <div class="card-title">Ley de Ohm</div>
+        </a>
+
+        <a href="EAN5/index.html" class="card group-basic">
+            <span class="ean-tag">EAN5</span>
+            <div class="icon-container"><i class="fa-solid fa-fire-flame-curved"></i></div>
+            <div class="card-title">Ley de Joule</div>
+        </a>
+
+        <a href="EAN6/index.html" class="card group-basic">
+            <span class="ean-tag">EAN6</span>
+            <div class="icon-container"><i class="fa-solid fa-code-branch"></i></div>
+            <div class="card-title">Leyes de Kirchhoff</div>
+        </a>
+
+        <a href="EAN7/index.html" class="card">
+            <span class="ean-tag">EAN7</span>
+            <div class="icon-container"><i class="fa-solid fa-circle-play"></i></div>
+            <div class="card-title">Diodos</div>
+        </a>
+
+        <a href="EAN8/index.html" class="card">
+            <span class="ean-tag">EAN8</span>
+            <div class="icon-container"><i class="fa-solid fa-battery-half"></i></div>
+            <div class="card-title">Condensadores</div>
+        </a>
+
+        <a href="EAN9/index.html" class="card group-transistors">
+            <span class="ean-tag">EAN9</span>
+            <div class="icon-container"><i class="fa-solid fa-toggle-on"></i></div>
+            <div class="card-title">Transistores (Estados)</div>
+        </a>
+
+        <a href="EAN10/index.html" class="card group-transistors">
+            <span class="ean-tag">EAN10</span>
+            <div class="icon-container"><i class="fa-solid fa-baby"></i></div>
+            <div class="card-title">Transistores<br><small>Nivel Pringaíllo</small></div>
+        </a>
+
+        <a href="EAN11/index.html" class="card group-transistors">
+            <span class="ean-tag">EAN11</span>
+            <div class="icon-container"><i class="fa-regular fa-face-smile"></i></div>
+            <div class="card-title">Transistores<br><small>Nivel Normalillo</small></div>
+        </a>
+
+        <a href="EAN12/index.html" class="card group-transistors">
+            <span class="ean-tag">EAN12</span>
+            <div class="icon-container"><i class="fa-solid fa-glasses"></i></div>
+            <div class="card-title">Transistores<br><small>Nivel Enteraíllo</small></div>
+        </a>
+
+        <a href="EAN13/index.html" class="card group-transistors">
+            <span class="ean-tag">EAN13</span>
+            <div class="icon-container"><i class="fa-solid fa-hand-fist"></i></div> <div class="card-title">Transistores<br><small>Nivel Heavy Metal</small></div>
+        </a>
+
+        <a href="EAN14/index.html" class="card group-advanced">
+            <span class="ean-tag">EAN14</span>
+            <div class="icon-container"><i class="fa-solid fa-microchip"></i></div>
+            <div class="card-title">Amplificador Operacional</div>
+        </a>
+
+        <a href="EAN15/index.html" class="card group-advanced">
+            <span class="ean-tag">EAN15</span>
+            <div class="icon-container"><i class="fa-solid fa-stopwatch"></i></div>
+            <div class="card-title">Temporizador 555</div>
+        </a>
+
+        <a href="EAN16/index.html" class="card group-advanced">
+            <span class="ean-tag">EAN16</span>
+            <div class="icon-container"><i class="fa-solid fa-wave-square"></i></div>
+            <div class="card-title">Trabajando con PWM</div>
+        </a>
+
+    </div>
+
+    <footer style="margin-top: 50px; color: #6b7280; font-size: 0.9rem;">
+        &copy; Departamento de Tecnología - Electrónica Analógica
+    </footer>
+
+</body>
+</html>
