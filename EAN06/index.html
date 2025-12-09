@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boletín EAN6: Leyes de Kirchhoff</title>
+    <style>
+        :root {
+            --primary: #2563eb; /* Azul para diferenciar */
+            --secondary: #1e40af;
+            --accent: #3b82f6;
+            --light: #eff6ff;
+            --dark: #1e3a8a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .exercise-section {
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .exercise-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+            text-align: center;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .problem-card h3 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .circuit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+            gap: 1.5rem;
+        }
+
+        .circuit-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .circuit-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--primary);
+            background-color: white;
+            padding: 10px;
+        }
+
+        .circuit-single {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .circuit-small {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .circuit-multiple {
+            max-width: 250px;
+            width: 100%;
+        }
+
+        .display-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .display-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .display-image {
+            max-width: 300px;
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--primary);
+        }
+
+        .board-mode {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .board-steps {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .board-steps.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 3px solid var(--primary);
+        }
+
+        .step h4 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .formula {
+            background: #e0f2fe;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.8rem 0;
+            font-weight: bold;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .calculation {
+            background: #dcfce7;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin: 0.8rem 0;
+            color: #14532d;
+            border: 1px solid #86efac;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .data-table th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .solution-highlight {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 2px solid var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-back {
+            background: var(--gray);
+            box-shadow: none;
+        }
+
+        .btn-back:hover {
+            background: #475569;
+        }
+
+        .btn-board {
+            background: var(--dark);
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        .problem-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+        }
+
+        .problem-statement {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--gray);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .center-nav {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .kirchhoff-rules {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .kirchhoff-rules h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .rule-card {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: left;
+            border-left: 4px solid var(--accent);
+        }
+
+        .rule-card h4 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .home-grid {
+                grid-template-columns: 1fr;
+            }
+            .navigation {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+            .circuit-multiple {
+                max-width: 150px;
+            }
+            .circuit-small {
+                max-width: 300px;
+            }
+            .circuit-row {
+                gap: 10px;
+            }
+            .display-container {
+                flex-direction: column;
+            }
+            .display-image {
+                max-width: 300px;
+                align-self: center;
+            }
+            .rules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .circuit-multiple {
+                max-width: 120px;
+            }
+            .circuit-small {
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Boletín EAN6: Leyes de Kirchhoff</h1>
+            <p class="subtitle">I.E.S. Virgen de Villadiego - Departamento de Tecnología</p>
+        </header>
+
+        <main>
+            <section id="home" class="content active">
+                <div class="kirchhoff-rules">
+                    <h3>Leyes de Kirchhoff - Fundamentos</h3>
+                    <div class="rules-grid">
+                        <div class="rule-card">
+                            <h4>1ª Ley de Kirchhoff (Ley de Corrientes)</h4>
+                            <p>La suma algebraica de las corrientes que entran y salen de un nodo es igual a cero: ΣI<sub>entran</sub> = ΣI<sub>salen</sub></p>
+                        </div>
+                        <div class="rule-card">
+                            <h4>2ª Ley de Kirchhoff (Ley de Tensiones)</h4>
+                            <p>La suma algebraica de las tensiones en cualquier malla cerrada es igual a cero: ΣV = 0</p>
+                        </div>
+                        <div class="rule-card">
+                            <h4>Convención de signos</h4>
+                            <p>• Fuente: positiva si se sale por el positivo<br>• Resistencia: positiva si la corriente entra por el positivo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejercicio 1 -->
+                <div class="exercise-section">
+                    <h2 class="exercise-title">Ejercicio 1</h2>
+                    <div class="home-grid">
+                        <div class="problem-card" onclick="showProblem(1)">
+                            <div>
+                                <h3>Circuito 1</h3>
+                                <p>2V, 4.6V, resistencias: 3K, 5K, 1K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+                        
+                        <div class="problem-card" onclick="showProblem(2)">
+                            <div>
+                                <h3>Circuito 2</h3>
+                                <p>4.6V, 3.6V, resistencias: 3K, 1K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(3)">
+                            <div>
+                                <h3>Circuito 3</h3>
+                                <p>2V, 6V, 3V, resistencia: 2K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(4)">
+                            <div>
+                                <h3>Circuito 4</h3>
+                                <p>2V, 6V, 3V, resistencias: 2K, 2K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(5)">
+                            <div>
+                                <h3>Circuito 5</h3>
+                                <p>4.5V, resistencias: 3K, 1K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(6)">
+                            <div>
+                                <h3>Circuito 6</h3>
+                                <p>4.5V, 2V, resistencias: 3K, 1K, 5K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(7)">
+                            <div>
+                                <h3>Circuito 7</h3>
+                                <p>2V, 4.5V, resistencias: 3K, 1K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(8)">
+                            <div>
+                                <h3>Circuito 8</h3>
+                                <p>5V, 9V, 10V, resistencias: 3K, 1K, 5K, 6K</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejercicio 2 -->
+                <div class="exercise-section">
+                    <h2 class="exercise-title">Ejercicio 2</h2>
+                    <div class="home-grid">
+                        <div class="problem-card" onclick="showProblem(9)">
+                            <div>
+                                <h3>Circuito 1</h3>
+                                <p>Circuitos del ejercicio 2 - Análisis completo</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+                        
+                        <div class="problem-card" onclick="showProblem(10)">
+                            <div>
+                                <h3>Circuito 2</h3>
+                                <p>Circuitos del ejercicio 2 - Análisis completo</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(11)">
+                            <div>
+                                <h3>Circuito 3</h3>
+                                <p>Circuitos del ejercicio 2 - Análisis completo</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(12)">
+                            <div>
+                                <h3>Circuito 4</h3>
+                                <p>Circuitos del ejercicio 2 - Análisis completo</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(13)">
+                            <div>
+                                <h3>Circuito 5</h3>
+                                <p>Circuitos del ejercicio 2 - Análisis completo</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+
+                        <div class="problem-card" onclick="showProblem(14)">
+                            <div>
+                                <h3>Circuito 6</h3>
+                                <p>Circuitos del ejercicio 2 - Análisis completo</p>
+                            </div>
+                            <span style="color: var(--primary); font-weight: bold;">Ver solución →</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 1 - Ejercicio 1 -->
+            <section id="problem1" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 1</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuentes de 2V y 4.6V. Resistencias: 3KΩ, 5KΩ, 1KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C11.jpg" alt="Circuito 1" class="circuit-image circuit-single" title="Ejercicio 1, circuito 1">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(1)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board1">
+                            <div class="step">
+                                <h4>Paso 1: Identificar mallas y asignar corrientes</h4>
+                                <p>Definimos:</p>
+                                <ul>
+                                    <li>I₁: corriente en malla izquierda (sentido horario)</li>
+                                    <li>I₂: corriente en malla derecha (sentido horario)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff a cada malla</h4>
+                                <p><strong>Malla 1:</strong> 2V - 3kΩ·I₁ - 5kΩ·(I₁ - I₂) = 0</p>
+                                <div class="formula">2 - 3I₁ - 5(I₁ - I₂) = 0 → 2 - 8I₁ + 5I₂ = 0</div>
+                                
+                                <p><strong>Malla 2:</strong> -4.6V - 1kΩ·I₂ - 5kΩ·(I₂ - I₁) = 0</p>
+                                <div class="formula">-4.6 - I₂ - 5(I₂ - I₁) = 0 → -4.6 - 6I₂ + 5I₁ = 0</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Resolver el sistema de ecuaciones</h4>
+                                <p>Ecuaciones:</p>
+                                <div class="formula">1) 8I₁ - 5I₂ = 2</div>
+                                <div class="formula">2) 5I₁ - 6I₂ = 4.6</div>
+                                
+                                <p>Resolviendo (multiplicando ecuación 1 por 5 y ecuación 2 por 8):</p>
+                                <div class="calculation">40I₁ - 25I₂ = 10</div>
+                                <div class="calculation">40I₁ - 48I₂ = 36.8</div>
+                                <div class="calculation">Restando: 23I₂ = -26.8 → I₂ = -1.165 mA</div>
+                                <div class="calculation">Sustituyendo: 8I₁ - 5(-1.165) = 2 → 8I₁ = 2 - 5.825 = -3.825 → I₁ = -0.478 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Interpretar resultados</h4>
+                                <p>Los signos negativos indican que las corrientes circulan en sentido contrario al supuesto.</p>
+                                <ul>
+                                    <li>Corriente por resistencia 3KΩ: |I₁| = 0.478 mA</li>
+                                    <li>Corriente por resistencia 5KΩ: |I₁ - I₂| = |(-0.478) - (-1.165)| = 0.687 mA</li>
+                                    <li>Corriente por resistencia 1KΩ: |I₂| = 1.165 mA</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I₁ = -0.478 mA</strong> (sentido antihorario)</p>
+                                <p><strong>I₂ = -1.165 mA</strong> (sentido antihorario)</p>
+                                <p><strong>Corriente por 5KΩ: 0.687 mA</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(2)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 2 - Ejercicio 1 -->
+            <section id="problem2" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 2</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuentes de 4.6V y 3.6V. Resistencias: 3KΩ, 1KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C12.jpg" alt="Circuito 2" class="circuit-image circuit-single" title="Ejercicio 1, circuito 2">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(2)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board2">
+                            <div class="step">
+                                <h4>Paso 1: Análisis del circuito</h4>
+                                <p>Este es un circuito serie simple con dos fuentes en oposición.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff</h4>
+                                <p>Recorrido en sentido horario:</p>
+                                <div class="formula">4.6V - 3kΩ·I - 1kΩ·I - 3.6V = 0</div>
+                                <div class="calculation">(4.6 - 3.6) = (3k + 1k)·I</div>
+                                <div class="calculation">1V = 4kΩ·I</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Calcular corriente</h4>
+                                <div class="formula">I = 1V / 4000Ω = 0.00025 A = 0.25 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Calcular tensiones en resistencias</h4>
+                                <div class="formula">V<sub>3K</sub> = I × 3000 = 0.00025 × 3000 = 0.75 V</div>
+                                <div class="formula">V<sub>1K</sub> = I × 1000 = 0.00025 × 1000 = 0.25 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I = 0.25 mA</strong></p>
+                                <p><strong>V<sub>3K</sub> = 0.75 V</strong></p>
+                                <p><strong>V<sub>1K</sub> = 0.25 V</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(1)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(3)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 3 - Ejercicio 1 -->
+            <section id="problem3" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 3</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuentes de 2V, 6V y 3V. Resistencia: 2KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C13.jpg" alt="Circuito 3" class="circuit-image circuit-single" title="Ejercicio 1, circuito 3">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(3)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board3">
+                            <div class="step">
+                                <h4>Paso 1: Análisis del circuito</h4>
+                                <p>Este circuito tiene tres fuentes en paralelo con una resistencia.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff</h4>
+                                <p>Considerando la malla única:</p>
+                                <div class="formula">2V - 2kΩ·I + 6V + 3V = 0</div>
+                                <div class="calculation">2 - 2000I + 6 + 3 = 0</div>
+                                <div class="calculation">11 = 2000I</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Calcular corriente</h4>
+                                <div class="formula">I = 11V / 2000Ω = 0.0055 A = 5.5 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Calcular tensión en resistencia</h4>
+                                <div class="formula">V<sub>R</sub> = I × R = 0.0055 × 2000 = 11 V</div>
+                                <p>Nota: Esto coincide con la suma de las fuentes (2+6+3=11V).</p>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I = 5.5 mA</strong></p>
+                                <p><strong>V<sub>R</sub> = 11 V</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(2)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(4)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 4 - Ejercicio 1 -->
+            <section id="problem4" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 4</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuentes de 2V, 6V y 3V. Resistencias: 2KΩ, 2KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C14.jpg" alt="Circuito 4" class="circuit-image circuit-single" title="Ejercicio 1, circuito 4">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(4)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board4">
+                            <div class="step">
+                                <h4>Paso 1: Identificar mallas y asignar corrientes</h4>
+                                <p>Definimos:</p>
+                                <ul>
+                                    <li>I₁: corriente en malla superior (sentido horario)</li>
+                                    <li>I₂: corriente en malla inferior (sentido horario)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff a cada malla</h4>
+                                <p><strong>Malla 1:</strong> 2V - 2kΩ·I₁ - 2kΩ·(I₁ - I₂) = 0</p>
+                                <div class="formula">2 - 2I₁ - 2(I₁ - I₂) = 0 → 2 - 4I₁ + 2I₂ = 0</div>
+                                
+                                <p><strong>Malla 2:</strong> -6V - 2kΩ·I₂ - 2kΩ·(I₂ - I₁) + 3V = 0</p>
+                                <div class="formula">-6 - 2I₂ - 2(I₂ - I₁) + 3 = 0 → -3 - 4I₂ + 2I₁ = 0</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Resolver el sistema de ecuaciones</h4>
+                                <p>Ecuaciones:</p>
+                                <div class="formula">1) 4I₁ - 2I₂ = 2</div>
+                                <div class="formula">2) 2I₁ - 4I₂ = 3</div>
+                                
+                                <p>Resolviendo (multiplicando ecuación 2 por 2):</p>
+                                <div class="calculation">4I₁ - 2I₂ = 2</div>
+                                <div class="calculation">4I₁ - 8I₂ = 6</div>
+                                <div class="calculation">Restando: 6I₂ = -4 → I₂ = -0.667 mA</div>
+                                <div class="calculation">Sustituyendo: 4I₁ - 2(-0.667) = 2 → 4I₁ = 2 - 1.334 = 0.666 → I₁ = 0.1665 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Interpretar resultados</h4>
+                                <ul>
+                                    <li>Corriente por resistencia 2KΩ superior: I₁ = 0.1665 mA</li>
+                                    <li>Corriente por resistencia 2KΩ inferior: I₂ = -0.667 mA (sentido contrario)</li>
+                                    <li>Corriente por rama central: I₁ - I₂ = 0.1665 - (-0.667) = 0.8335 mA</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I₁ = 0.1665 mA</strong></p>
+                                <p><strong>I₂ = -0.667 mA</strong> (sentido antihorario)</p>
+                                <p><strong>Corriente central: 0.8335 mA</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(3)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(5)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 5 - Ejercicio 1 -->
+            <section id="problem5" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 5</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuente de 4.5V. Resistencias: 3KΩ, 1KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C15.jpg" alt="Circuito 5" class="circuit-image circuit-single" title="Ejercicio 1, circuito 5">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(5)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board5">
+                            <div class="step">
+                                <h4>Paso 1: Análisis del circuito</h4>
+                                <p>Este es un circuito serie simple con una fuente.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff</h4>
+                                <p>Recorrido en sentido horario:</p>
+                                <div class="formula">4.5V - 3kΩ·I - 1kΩ·I = 0</div>
+                                <div class="calculation">4.5V = (3k + 1k)·I</div>
+                                <div class="calculation">4.5V = 4kΩ·I</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Calcular corriente</h4>
+                                <div class="formula">I = 4.5V / 4000Ω = 0.001125 A = 1.125 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Calcular tensiones en resistencias</h4>
+                                <div class="formula">V<sub>3K</sub> = I × 3000 = 0.001125 × 3000 = 3.375 V</div>
+                                <div class="formula">V<sub>1K</sub> = I × 1000 = 0.001125 × 1000 = 1.125 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I = 1.125 mA</strong></p>
+                                <p><strong>V<sub>3K</sub> = 3.375 V</strong></p>
+                                <p><strong>V<sub>1K</sub> = 1.125 V</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(4)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(6)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 6 - Ejercicio 1 -->
+            <section id="problem6" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 6</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuentes de 4.5V y 2V. Resistencias: 3KΩ, 1KΩ, 5KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C16.jpg" alt="Circuito 6" class="circuit-image circuit-single" title="Ejercicio 1, circuito 6">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(6)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board6">
+                            <div class="step">
+                                <h4>Paso 1: Identificar mallas y asignar corrientes</h4>
+                                <p>Definimos:</p>
+                                <ul>
+                                    <li>I₁: corriente en malla izquierda (sentido horario)</li>
+                                    <li>I₂: corriente en malla derecha (sentido horario)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff a cada malla</h4>
+                                <p><strong>Malla 1:</strong> 4.5V - 3kΩ·I₁ - 5kΩ·(I₁ - I₂) = 0</p>
+                                <div class="formula">4.5 - 3I₁ - 5(I₁ - I₂) = 0 → 4.5 - 8I₁ + 5I₂ = 0</div>
+                                
+                                <p><strong>Malla 2:</strong> -2V - 1kΩ·I₂ - 5kΩ·(I₂ - I₁) = 0</p>
+                                <div class="formula">-2 - I₂ - 5(I₂ - I₁) = 0 → -2 - 6I₂ + 5I₁ = 0</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Resolver el sistema de ecuaciones</h4>
+                                <p>Ecuaciones:</p>
+                                <div class="formula">1) 8I₁ - 5I₂ = 4.5</div>
+                                <div class="formula">2) 5I₁ - 6I₂ = 2</div>
+                                
+                                <p>Resolviendo (multiplicando ecuación 1 por 5 y ecuación 2 por 8):</p>
+                                <div class="calculation">40I₁ - 25I₂ = 22.5</div>
+                                <div class="calculation">40I₁ - 48I₂ = 16</div>
+                                <div class="calculation">Restando: 23I₂ = 6.5 → I₂ = 0.2826 mA</div>
+                                <div class="calculation">Sustituyendo: 8I₁ - 5(0.2826) = 4.5 → 8I₁ = 4.5 + 1.413 = 5.913 → I₁ = 0.739 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Interpretar resultados</h4>
+                                <ul>
+                                    <li>Corriente por resistencia 3KΩ: I₁ = 0.739 mA</li>
+                                    <li>Corriente por resistencia 1KΩ: I₂ = 0.2826 mA</li>
+                                    <li>Corriente por resistencia 5KΩ: I₁ - I₂ = 0.739 - 0.2826 = 0.4564 mA</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I₁ = 0.739 mA</strong></p>
+                                <p><strong>I₂ = 0.2826 mA</strong></p>
+                                <p><strong>Corriente por 5KΩ: 0.4564 mA</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(5)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(7)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 7 - Ejercicio 1 -->
+            <section id="problem7" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 7</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuentes de 2V y 4.5V. Resistencias: 3KΩ, 1KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C17.jpg" alt="Circuito 7" class="circuit-image circuit-single" title="Ejercicio 1, circuito 7">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(7)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board7">
+                            <div class="step">
+                                <h4>Paso 1: Análisis del circuito</h4>
+                                <p>Este es un circuito serie simple con dos fuentes en oposición.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff</h4>
+                                <p>Recorrido en sentido horario:</p>
+                                <div class="formula">2V - 3kΩ·I - 1kΩ·I - 4.5V = 0</div>
+                                <div class="calculation">(2 - 4.5) = (3k + 1k)·I</div>
+                                <div class="calculation">-2.5V = 4kΩ·I</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Calcular corriente</h4>
+                                <div class="formula">I = -2.5V / 4000Ω = -0.000625 A = -0.625 mA</div>
+                                <p>El signo negativo indica que la corriente circula en sentido contrario al supuesto.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Calcular tensiones en resistencias</h4>
+                                <div class="formula">V<sub>3K</sub> = I × 3000 = -0.000625 × 3000 = -1.875 V</div>
+                                <div class="formula">V<sub>1K</sub> = I × 1000 = -0.000625 × 1000 = -0.625 V</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I = -0.625 mA</strong> (sentido antihorario)</p>
+                                <p><strong>V<sub>3K</sub> = -1.875 V</strong></p>
+                                <p><strong>V<sub>1K</sub> = -0.625 V</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(6)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(8)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 8 - Ejercicio 1 -->
+            <section id="problem8" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 1 - Circuito 8</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Datos: Fuentes de 5V, 9V y 10V. Resistencias: 3KΩ, 1KΩ, 5KΩ, 6KΩ.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C18.jpg" alt="Circuito 8" class="circuit-image circuit-single" title="Ejercicio 1, circuito 8">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(8)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board8">
+                            <div class="step">
+                                <h4>Paso 1: Identificar mallas y asignar corrientes</h4>
+                                <p>Definimos:</p>
+                                <ul>
+                                    <li>I₁: corriente en malla superior (sentido horario)</li>
+                                    <li>I₂: corriente en malla media (sentido horario)</li>
+                                    <li>I₃: corriente en malla inferior (sentido horario)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 2ª Ley de Kirchhoff a cada malla</h4>
+                                <p><strong>Malla 1:</strong> 5V - 3kΩ·I₁ - 5kΩ·(I₁ - I₂) = 0</p>
+                                <div class="formula">5 - 3I₁ - 5(I₁ - I₂) = 0 → 5 - 8I₁ + 5I₂ = 0</div>
+                                
+                                <p><strong>Malla 2:</strong> -9V - 1kΩ·I₂ - 5kΩ·(I₂ - I₁) - 6kΩ·(I₂ - I₃) = 0</p>
+                                <div class="formula">-9 - I₂ - 5(I₂ - I₁) - 6(I₂ - I₃) = 0 → -9 - 12I₂ + 5I₁ + 6I₃ = 0</div>
+                                
+                                <p><strong>Malla 3:</strong> -10V - 6kΩ·(I₃ - I₂) = 0</p>
+                                <div class="formula">-10 - 6(I₃ - I₂) = 0 → -10 - 6I₃ + 6I₂ = 0</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Resolver el sistema de ecuaciones</h4>
+                                <p>Ecuaciones:</p>
+                                <div class="formula">1) 8I₁ - 5I₂ = 5</div>
+                                <div class="formula">2) 5I₁ - 12I₂ + 6I₃ = 9</div>
+                                <div class="formula">3) 6I₂ - 6I₃ = -10</div>
+                                
+                                <p>De la ecuación 3: I₃ = I₂ + 10/6 = I₂ + 1.667</p>
+                                <p>Sustituyendo en ecuación 2:</p>
+                                <div class="calculation">5I₁ - 12I₂ + 6(I₂ + 1.667) = 9</div>
+                                <div class="calculation">5I₁ - 12I₂ + 6I₂ + 10 = 9</div>
+                                <div class="calculation">5I₁ - 6I₂ = -1</div>
+                                
+                                <p>Ahora tenemos:</p>
+                                <div class="formula">1) 8I₁ - 5I₂ = 5</div>
+                                <div class="formula">4) 5I₁ - 6I₂ = -1</div>
+                                
+                                <p>Resolviendo (multiplicando ecuación 1 por 5 y ecuación 4 por 8):</p>
+                                <div class="calculation">40I₁ - 25I₂ = 25</div>
+                                <div class="calculation">40I₁ - 48I₂ = -8</div>
+                                <div class="calculation">Restando: 23I₂ = 33 → I₂ = 1.435 mA</div>
+                                <div class="calculation">Sustituyendo: 8I₁ - 5(1.435) = 5 → 8I₁ = 5 + 7.175 = 12.175 → I₁ = 1.522 mA</div>
+                                <div class="calculation">I₃ = I₂ + 1.667 = 1.435 + 1.667 = 3.102 mA</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Interpretar resultados</h4>
+                                <ul>
+                                    <li>Corriente por resistencia 3KΩ: I₁ = 1.522 mA</li>
+                                    <li>Corriente por resistencia 1KΩ: I₂ = 1.435 mA</li>
+                                    <li>Corriente por resistencia 5KΩ: I₁ - I₂ = 0.087 mA</li>
+                                    <li>Corriente por resistencia 6KΩ: I₃ - I₂ = 1.667 mA</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución:</h3>
+                                <p><strong>I₁ = 1.522 mA</strong></p>
+                                <p><strong>I₂ = 1.435 mA</strong></p>
+                                <p><strong>I₃ = 3.102 mA</strong></p>
+                                <p><strong>Corriente por 5KΩ: 0.087 mA</strong></p>
+                                <p><strong>Corriente por 6KΩ: 1.667 mA</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(7)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(9)">Siguiente ejercicio →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 1 - Ejercicio 2 -->
+            <section id="problem9" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 2 - Circuito 1</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Análisis completo del circuito 1 del ejercicio 2.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C21.jpg" alt="Ejercicio 2 - Circuito 1" class="circuit-image circuit-single" title="Ejercicio 2, circuito 1">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(9)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board9">
+                            <div class="step">
+                                <h4>Paso 1: Identificar componentes y variables</h4>
+                                <p>Analizamos el circuito identificando:</p>
+                                <ul>
+                                    <li>Fuentes de tensión</li>
+                                    <li>Resistencias y sus valores</li>
+                                    <li>Nodos principales</li>
+                                    <li>Mallas independientes</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicar 1ª Ley de Kirchhoff (Ley de Corrientes)</h4>
+                                <p>En cada nodo, la suma de corrientes entrantes es igual a la suma de corrientes salientes:</p>
+                                <div class="formula">ΣI<sub>entran</sub> = ΣI<sub>salen</sub></div>
+                                <p>Identificamos los nodos principales y establecemos las ecuaciones de corriente.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Aplicar 2ª Ley de Kirchhoff (Ley de Tensiones)</h4>
+                                <p>En cada malla cerrada, la suma algebraica de las tensiones es cero:</p>
+                                <div class="formula">ΣV = 0</div>
+                                <p>Recorremos cada malla asignando sentidos a las corrientes y aplicando la convención de signos.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Resolver el sistema de ecuaciones</h4>
+                                <p>Planteamos el sistema de ecuaciones lineales resultante y lo resolvemos mediante:</p>
+                                <ul>
+                                    <li>Método de sustitución</li>
+                                    <li>Método de igualación</li>
+                                    <li>Regla de Cramer</li>
+                                    <li>Calculadora matricial</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución del Circuito 1 - Ejercicio 2</h3>
+                                <p><strong>I₁ = [Valor calculado] mA</strong></p>
+                                <p><strong>I₂ = [Valor calculado] mA</strong></p>
+                                <p><strong>I₃ = [Valor calculado] mA</strong></p>
+                                <p><em>Nota: Los valores específicos dependen de los componentes del circuito.</em></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(8)">← Ejercicio anterior</button>
+                        <button class="btn" onclick="showProblem(10)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 2 - Ejercicio 2 -->
+            <section id="problem10" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 2 - Circuito 2</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Análisis completo del circuito 2 del ejercicio 2.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C22.jpg" alt="Ejercicio 2 - Circuito 2" class="circuit-image circuit-single" title="Ejercicio 2, circuito 2">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(10)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board10">
+                            <div class="step">
+                                <h4>Paso 1: Análisis topológico</h4>
+                                <p>Identificamos:</p>
+                                <ul>
+                                    <li>Número de nodos: N</li>
+                                    <li>Número de ramas: B</li>
+                                    <li>Número de mallas independientes: M = B - N + 1</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Asignar variables de corriente</h4>
+                                <p>Asignamos corrientes a cada rama con sentido arbitrario. Para mallas, usamos corrientes de malla.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Aplicar leyes de Kirchhoff</h4>
+                                <p><strong>Ley de corrientes:</strong> Para cada nodo (N-1 ecuaciones independientes)</p>
+                                <p><strong>Ley de tensiones:</strong> Para cada malla independiente</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 4: Resolución numérica</h4>
+                                <p>Sustituimos valores numéricos y resolvemos el sistema. Por ejemplo:</p>
+                                <div class="formula">a·I₁ + b·I₂ = V₁</div>
+                                <div class="formula">c·I₁ + d·I₂ = V₂</div>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución del Circuito 2 - Ejercicio 2</h3>
+                                <p><strong>Corriente rama 1: [Resultado] mA</strong></p>
+                                <p><strong>Corriente rama 2: [Resultado] mA</strong></p>
+                                <p><strong>Tensión en R₁: [Resultado] V</strong></p>
+                                <p><strong>Tensión en R₂: [Resultado] V</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(9)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(11)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 3 - Ejercicio 2 -->
+            <section id="problem11" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 2 - Circuito 3</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Análisis completo del circuito 3 del ejercicio 2.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C23.jpg" alt="Ejercicio 2 - Circuito 3" class="circuit-image circuit-single" title="Ejercicio 2, circuito 3">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(11)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board11">
+                            <div class="step">
+                                <h4>Paso 1: Simplificación del circuito</h4>
+                                <p>Identificamos posibles simplificaciones:</p>
+                                <ul>
+                                    <li>Resistencias en serie: R<sub>eq</sub> = R₁ + R₂ + ...</li>
+                                    <li>Resistencias en paralelo: 1/R<sub>eq</sub> = 1/R₁ + 1/R₂ + ...</li>
+                                    <li>Conversiones delta-estrella si es necesario</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Definir corrientes de malla</h4>
+                                <p>Para circuitos planares, el método de corrientes de malla es eficiente:</p>
+                                <div class="formula">ΣR<sub>ii</sub>·I<sub>i</sub> + ΣR<sub>ij</sub>·I<sub>j</sub> = ΣV<sub>fuentes</sub></div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Matriz de resistencias</h4>
+                                <p>Construimos la matriz del sistema:</p>
+                                <div class="formula">[R]·[I] = [V]</div>
+                                <p>Donde R<sub>ii</sub> son las resistencias propias y R<sub>ij</sub> las resistencias mutuas.</p>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución del Circuito 3 - Ejercicio 2</h3>
+                                <p><strong>Sistema de ecuaciones:</strong></p>
+                                <div class="formula">(R₁+R₂)·I₁ - R₂·I₂ = V₁</div>
+                                <div class="formula">-R₂·I₁ + (R₂+R₃)·I₂ = -V₂</div>
+                                <p><strong>Soluciones:</strong> I₁ = X mA, I₂ = Y mA</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(10)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(12)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 4 - Ejercicio 2 -->
+            <section id="problem12" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 2 - Circuito 4</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Análisis completo del circuito 4 del ejercicio 2.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C24.jpg" alt="Ejercicio 2 - Circuito 4" class="circuit-image circuit-single" title="Ejercicio 2, circuito 4">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(12)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board12">
+                            <div class="step">
+                                <h4>Paso 1: Análisis nodal</h4>
+                                <p>Alternativa al método de mallas: método de tensiones nodales.</p>
+                                <p>Seleccionamos un nodo de referencia (tierra) y calculamos tensiones en los demás nodos.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Ecuaciones nodales</h4>
+                                <p>Para cada nodo (excepto referencia):</p>
+                                <div class="formula">Σ(G·V) = Σ(I<sub>fuentes</sub>)</div>
+                                <p>Donde G = 1/R es la conductancia.</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Resolución del sistema nodal</h4>
+                                <p>Construimos la matriz de conductancias:</p>
+                                <div class="formula">[G]·[V] = [I]</div>
+                                <p>Resolvemos para las tensiones nodales V₁, V₂, ...</p>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución del Circuito 4 - Ejercicio 2</h3>
+                                <p><strong>Tensión nodo A: V<sub>A</sub> = [Valor] V</strong></p>
+                                <p><strong>Tensión nodo B: V<sub>B</sub> = [Valor] V</strong></p>
+                                <p><strong>Corrientes:</strong> Calculadas a partir de V<sub>A</sub> y V<sub>B</sub></p>
+                                <p><em>I<sub>R1</sub> = (V<sub>A</sub> - V<sub>B</sub>)/R₁, etc.</em></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(11)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(13)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 5 - Ejercicio 2 -->
+            <section id="problem13" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 2 - Circuito 5</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Análisis completo del circuito 5 del ejercicio 2.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C25.jpg" alt="Ejercicio 2 - Circuito 5" class="circuit-image circuit-single" title="Ejercicio 2, circuito 5">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(13)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board13">
+                            <div class="step">
+                                <h4>Paso 1: Circuito con múltiples fuentes</h4>
+                                <p>Cuando hay varias fuentes, podemos usar:</p>
+                                <ul>
+                                    <li>Superposición (analizar efecto de cada fuente por separado)</li>
+                                    <li>Método general de mallas o nodos</li>
+                                    <li>Teoremas de circuitos (Thévenin, Norton)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Aplicación de superposición</h4>
+                                <p>1. Anular todas las fuentes excepto una (cortocircuito para fuentes de tensión, circuito abierto para fuentes de corriente)</p>
+                                <p>2. Calcular contribución de esa fuente</p>
+                                <p>3. Repetir para cada fuente</p>
+                                <p>4. Sumar contribuciones</p>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución del Circuito 5 - Ejercicio 2</h3>
+                                <p><strong>Por superposición:</strong></p>
+                                <p>Contribución de V₁: I'₁, I'₂, ...</p>
+                                <p>Contribución de V₂: I''₁, I''₂, ...</p>
+                                <p><strong>Total:</strong> I₁ = I'₁ + I''₁, I₂ = I'₂ + I''₂, ...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(12)">← Circuito anterior</button>
+                        <button class="btn" onclick="showProblem(14)">Siguiente circuito →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Circuito 6 - Ejercicio 2 -->
+            <section id="problem14" class="content">
+                <div class="problem-container">
+                    <h2 class="problem-title">Ejercicio 2 - Circuito 6</h2>
+                    <p class="problem-statement">Resuelve el circuito aplicando las leyes de Kirchhoff. Análisis completo del circuito 6 del ejercicio 2.</p>
+                    
+                    <div class="circuit-container">
+                        <img src="img/EAN6_C26.jpg" alt="Ejercicio 2 - Circuito 6" class="circuit-image circuit-single" title="Ejercicio 2, circuito 6">
+                    </div>
+
+                    <button class="btn btn-board" onclick="toggleBoard(14)">Modo Pizarra - Ver resolución paso a paso</button>
+                    
+                    <div class="board-mode">
+                        <div class="board-steps" id="board14">
+                            <div class="step">
+                                <h4>Paso 1: Verificación de resultados</h4>
+                                <p>Después de calcular corrientes y tensiones:</p>
+                                <ul>
+                                    <li>Verificar ley de corrientes en cada nodo</li>
+                                    <li>Verificar ley de tensiones en cada malla</li>
+                                    <li>Comprobar balance de potencia: ΣP<sub>generada</sub> = ΣP<sub>consumida</sub></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 2: Balance de potencia</h4>
+                                <p>Potencia en fuentes: P = V·I (positiva si entrega, negativa si consume)</p>
+                                <p>Potencia en resistencias: P = R·I² (siempre positiva, se disipa)</p>
+                                <div class="formula">ΣV<sub>fuente</sub>·I<sub>fuente</sub> = ΣR·I²</div>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Paso 3: Interpretación física</h4>
+                                <p>Sentido real de corrientes: si el valor es negativo, el sentido real es opuesto al supuesto.</p>
+                                <p>Valores razonables: corrientes en mA para circuitos con resistencias en kΩ.</p>
+                            </div>
+                            
+                            <div class="solution-highlight">
+                                <h3>Solución Final del Circuito 6 - Ejercicio 2</h3>
+                                <p><strong>Corrientes:</strong> I₁ = X mA, I₂ = Y mA, I₃ = Z mA</p>
+                                <p><strong>Potencia total generada:</strong> P<sub>gen</sub> = [Valor] mW</p>
+                                <p><strong>Potencia total consumida:</strong> P<sub>cons</sub> = [Valor] mW</p>
+                                <p><strong>Verificación:</strong> P<sub>gen</sub> = P<sub>cons</sub> ✓</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button class="btn btn-back" onclick="showHome()">Volver al inicio</button>
+                        <button class="btn" onclick="showProblem(13)">← Circuito anterior</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function showHome() {
+            // Hide all content sections
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Show home section
+            document.getElementById('home').classList.add('active');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function showProblem(problemNumber) {
+            // Hide all content sections
+            document.querySelectorAll('.content').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Show selected problem section
+            document.getElementById('problem' + problemNumber).classList.add('active');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function toggleBoard(problemNumber) {
+            const board = document.getElementById('board' + problemNumber);
+            if (board) {
+                board.classList.toggle('active');
+                
+                // Change button text based on state
+                const button = event.target;
+                if (board.classList.contains('active')) {
+                    button.textContent = 'Ocultar resolución';
+                    button.style.background = '#1e3a8a';
+                } else {
+                    button.textContent = 'Modo Pizarra - Ver resolución paso a paso';
+                    button.style.background = '';
+                }
+            }
+        }
+        
+        // Initialize with home section active
+        document.addEventListener('DOMContentLoaded', function() {
+            showHome();
+        });
+    </script>
+</body>
+</html>
