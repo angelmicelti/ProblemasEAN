@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transistores Enteraillo - EAN12</title>
+    <style>
+        :root {
+            --primary: #7c3aed; /* Violeta */
+            --secondary: #6d28d9;
+            --accent: #f59e0b; /* Ámbar */
+            --light: #fdfbf7;
+            --dark: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: #ede9fe;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .problem-card h3 {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .problem-statement {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* SVG Circuit Styles */
+        .circuit-diagram {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto 2rem;
+            display: block;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-board {
+            background: var(--dark);
+            width: 100%;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-board:hover {
+            background: #334155;
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .btn-back:hover {
+            background: #cbd5e1;
+            transform: none;
+        }
+
+        /* Board Mode Styles */
+        .board-mode {
+            background: #333;
+            border-radius: var(--border-radius);
+            padding: 0;
+            margin-top: 1rem;
+            overflow: hidden;
+            border: 4px solid #475569;
+            display: none;
+        }
+
+        .board-mode.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 2000px; }
+        }
+
+        .board-header {
+            background: #1e293b;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #475569;
+        }
+
+        .board-content {
+            padding: 2rem;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--accent);
+        }
+
+        .step h4 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .math-block {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        .result-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .result-highlight h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .key-value {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 10px; }
+            .problem-container { padding: 1.5rem; }
+            .home-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Boletín EAN12: Transistores</h1>
+        <p class="subtitle">Ejercicios de Electrónica Analógica - Nivel "Enteraillo"</p>
+    </header>
+
+    <section id="home" class="content active">
+        <div class="home-grid">
+            <div class="problem-card" onclick="showProblem(1)">
+                <div class="card-header">
+                    <span class="badge">Estado del Transistor</span>
+                </div>
+                <h3>Ejercicio 1</h3>
+                <p>Resuelve el circuito indicando el estado del transistor. ¿Se encenderá el LED rojo?</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(2)">
+                <div class="card-header">
+                    <span class="badge">Cambio de Resistencia</span>
+                </div>
+                <h3>Ejercicio 2</h3>
+                <p>Cambia la resistencia de 50K por una de 1K y resuelve nuevamente el circuito.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(3)">
+                <div class="card-header">
+                    <span class="badge">Análisis de Estado</span>
+                </div>
+                <h3>Ejercicio 3</h3>
+                <p>Averigua el estado del transistor y todas las corrientes con β=100, VBE=0.65V.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(4)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fee2e2; color:var(--danger)">Resistencia de Base 5K</span>
+                </div>
+                <h3>Ejercicio 4</h3>
+                <p>Con resistencia de base de 5KΩ, ¿qué sucede con el transistor?</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(5)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fce7f3; color:var(--accent)">LED entre Colector-Emisor</span>
+                </div>
+                <h3>Ejercicio 5</h3>
+                <p>LED entre colector y emisor con resistencia de base de 8K. ¿Qué sucede?</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(6)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:var(--warning)">Resistencia Base 5K</span>
+                </div>
+                <h3>Ejercicio 6</h3>
+                <p>En el montaje anterior con resistencia de base de 5K, ¿qué sucede?</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem1" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 1: Estado del Transistor</h2>
+            
+            <img src="img/EAN12_C1.jpg" alt="Circuito Ejercicio 1" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el circuito de la figura, indicando el estado del transistor. ¿Crees que se encenderá el LED rojo?<br>
+                <strong>Datos del esquema:</strong> Vcc=9V, Rb=50K, Rc=300Ω, LED rojo. β=100 (asumido).
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(1)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board1" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 1</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del circuito</h4>
+                        <p>Tenemos una configuración de polarización fija con LED en el colector. Calculamos la corriente de base primero.</p>
+                        <div class="math-block">
+                            Vcc = Ib·Rb + Vbe<br>
+                            9 = Ib·50k + 0.65<br>
+                            Ib = (9 - 0.65) / 50000<br>
+                            Ib = 8.35 / 50000 = <strong>0.167 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de colector</h4>
+                        <div class="math-block">
+                            Ic = β · Ib = 100 · 0.167 mA = <strong>16.7 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Voltaje en el LED y Vce</h4>
+                        <p>Para un LED rojo, V_LED ≈ 1.8-2.0V. Usamos 1.8V para cálculo.</p>
+                        <div class="math-block">
+                            Vcc = Ic·Rc + V_LED + Vce<br>
+                            9 = (16.7mA · 300Ω) + 1.8 + Vce<br>
+                            9 = 5.01 + 1.8 + Vce<br>
+                            Vce = 9 - 6.81 = <strong>2.19 V</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Comprobación de estado</h4>
+                        <p>Como Vce = 2.19V > 0.2V, el transistor está en zona <strong>activa</strong>.</p>
+                        <p>La corriente que pasa por el LED es Ic = 16.7mA, suficiente para encenderlo.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.167 mA</div>
+                        <div class="key-value">I<sub>C</sub> = 16.7 mA</div>
+                        <div class="key-value">V<sub>CE</sub> = 2.19 V</div>
+                        <div class="key-value">Estado: <strong>ACTIVA</strong> - LED se enciende</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showHome()">Menú</button>
+                <button class="btn" onclick="showProblem(2)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem2" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 2: Cambio de Resistencia</h2>
+            
+            <img src="img/EAN12_C1.jpg" alt="Circuito Ejercicio 2" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> En el circuito anterior, cambia la resistencia de 50K por una de 1K y vuelve a resolver el circuito. ¿En qué estado se encuentra ahora?<br>
+                <strong>Datos:</strong> Vcc=9V, Rb=1K, Rc=300Ω, LED rojo. β=100.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(2)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board2" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 2</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Cálculo de corriente de base</h4>
+                        <div class="math-block">
+                            Vcc = Ib·Rb + Vbe<br>
+                            9 = Ib·1k + 0.65<br>
+                            Ib = (9 - 0.65) / 1000<br>
+                            Ib = 8.35 / 1000 = <strong>8.35 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de colector teórica</h4>
+                        <div class="math-block">
+                            Ic_teorica = β · Ib = 100 · 8.35 mA = <strong>835 mA</strong>
+                        </div>
+                        <p>¡Esta corriente es imposible! El circuito no puede suministrar tanta corriente.</p>
+                    </div>
+                    <div class="step">
+                        <h4>3. Comprobación de saturación</h4>
+                        <p>Calculamos la corriente máxima posible en saturación (Vce ≈ 0.2V):</p>
+                        <div class="math-block">
+                            Ic_sat ≈ (Vcc - V_LED) / Rc<br>
+                            Ic_sat = (9 - 1.8) / 300 = 7.2 / 300 = <strong>24 mA</strong>
+                        </div>
+                        <p>La corriente teórica (835 mA) es mucho mayor que la posible en saturación (24 mA).</p>
+                    </div>
+                    <div class="step">
+                        <h4>4. Estado final</h4>
+                        <p>El transistor está en <strong>saturación profunda</strong>. La corriente de base es muy alta, forzando al transistor a saturarse por completo.</p>
+                        <div class="math-block">
+                            En saturación: Vce ≈ 0.2V<br>
+                            Ic ≈ Ic_sat = 24 mA<br>
+                            Ib = 8.35 mA (alta)<br>
+                            β_sat = Ic / Ib = 24 / 8.35 ≈ 2.87 (muy bajo, típico de saturación)
+                        </div>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Conclusión: SATURACIÓN PROFUNDA</h3>
+                        <div class="key-value">I<sub>B</sub> = 8.35 mA</div>
+                        <div class="key-value">I<sub>C</sub> ≈ 24 mA</div>
+                        <div class="key-value">V<sub>CE</sub> ≈ 0.2 V</div>
+                        <div class="key-value">LED se enciende muy brillante (posible daño)</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(1)">← Anterior</button>
+                <button class="btn" onclick="showProblem(3)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem3" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 3: Análisis de Estado</h2>
+            
+            <img src="img/EAN12_C2.jpg" alt="Circuito Ejercicio 3" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> En el circuito de la figura 2, el transistor tiene una ganancia β=100, y VBE=0.65V. Averigua el estado en el que se encuentra y todas las corrientes.<br>
+                <strong>Datos:</strong> Vcc=9V, Rb=10K, Rc=470Ω, Vin=1.5V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(3)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board3" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 3</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis de la malla de entrada</h4>
+                        <p>La fuente de 1.5V polariza la base a través de Rb=10K.</p>
+                        <div class="math-block">
+                            Vin = Ib·Rb + Vbe<br>
+                            1.5 = Ib·10k + 0.65<br>
+                            Ib = (1.5 - 0.65) / 10000<br>
+                            Ib = 0.85 / 10000 = <strong>0.085 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de colector</h4>
+                        <div class="math-block">
+                            Ic = β · Ib = 100 · 0.085 mA = <strong>8.5 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Voltaje colector-emisor</h4>
+                        <div class="math-block">
+                            Vcc = Ic·Rc + Vce<br>
+                            9 = (8.5mA · 470Ω) + Vce<br>
+                            9 = 3.995 + Vce<br>
+                            Vce = 9 - 3.995 = <strong>5.005 V</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Comprobación de estado</h4>
+                        <p>Vce = 5.005V > 0.2V, por lo tanto el transistor está en zona <strong>activa</strong>.</p>
+                        <p>La corriente de emisor es:</p>
+                        <div class="math-block">
+                            Ie = Ic + Ib = 8.5 + 0.085 = <strong>8.585 mA</strong>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.085 mA</div>
+                        <div class="key-value">I<sub>C</sub> = 8.5 mA</div>
+                        <div class="key-value">I<sub>E</sub> = 8.585 mA</div>
+                        <div class="key-value">V<sub>CE</sub> = 5.005 V</div>
+                        <div class="key-value">Estado: <strong>ACTIVA</strong></div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(2)">← Anterior</button>
+                <button class="btn" onclick="showProblem(4)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem4" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 4: Resistencia de Base 5K</h2>
+            
+            <img src="img/EAN12_C2.jpg" alt="Circuito Ejercicio 4" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Si en el circuito de la figura 2, con el transistor con las mismas características, ponemos una resistencia de 5KΩ en la base, ¿Qué sucede?<br>
+                <strong>Datos:</strong> Vcc=9V, Rb=5K, Rc=470Ω, Vin=1.5V, β=100, Vbe=0.65V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(4)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board4" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 4</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Cálculo de corriente de base</h4>
+                        <div class="math-block">
+                            Vin = Ib·Rb + Vbe<br>
+                            1.5 = Ib·5k + 0.65<br>
+                            Ib = (1.5 - 0.65) / 5000<br>
+                            Ib = 0.85 / 5000 = <strong>0.17 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de colector teórica</h4>
+                        <div class="math-block">
+                            Ic_teorica = β · Ib = 100 · 0.17 mA = <strong>17 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Comprobación de saturación</h4>
+                        <p>Calculamos la corriente máxima posible si el transistor estuviera en saturación:</p>
+                        <div class="math-block">
+                            Ic_sat ≈ Vcc / Rc = 9 / 470 = <strong>19.15 mA</strong>
+                        </div>
+                        <p>La corriente teórica (17 mA) es menor que la corriente de saturación (19.15 mA), pero muy cercana.</p>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo exacto en saturación</h4>
+                        <p>En saturación, Vce ≈ 0.2V. La corriente real sería:</p>
+                        <div class="math-block">
+                            Ic_sat_real = (Vcc - Vce_sat) / Rc<br>
+                            Ic_sat_real = (9 - 0.2) / 470 = 8.8 / 470 = <strong>18.72 mA</strong>
+                        </div>
+                        <p>La corriente de base calculada (0.17 mA) es suficiente para saturar el transistor porque:</p>
+                        <div class="math-block">
+                            Ib_min_sat = Ic_sat / β = 18.72 / 100 = 0.187 mA<br>
+                            Nuestra Ib = 0.17 mA es ligeramente menor, pero en la práctica el transistor entrará en saturación.
+                        </div>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Conclusión: SATURACIÓN</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.17 mA</div>
+                        <div class="key-value">I<sub>C</sub> ≈ 18.72 mA</div>
+                        <div class="key-value">V<sub>CE</sub> ≈ 0.2 V</div>
+                        <div class="key-value">El transistor está en saturación</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(3)">← Anterior</button>
+                <button class="btn" onclick="showProblem(5)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem5" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 5: LED entre Colector-Emisor</h2>
+            
+            <img src="img/EAN12_C3.jpg" alt="Circuito Ejercicio 5" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Cambiamos ahora la posición del LED para ponerlo entre colector y emisor, con una resistencia de base de 8K. Averigua qué sucede.<br>
+                <strong>Datos:</strong> Vcc=9V, Rb=8K, Rc=470Ω, LED rojo, Vin=1.5V, β=100, Vbe=0.65V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(5)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board5" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 5</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del circuito</h4>
+                        <p>El LED está en paralelo con la unión colector-emisor. Cuando el transistor conduce, la corriente pasa por el LED.</p>
+                        <div class="math-block">
+                            Vin = Ib·Rb + Vbe<br>
+                            1.5 = Ib·8k + 0.65<br>
+                            Ib = (1.5 - 0.65) / 8000<br>
+                            Ib = 0.85 / 8000 = <strong>0.10625 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de colector</h4>
+                        <div class="math-block">
+                            Ic = β · Ib = 100 · 0.10625 = <strong>10.625 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Malla de salida con LED</h4>
+                        <p>El LED está en paralelo con Vce. Cuando el transistor conduce, Vce se fija en aproximadamente V_LED (1.8V para rojo).</p>
+                        <div class="math-block">
+                            Vcc = Ic·Rc + V_LED<br>
+                            9 = (10.625mA · 470Ω) + V_LED<br>
+                            9 = 4.994 + V_LED<br>
+                            V_LED = 9 - 4.994 = <strong>4.006 V</strong>
+                        </div>
+                        <p>¡Esto es imposible! Un LED rojo no puede tener 4V de caída. Esto indica que nuestro supuesto es incorrecto.</p>
+                    </div>
+                    <div class="step">
+                        <h4>4. Análisis correcto</h4>
+                        <p>El LED limita Vce a aproximadamente 1.8V. Recalculamos Ic:</p>
+                        <div class="math-block">
+                            Vcc = Ic·Rc + V_LED<br>
+                            Ic = (Vcc - V_LED) / Rc<br>
+                            Ic = (9 - 1.8) / 470 = 7.2 / 470 = <strong>15.32 mA</strong>
+                        </div>
+                        <p>Esta es la corriente máxima que puede circular por el LED. La Ib calculada (0.106 mA) daría una Ic teórica de 10.625 mA, que es menor que 15.32 mA, por lo que el transistor está en activa.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.106 mA</div>
+                        <div class="key-value">I<sub>C</sub> = 10.625 mA</div>
+                        <div class="key-value">I<sub>LED</sub> = 10.625 mA</div>
+                        <div class="key-value">V<sub>CE</sub> = V<sub>LED</sub> = 1.8 V</div>
+                        <div class="key-value">Estado: <strong>ACTIVA</strong> - LED brilla levemente</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(4)">← Anterior</button>
+                <button class="btn" onclick="showProblem(6)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem6" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 6: Resistencia de Base 5K</h2>
+            
+            <img src="img/EAN12_C3.jpg" alt="Circuito Ejercicio 6" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Si en el montaje de la figura 3 coloco una resistencia en la base de 5K, ¿qué sucede?<br>
+                <strong>Datos:</strong> Vcc=9V, Rb=5K, Rc=470Ω, LED rojo, Vin=1.5V, β=100, Vbe=0.65V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(6)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board6" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 6</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Cálculo de corriente de base</h4>
+                        <div class="math-block">
+                            Vin = Ib·Rb + Vbe<br>
+                            1.5 = Ib·5k + 0.65<br>
+                            Ib = (1.5 - 0.65) / 5000<br>
+                            Ib = 0.85 / 5000 = <strong>0.17 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de colector teórica</h4>
+                        <div class="math-block">
+                            Ic_teorica = β · Ib = 100 · 0.17 = <strong>17 mA</strong>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Corriente máxima con LED</h4>
+                        <p>La corriente máxima que puede pasar por el LED es cuando Vce ≈ 0.2V (saturación):</p>
+                        <div class="math-block">
+                            Ic_max = (Vcc - V_LED) / Rc<br>
+                            Ic_max = (9 - 1.8) / 470 = 7.2 / 470 = <strong>15.32 mA</strong>
+                        </div>
+                        <p>La corriente teórica (17 mA) es mayor que la máxima posible (15.32 mA).</p>
+                    </div>
+                    <div class="step">
+                        <h4>4. Estado del transistor</h4>
+                        <p>El transistor entrará en saturación. En saturación, Vce ≈ 0.2V, pero aquí tenemos el LED en paralelo, por lo que Vce se fijará en V_LED (1.8V). Esto crea una situación inconsistente.</p>
+                        <p>La solución es que el transistor estará en el límite de saturación, con Vce ligeramente superior a 0.2V para acomodar la caída del LED.</p>
+                        <div class="math-block">
+                            En saturación: Vce ≈ 0.2V + V_LED ≈ 2.0V (aprox)<br>
+                            Ic ≈ (Vcc - 2.0) / Rc = 7 / 470 = <strong>14.89 mA</strong>
+                        </div>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Conclusión: SATURACIÓN</h3>
+                        <div class="key-value">I<sub>B</sub> = 0.17 mA</div>
+                        <div class="key-value">I<sub>C</sub> ≈ 14.89 mA</div>
+                        <div class="key-value">V<sub>CE</sub> ≈ 2.0 V (V_LED + Vce_sat)</div>
+                        <div class="key-value">El LED no se enciende (o brilla muy débilmente)</div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(5)">← Anterior</button>
+                <button class="btn" onclick="showHome()">Volver al Inicio</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    function showHome() {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('home').classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function showProblem(id) {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('problem' + id).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function toggleBoard(id) {
+        const board = document.getElementById('board' + id);
+        board.classList.toggle('active');
+        const btn = event.target;
+        if (board.classList.contains('active')) {
+            btn.textContent = '✖ Cerrar Pizarra';
+            btn.style.background = '#ef4444';
+        } else {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '#1e293b';
+        }
+    }
+</script>
+
+</body>
+</html>
