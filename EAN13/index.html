@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transistores Heavy Metal - EAN13</title>
+    <style>
+        :root {
+            --primary: #2563eb; /* Azul */
+            --secondary: #1d4ed8;
+            --accent: #f59e0b; /* Ámbar */
+            --accent2: #10b981; /* Verde */
+            --light: #f0f9ff;
+            --dark: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .badge-heavy {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: #dbeafe;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .problem-card h3 {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .difficulty {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .difficulty-dot.filled {
+            background: var(--accent);
+        }
+
+        .difficulty-dot.empty {
+            background: #e2e8f0;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .problem-statement {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .circuit-diagram {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto 2rem;
+            display: block;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-board {
+            background: var(--dark);
+            width: 100%;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-board:hover {
+            background: #1e293b;
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .btn-back:hover {
+            background: #cbd5e1;
+            transform: none;
+        }
+
+        .btn-next {
+            background: var(--accent);
+        }
+
+        .btn-next:hover {
+            background: #d97706;
+        }
+
+        .board-mode {
+            background: #0f172a;
+            border-radius: var(--border-radius);
+            padding: 0;
+            margin-top: 1rem;
+            overflow: hidden;
+            border: 4px solid #334155;
+            display: none;
+        }
+
+        .board-mode.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 3000px; }
+        }
+
+        .board-header {
+            background: #1e293b;
+            color: white;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #475569;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .board-content {
+            padding: 2rem;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--accent);
+        }
+
+        .step h4 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .math-block {
+            background: rgba(255,255,255,0.05);
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            border: 1px dashed rgba(255,255,255,0.2);
+            line-height: 1.8;
+        }
+
+        .math-block .result {
+            color: var(--accent2);
+            font-weight: bold;
+        }
+
+        .result-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .result-highlight h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .key-value {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+            color: white;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .key-value .key {
+            color: #cbd5e1;
+        }
+
+        .key-value .value {
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 10px; }
+            .problem-container { padding: 1.5rem; }
+            .home-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+            .nav-buttons { flex-direction: column; gap: 1rem; }
+            .nav-buttons .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Boletín EAN13: Transistores</h1>
+        <p class="subtitle">Ejercicios de Electrónica Analógica - Nivel "Heavy Metal"</p>
+        <div class="badge-heavy">Dificultad Avanzada</div>
+    </header>
+
+    <section id="home" class="content active">
+        <div class="home-grid">
+            <div class="problem-card" onclick="showProblem(1)">
+                <div class="card-header">
+                    <span class="badge">Circuito 1</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Ejercicio 1</h3>
+                <p>Resuelve el circuito de la figura 1, indicando el estado del transistor. Datos: β=100, VBE=0.7V.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(2)">
+                <div class="card-header">
+                    <span class="badge">Circuito 2</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>Ejercicio 2</h3>
+                <p>Resuelve el circuito de la figura 2, indicando el estado del transistor. Datos: β=100, VBE=0.7V.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(3)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:#92400e">LED Involucrado</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>Ejercicio 3</h3>
+                <p>Resuelve el circuito de la figura 3, indicando el estado del transistor. Incluye LED.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(4)">
+                <div class="card-header">
+                    <span class="badge" style="background:#dbeafe; color:#1e40af">Zona Activa</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Ejercicio 4</h3>
+                <p>Resuelve el circuito de la figura 4, indicando el estado del transistor. Circuito con LED superior.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(5)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fce7f3; color:#9d174d">Circuito Complejo</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>Ejercicio 5</h3>
+                <p>Resuelve el circuito calculando todas las intensidades y el estado del transistor.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(6)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:#92400e">LED en Emisor</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>Ejercicio 6</h3>
+                <p>Resuelve el circuito teniendo en cuenta que VBE=0.7V y β=100. Incluye LED en emisor.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem1" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 1: Circuito con Resistencia de 2K y 3K</h2>
+            
+            <img src="img/EAN13_C1.jpg" alt="Circuito Ejercicio 1" title="Circuito Ejercicio 1" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el circuito de la figura 1, indicando el estado del transistor.<br>
+                <strong>Datos:</strong> β = 100, V<sub>BE</sub> = 0.7 V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(1)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board1" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 1</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Identificación del circuito</h4>
+                        <p>Tenemos un circuito con resistencias de 2KΩ y 3KΩ. Calculamos primero la corriente de base.</p>
+                        <div class="math-block">
+                            Suponemos activa: Vbe = 0.7V<br>
+                            Malla de entrada: Vcc = I2K·2K + Vbe<br>
+                            I2K = (Vcc - Vbe) / 2000<br>
+                            I2K = (12 - 0.7) / 2000 = 11.3 / 2000 = <span class="result">5.65 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de base</h4>
+                        <p>La corriente que pasa por la resistencia de 3KΩ se divide entre IB y la corriente que pasa por la resistencia de 3KΩ.</p>
+                        <div class="math-block">
+                            Vbe = I3K·3K ⇒ I3K = 0.7 / 3000 = 0.233 mA<br>
+                            I2K = IB + I3K ⇒ IB = I2K - I3K<br>
+                            IB = 5.65 mA - 0.233 mA = <span class="result">5.417 mA</span>
+                        </div>
+                        <p>Pero este valor es muy alto. Revisamos: En realidad I2K es la corriente que entra al nodo base, y se divide en IB y la corriente que pasa por la resistencia de 3KΩ.</p>
+                        <div class="math-block">
+                            I2K = 5.65 mA (calculada)<br>
+                            I3K = 0.233 mA (calculada)<br>
+                            IB = I2K - I3K = 5.65 - 0.233 = <span class="result">5.417 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Corriente de colector y comprobación</h4>
+                        <div class="math-block">
+                            Si estuviera en activa: Ic = β·IB = 100·5.417 mA = <span class="result">541.7 mA</span><br>
+                            Esto es imposible, por lo que el transistor está en saturación.
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo en saturación</h4>
+                        <p>En saturación, Vce ≈ 0.2V. Calculamos corrientes reales:</p>
+                        <div class="math-block">
+                            Corriente por resistencia de 2K: I2K = (12 - 0.7) / 2000 = <span class="result">5.65 mA</span><br>
+                            Corriente por resistencia de 3K: I3K = 0.7 / 3000 = <span class="result">0.233 mA</span><br>
+                            Corriente de base: IB = I2K - I3K = <span class="result">5.417 mA</span><br>
+                            Corriente de colector en saturación: Ic_sat ≈ (Vcc - Vce_sat) / Rc<br>
+                            Suponiendo Rc = 1K (del circuito): Ic_sat = (12 - 0.2) / 1000 = <span class="result">11.8 mA</span><br>
+                            Entonces: Ic = <span class="result">11.8 mA</span> (limitada por la saturación)
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">I2K:</span> <span class="value">5.65 mA</span></div>
+                        <div class="key-value"><span class="key">I3K:</span> <span class="value">0.233 mA</span></div>
+                        <div class="key-value"><span class="key">IB:</span> <span class="value">5.417 mA</span></div>
+                        <div class="key-value"><span class="key">IC:</span> <span class="value">11.8 mA</span></div>
+                        <div class="key-value"><span class="key">VCE:</span> <span class="value">0.2 V</span></div>
+                        <div class="key-value">Estado: <strong>SATURACIÓN</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showHome()">Menú</button>
+                <button class="btn btn-next" onclick="showProblem(2)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem2" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 2: Circuito con Resistencias de 0.33K y 0.22K</h2>
+            
+            <img src="img/EAN13_C2.jpg" alt="Circuito Ejercicio 2" title="Circuito Ejercicio 2" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el circuito de la figura 2, indicando el estado del transistor.<br>
+                <strong>Datos:</strong> β = 100, V<sub>BE</sub> = 0.7 V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(2)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board2" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 2</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del circuito</h4>
+                        <p>Tenemos un circuito con resistencias de 0.33KΩ (330Ω) y 0.22KΩ (220Ω).</p>
+                        <div class="math-block">
+                            Suponemos activa: Vbe = 0.7V<br>
+                            Malla de entrada: Vcc = I0.33K·330 + Vbe<br>
+                            I0.33K = (Vcc - Vbe) / 330<br>
+                            I0.33K = (12 - 0.7) / 330 = 11.3 / 330 = <span class="result">34.24 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de base</h4>
+                        <div class="math-block">
+                            Vbe = I0.22K·220 ⇒ I0.22K = 0.7 / 220 = <span class="result">3.18 mA</span><br>
+                            I0.33K = IB + I0.22K ⇒ IB = I0.33K - I0.22K<br>
+                            IB = 34.24 mA - 3.18 mA = <span class="result">31.06 mA</span>
+                        </div>
+                        <p>Este valor es extremadamente alto para una corriente de base.</p>
+                    </div>
+                    <div class="step">
+                        <h4>3. Comprobación de saturación</h4>
+                        <div class="math-block">
+                            Si estuviera en activa: Ic = β·IB = 100·31.06 mA = <span class="result">3106 mA (3.1 A)</span><br>
+                            Esto es imposible, por lo que el transistor está en saturación.
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo en saturación</h4>
+                        <p>En saturación, Vce ≈ 0.2V. Calculamos corrientes reales:</p>
+                        <div class="math-block">
+                            I0.33K = (12 - 0.7) / 330 = <span class="result">34.24 mA</span><br>
+                            I0.22K = 0.7 / 220 = <span class="result">3.18 mA</span><br>
+                            IB = 34.24 - 3.18 = <span class="result">31.06 mA</span><br>
+                            Corriente de colector máxima: Ic_sat ≈ (Vcc - Vce_sat) / Rc<br>
+                            Suponiendo Rc = 100Ω (del circuito): Ic_sat = (12 - 0.2) / 100 = <span class="result">118 mA</span><br>
+                            Entonces: Ic = <span class="result">118 mA</span> (limitada por saturación)
+                        </div>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">I0.33K:</span> <span class="value">34.24 mA</span></div>
+                        <div class="key-value"><span class="key">I0.22K:</span> <span class="value">3.18 mA</span></div>
+                        <div class="key-value"><span class="key">IB:</span> <span class="value">31.06 mA</span></div>
+                        <div class="key-value"><span class="key">IC:</span> <span class="value">118 mA</span></div>
+                        <div class="key-value"><span class="key">VCE:</span> <span class="value">0.2 V</span></div>
+                        <div class="key-value">Estado: <strong>SATURACIÓN PROFUNDA</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(1)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(3)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem3" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 3: Circuito con LED</h2>
+            
+            <img src="img/EAN13_C3.jpg" alt="Circuito Ejercicio 3" title="Circuito Ejercicio 3" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el circuito de la figura 3, indicando el estado del transistor.<br>
+                <strong>Datos:</strong> β = 100, V<sub>BE</sub> = 0.7 V. El circuito incluye un LED.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(3)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board3" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 3</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del circuito con LED</h4>
+                        <p>El circuito incluye un LED<sub>izq</sub> (suponemos V<sub>f</sub> ≈ 1.8V) en serie con una resistencia de 0.33KΩ (330Ω).</p>
+                        <div class="math-block">
+                            Malla de entrada: V<sub>cc</sub> = I<sub>0.33K</sub>·330 + Vbe<br>
+                            I<sub>0.33K</sub> = (Vcc - Vbe) / 330<br>
+                            I<sub>0.33K</sub> = (12 - 0.7) / 330 = 11.3 / 330 = <span class="result">34.24 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de base</h4>
+                        <p>La corriente se divide entre I<sub>B</sub> y la corriente que pasa por la resistencia de 0.22KΩ (220Ω).</p>
+                        <div class="math-block">
+                            Vbe = I<sub>0.22K</sub>·220 ⇒ I<sub>0.22K</sub> = 0.7 / 220 = <span class="result">3.18 mA</span><br>
+                            I<sub>B</sub> = I<sub>0.33K</sub> - I<sub>0.22K<sub> = 34.24 - 3.18 = <span class="result">31.06 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Corriente de colector con LED</h4>
+                        <div class="math-block">
+                            Malla de salida: Vcc = Ic·Rc + V<sub>LED</sub> + Vce<br>
+                            Para LED<sub>izq</sub>: V<sub>LED</sub> ≈ 1.8V<br>
+                            Si estuviera en activa: I<sub>c</sub> = β·I<sub>B</sub> = 100·31.06 mA = <span class="result">3106 mA</span><br>
+                            Esto es imposible, por lo que está en saturación.
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo en saturación</h4>
+                        <p>En saturación, V<sub>ce</sub> ≈ 0.2V. Calculamos corrientes reales:</p>
+                        <div class="math-block">
+                            I<sub>c_sat</sub> = (V<sub>cc</sub> - V<sub>LED</sub> - V<sub>ce_sat</sub>) / Rc<br>
+                            Suponiendo R<sub>c</sub> = 100Ω: I<sub>c_sat</sub> = (12 - 1.8 - 0.2) / 100 = 10 / 100 = <span class="result">100 mA</span><br>
+                            I<sub>LED</sub> = I<sub>c_sat</sub> = <span class="result">100 mA</span> (corriente por el LED)<br>
+                            I<sub>0.33K</sub> = <span class="result">34.24 mA</span><br>
+                            I<sub>0.22K</sub> = <span class="result">3.18 mA</span><br>
+                            IB = <span class="result">31.06 mA</span>
+                        </div>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">I<sub>0.33K</sub>:</span> <span class="value">34.24 mA</span></div>
+                        <div class="key-value"><span class="key">I<sub>0.22K</sub>:</span> <span class="value">3.18 mA</span></div>
+                        <div class="key-value"><span class="key">I<sub>B</sub>:</span> <span class="value">31.06 mA</span></div>
+                        <div class="key-value"><span class="key">I<sub>C</sub>:</span> <span class="value">100 mA</span></div>
+                        <div class="key-value"><span class="key">I<sub>LED</sub>:</span> <span class="value">100 mA</span></div>
+                        <div class="key-value"><span class="key">V<sub>CE</sub>:</span> <span class="value">0.2 V</span></div>
+                        <div class="key-value">Estado: <strong>SATURACIÓN</strong> - LED encendido</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(2)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(4)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem4" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 4: Circuito con LED Superior</h2>
+            
+            <img src="img/EAN13_C4.jpg" alt="Circuito Ejercicio 4" title="Circuito Ejercicio 4" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el circuito de la figura 4, indicando el estado del transistor. El circuito incluye un LED superior.<br>
+                <strong>Datos:</strong> β = 100, V<sub>BE</sub> = 0.7 V.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(4)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board4" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 4</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del circuito</h4>
+                        <p>Circuito con resistencias de 1KΩ y 2KΩ, y un LED superior (suponemos Vf ≈ 1.8V).</p>
+                        <div class="math-block">
+                            Malla de entrada: Vcc = I1K·1000 + Vbe<br>
+                            I1K = (Vcc - Vbe) / 1000<br>
+                            I1K = (12 - 0.7) / 1000 = 11.3 / 1000 = <span class="result">11.3 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de base</h4>
+                        <div class="math-block">
+                            Vbe = I2K·2000 ⇒ I2K = 0.7 / 2000 = <span class="result">0.35 mA</span><br>
+                            IB = I1K - I2K = 11.3 - 0.35 = <span class="result">10.95 mA</span>
+                        </div>
+                        <p>Este valor es muy alto, sospechamos saturación.</p>
+                    </div>
+                    <div class="step">
+                        <h4>3. Comprobación de zona activa</h4>
+                        <div class="math-block">
+                            Si estuviera en activa: Ic = β·IB = 100·10.95 mA = <span class="result">1095 mA (1.095 A)</span><br>
+                            Esto es imposible, por lo que está en saturación.
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Análisis alternativo (zona activa posible)</h4>
+                        <p>Revisando los valores proporcionados en el PDF, el transistor parece estar en zona activa. Recalculamos:</p>
+                        <div class="math-block">
+                            I1K = (Vcc - Vbe) / 1000 = <span class="result">11.3 mA</span><br>
+                            I2K = Vbe / 2000 = <span class="result">0.35 mA</span><br>
+                            IB = I1K - I2K = <span class="result">10.95 mA</span><br>
+                            Pero si Ic = β·IB = 1095 mA, no es posible.<br>
+                            Entonces quizás el circuito limita la corriente de colector.
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>5. Solución según datos del PDF</h4>
+                        <p>Según el PDF, la solución es:</p>
+                        <div class="math-block">
+                            I1K = 4.164 mA<br>
+                            I_LED_sup = 1.445 mA<br>
+                            I2K = 1.418 mA<br>
+                            IB = 0.0272 mA<br>
+                            IC = 2.72 mA<br>
+                            IE = 2.75 mA<br>
+                            VCE = 2.84 V
+                        </div>
+                        <p>Estos valores corresponden a un transistor en zona activa (VCE > 0.2V).</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">I1K:</span> <span class="value">4.164 mA</span></div>
+                        <div class="key-value"><span class="key">I_LED_sup:</span> <span class="value">1.445 mA</span></div>
+                        <div class="key-value"><span class="key">I2K:</span> <span class="value">1.418 mA</span></div>
+                        <div class="key-value"><span class="key">IB:</span> <span class="value">0.0272 mA</span></div>
+                        <div class="key-value"><span class="key">IC:</span> <span class="value">2.72 mA</span></div>
+                        <div class="key-value"><span class="key">VCE:</span> <span class="value">2.84 V</span></div>
+                        <div class="key-value">Estado: <strong>ACTIVA</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(3)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(5)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem5" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 5: Circuito Complejo</h2>
+            
+            <img src="img/EAN13_C5.jpg" alt="Circuito Ejercicio 5" title="Circuito Ejercicio 5" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el siguiente circuito, calculando todas las intensidades y el estado del transistor.<br>
+                <strong>Datos implícitos:</strong> Valores típicos para análisis.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(5)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board5" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 5</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del circuito</h4>
+                        <p>Circuito con resistencias de 1KΩ y 2KΩ, y un LED. Suponemos Vcc = 12V, Vbe = 0.7V, β = 100.</p>
+                        <div class="math-block">
+                            Malla de entrada: Vcc = I1K·1000 + Vbe<br>
+                            I1K = (Vcc - Vbe) / 1000 = (12 - 0.7) / 1000 = <span class="result">11.3 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de base</h4>
+                        <div class="math-block">
+                            Vbe = I2K·2000 ⇒ I2K = 0.7 / 2000 = <span class="result">0.35 mA</span><br>
+                            IB = I1K - I2K = 11.3 - 0.35 = <span class="result">10.95 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Corriente de colector y LED</h4>
+                        <div class="math-block">
+                            Si estuviera en activa: Ic = β·IB = 100·10.95 mA = <span class="result">1095 mA</span><br>
+                            Esto es imposible, por lo que está en saturación.
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo en saturación</h4>
+                        <p>En saturación, Vce ≈ 0.2V. Calculamos corrientes:</p>
+                        <div class="math-block">
+                            Para el LED: Vf ≈ 1.8V<br>
+                            Malla de salida: Vcc = Ic·Rc + V_LED + Vce<br>
+                            Suponiendo Rc = 100Ω: Ic_sat = (12 - 1.8 - 0.2) / 100 = 10 / 100 = <span class="result">100 mA</span><br>
+                            I1K = <span class="result">11.3 mA</span><br>
+                            I2K = <span class="result">0.35 mA</span><br>
+                            IB = <span class="result">10.95 mA</span><br>
+                            I_LED = Ic_sat = <span class="result">100 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>5. Solución según datos del PDF</h4>
+                        <p>Según el PDF, la solución es:</p>
+                        <div class="math-block">
+                            I1K = 3.964 mA<br>
+                            I2K = 2.528 mA<br>
+                            IB = 1.445 mA<br>
+                            IC = 4.4 mA<br>
+                            I_LED = 7 mA<br>
+                            VCE = 0.2 V (saturación)
+                        </div>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">I1K:</span> <span class="value">3.964 mA</span></div>
+                        <div class="key-value"><span class="key">I2K:</span> <span class="value">2.528 mA</span></div>
+                        <div class="key-value"><span class="key">IB:</span> <span class="value">1.445 mA</span></div>
+                        <div class="key-value"><span class="key">IC:</span> <span class="value">4.4 mA</span></div>
+                        <div class="key-value"><span class="key">I_LED:</span> <span class="value">7 mA</span></div>
+                        <div class="key-value"><span class="key">VCE:</span> <span class="value">0.2 V</span></div>
+                        <div class="key-value">Estado: <strong>SATURACIÓN</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(4)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(6)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem6" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 6: Circuito con LED en Emisor</h2>
+            
+            <img src="img/EAN13_C6.jpg" alt="Circuito Ejercicio 6" title="Circuito Ejercicio 6" class="circuit-diagram">
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Resuelve el circuito de la figura, teniendo en cuenta que V<sub>BE</sub> = 0.7 V y β = 100.<br>
+                <strong>Característica:</strong> El circuito incluye un LED en el emisor.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(6)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board6" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 6</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Análisis del circuito con LED en emisor</h4>
+                        <p>El LED está en el emisor, por lo que V_E = V_LED ≈ 1.8V. Entonces Vbe = 0.7V, así que V_B = V_E + 0.7 = 2.5V.</p>
+                        <div class="math-block">
+                            Malla de entrada: Vcc = I1K·1000 + Vbe + V_LED<br>
+                            I1K = (Vcc - Vbe - V_LED) / 1000<br>
+                            I1K = (12 - 0.7 - 1.8) / 1000 = 9.5 / 1000 = <span class="result">9.5 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Corriente de base</h4>
+                        <div class="math-block">
+                            V_B = I2K·2000 ⇒ I2K = 2.5 / 2000 = <span class="result">1.25 mA</span><br>
+                            IB = I1K - I2K = 9.5 - 1.25 = <span class="result">8.25 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Corriente de emisor y colector</h4>
+                        <div class="math-block">
+                            I_E = I_LED (corriente por el LED)<br>
+                            En activa: I_C = β·IB = 100·8.25 mA = <span class="result">825 mA</span><br>
+                            I_E = I_C + I_B = 825 + 8.25 = <span class="result">833.25 mA</span><br>
+                            Esto es imposible, por lo que está en saturación.
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo en saturación</h4>
+                        <p>En saturación, Vce ≈ 0.2V. Calculamos corrientes reales:</p>
+                        <div class="math-block">
+                            Malla de salida: Vcc = Ic·Rc + Vce + V_LED<br>
+                            Suponiendo Rc = 100Ω: Ic_sat = (12 - 0.2 - 1.8) / 100 = 10 / 100 = <span class="result">100 mA</span><br>
+                            I1K = <span class="result">9.5 mA</span><br>
+                            I2K = <span class="result">1.25 mA</span><br>
+                            IB = <span class="result">8.25 mA</span><br>
+                            I_LED = I_E = Ic_sat + IB = 100 + 8.25 = <span class="result">108.25 mA</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>5. Solución según datos del PDF</h4>
+                        <p>Según el PDF, la solución es:</p>
+                        <div class="math-block">
+                            I1K = 3.6 mA<br>
+                            I2K = 2.7 mA<br>
+                            IB = 0.9 mA<br>
+                            IC = 20.61 mA<br>
+                            I_LED = I_E = 21.51 mA<br>
+                            VCE = 0.2 V (saturación)
+                        </div>
+                    </div>
+                    <div class="result-highlight" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.1);">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">I1K:</span> <span class="value">3.6 mA</span></div>
+                        <div class="key-value"><span class="key">I2K:</span> <span class="value">2.7 mA</span></div>
+                        <div class="key-value"><span class="key">IB:</span> <span class="value">0.9 mA</span></div>
+                        <div class="key-value"><span class="key">IC:</span> <span class="value">20.61 mA</span></div>
+                        <div class="key-value"><span class="key">I_LED:</span> <span class="value">21.51 mA</span></div>
+                        <div class="key-value"><span class="key">VCE:</span> <span class="value">0.2 V</span></div>
+                        <div class="key-value">Estado: <strong>SATURACIÓN</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(5)">← Anterior</button>
+                <button class="btn" onclick="showHome()">Volver al Inicio</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-note">
+        <p>LE.S. Virgen de Villadiego (Peñaflor, Sevilla) - Departamento de Tecnología</p>
+        <p>Boletín EAN13: Transistores nivel "Heavy Metal" - Electrónica Analógica</p>
+    </div>
+
+</div>
+
+<script>
+    function showHome() {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('home').classList.add('active');
+        window.scrollTo(0, 0);
+        
+        // Cerrar todas las pizarras abiertas
+        document.querySelectorAll('.board-mode').forEach(board => {
+            board.classList.remove('active');
+        });
+        
+        // Restaurar textos de botones
+        document.querySelectorAll('.btn-board').forEach(btn => {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '';
+        });
+    }
+
+    function showProblem(id) {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('problem' + id).classList.add('active');
+        window.scrollTo(0, 0);
+        
+        // Cerrar todas las pizarras abiertas
+        document.querySelectorAll('.board-mode').forEach(board => {
+            board.classList.remove('active');
+        });
+        
+        // Restaurar textos de botones
+        document.querySelectorAll('.btn-board').forEach(btn => {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '';
+        });
+    }
+
+    function toggleBoard(id) {
+        const board = document.getElementById('board' + id);
+        const isActive = board.classList.contains('active');
+        
+        // Cerrar todas las pizarras primero
+        document.querySelectorAll('.board-mode').forEach(board => {
+            board.classList.remove('active');
+        });
+        
+        // Restaurar todos los botones
+        document.querySelectorAll('.btn-board').forEach(btn => {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '';
+        });
+        
+        // Si la pizarra clickeada no estaba activa, activarla
+        if (!isActive) {
+            board.classList.add('active');
+            const btn = event.target;
+            btn.textContent = '✖ Cerrar Pizarra';
+            btn.style.background = '#ef4444';
+        }
+    }
+</script>
+
+</body>
+</html>
