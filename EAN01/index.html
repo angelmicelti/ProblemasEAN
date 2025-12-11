@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagramas V/I</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f0f2f5; color: #333; line-height: 1.6; padding: 20px; }
+        
+        .container { max-width: 100%; margin: 0 auto; background-color: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); overflow: hidden; display: flex; flex-direction: column; }
+        
+        header { background: linear-gradient(135deg, #2c3e50, #4a6491); color: white; padding: 20px 30px; text-align: center; }
+        h1 { font-size: 1.8rem; margin-bottom: 5px; }
+        
+        details.main-config { background-color: #fff; border-bottom: 2px solid #eaeaea; }
+        summary.main-config-summary {
+            padding: 15px 25px; font-size: 1.2rem; font-weight: bold; color: #2c3e50; cursor: pointer;
+            background-color: #f8f9fa; list-style: none; display: flex; justify-content: space-between; align-items: center;
+        }
+        summary.main-config-summary:hover { background-color: #e9ecef; }
+        summary.main-config-summary::after { content: '+'; font-size: 1.5rem; color: #4a6491; }
+        details[open] summary.main-config-summary::after { content: '-'; }
+
+        .config-content { padding: 25px; }
+
+        /* GRID RESPONSIVE 5 RAMAS */
+        .columns-container { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; align-items: start; }
+        .columns-container.show-1 { grid-template-columns: 1fr 1fr; }
+        .columns-container.show-2 { grid-template-columns: 1fr 1fr 1fr; }
+        .columns-container.show-3 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .columns-container.show-4 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+        .columns-container.show-5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; }
+
+        .config-card { background-color: #fff; border: 1px solid #e1e4e8; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); height: 100%; }
+        .config-card.hidden { display: none; }
+
+        .card-header { font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #dfe6ed; text-transform: uppercase; display: flex; align-items: center; }
+        .card-header::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; background-color: #ccc; }
+        
+        .card-battery .card-header::before { background-color: #2ecc71; }
+        .card-b1 .card-header::before { background-color: #3498db; }
+        .card-b2 .card-header::before { background-color: #9b59b6; }
+        .card-b3 .card-header::before { background-color: #e67e22; }
+        .card-b4 .card-header::before { background-color: #e74c3c; }
+        .card-b5 .card-header::before { background-color: #16a085; }
+
+        .input-group { margin-bottom: 15px; }
+        
+        label.interactive-label { display: block; margin-bottom: 6px; font-weight: 600; color: #4a6491; font-size: 0.85rem; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; }
+        label.normal-label { display: block; margin-bottom: 6px; font-weight: 600; color: #555; font-size: 0.85rem; }
+
+        input[type="text"], input[type="number"], select.main-select { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; }
+        
+        .input-row { display: flex; gap: 5px; align-items: center; }
+        .input-row input { flex: 2; }
+        .input-row select { flex: 1; min-width: 60px; padding: 8px 4px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+
+        .component-item { background-color: #fafbfc; border: 1px solid #eee; border-radius: 4px; padding: 8px; margin-bottom: 8px; border-left: 3px solid #ccc; font-size: 0.85rem; }
+        .component-item.resistance { border-left-color: #8B4513; }
+        .component-item.diode { border-left-color: #f39c12; }
+        .component-item.led { border-left-color: #9b59b6; }
+        .component-item.unknown { border-left-color: #e74c3c; background-color: #fdedec; color: #c0392b; }
+        
+        .parallel-group { border: 1px dashed #4a6491; background-color: #f1f8ff; padding: 8px; border-radius: 6px; margin-bottom: 8px; }
+        .parallel-legend { font-size: 0.75rem; color: #4a6491; font-weight: bold; margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .comp-title { display: block; color: #333; font-weight: 700; margin-bottom: 2px; }
+        .comp-info { display: block; color: #666; font-size: 0.8rem; margin-bottom: 5px; }
+
+        .error-msg { background-color: #fde8e8; color: #c0392b; padding: 8px; border-radius: 4px; font-size: 0.8rem; margin-top: 10px; border: 1px solid #fadbd8; font-weight: bold; text-align: center; }
+        .warning-msg { background-color: #fff3cd; color: #856404; padding: 8px; border-radius: 4px; font-size: 0.8rem; margin-top: 10px; border: 1px solid #ffeeba; text-align: center; font-weight: bold; }
+        .voltage-error { background-color: #e74c3c; color: white; border-color: #c0392b; }
+
+        button.action-btn { background: #4a6491; color: white; border: none; cursor: pointer; font-weight: 600; padding: 10px; border-radius: 4px; width: 100%; margin-top: 10px; transition: background 0.2s; }
+        button.action-btn:hover { background: #34495e; }
+        
+        .download-row { display: flex; gap: 5px; margin-top: 5px; }
+        .download-btn { font-size: 0.8rem; padding: 8px; background-color: #7f8c8d; flex: 1; border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: 600;}
+        .download-btn:hover { background-color: #95a5a6; }
+        .data-btn { background-color: #27ae60; }
+        .data-btn:hover { background-color: #2ecc71; }
+
+        .output-section { padding: 20px; background-color: #f8f9fa; flex-grow: 1; }
+        .canvas-container { display: flex; justify-content: center; overflow: auto; min-height: 850px; }
+        canvas { background-color: white; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background-color: white; padding: 25px; border-radius: 8px; max-width: 600px; width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; max-height: 80vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; }
+        
+        .code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem; }
+        .code-grid div { background: #f8f9fa; padding: 5px 8px; border-radius: 4px; border: 1px solid #eee; }
+        .code-grid b { color: #2c3e50; }
+        .code-grid code { color: #c0392b; font-family: monospace; font-weight: bold; }
+
+        @media (max-width: 1400px) { .columns-container.show-5 { grid-template-columns: 1fr 1fr 1fr; } .columns-container.show-4 { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 800px) { .columns-container, .columns-container.show-1, .columns-container.show-2, .columns-container.show-3, .columns-container.show-4, .columns-container.show-5 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Diagramas Tensión / Intensidad</h1>
+			<h2>Simulación hasta 5 ramas</h2>
+        </header>
+        
+        <details class="main-config" open>
+            <summary class="main-config-summary">Configuración</summary>
+            
+            <div class="config-content">
+                <div class="columns-container show-2" id="gridContainer">
+                    <div class="config-card card-battery">
+                        <div class="card-header">Fuente de Alimentación</div>
+                        <div class="input-group">
+                            <label class="normal-label" for="batteryVoltage">Voltaje (V)</label>
+                            <input type="number" id="batteryVoltage" min="0.1" max="500" step="0.1" value="9">
+                        </div>
+                        <div class="input-group">
+                            <label class="normal-label" for="branchSelector">Número de Ramas</label>
+                            <select id="branchSelector" class="main-select">
+                                <option value="1">1 Rama</option>
+                                <option value="2" selected>2 Ramas</option>
+                                <option value="3">3 Ramas</option>
+                                <option value="4">4 Ramas</option>
+                                <option value="5">5 Ramas</option>
+                            </select>
+                        </div>
+                        <button id="resetBtn" class="action-btn">Resetear</button>
+                        
+                        <div class="download-row">
+                            <button class="download-btn" onclick="downloadCanvas('jpg')">IMG .JPG</button>
+                            <button class="download-btn" onclick="downloadCanvas('png')">IMG .PNG</button>
+                            <button class="download-btn" onclick="downloadCanvas('svg')">IMG .SVG</button>
+                        </div>
+                        <div class="download-row">
+                            <button class="download-btn data-btn" onclick="downloadData('json')">DATOS .JSON</button>
+                            <button class="download-btn data-btn" onclick="downloadData('csv')">DATOS .CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="config-card card-b1" id="cardB1">
+                        <div class="card-header">Rama 1</div>
+                        <div class="input-group">
+                            <label class="interactive-label" onclick="openModal()">Componentes ℹ️</label>
+                            <input type="text" id="elementsB1" value="r, (r, r), r">
+                        </div>
+                        <div id="inputsB1"></div>
+                        <div id="errorB1" class="error-msg" style="display:none;"></div>
+                        <div id="warningB1" class="warning-msg" style="display:none;"></div>
+                    </div>
+
+                    <div class="config-card card-b2" id="cardB2">
+                        <div class="card-header">Rama 2</div>
+                        <div class="input-group">
+                            <label class="interactive-label" onclick="openModal()">Componentes ℹ️</label>
+                            <input type="text" id="elementsB2" value="lg, (r, r)">
+                        </div>
+                        <div id="inputsB2"></div>
+                        <div id="errorB2" class="error-msg" style="display:none;"></div>
+                        <div id="warningB2" class="warning-msg" style="display:none;"></div>
+                    </div>
+
+                    <div class="config-card card-b3" id="cardB3">
+                        <div class="card-header">Rama 3</div>
+                        <div class="input-group">
+                            <label class="interactive-label" onclick="openModal()">Componentes ℹ️</label>
+                            <input type="text" id="elementsB3" value="">
+                        </div>
+                        <div id="inputsB3"></div>
+                        <div id="errorB3" class="error-msg" style="display:none;"></div>
+                        <div id="warningB3" class="warning-msg" style="display:none;"></div>
+                    </div>
+
+                    <div class="config-card card-b4" id="cardB4">
+                        <div class="card-header">Rama 4</div>
+                        <div class="input-group">
+                            <label class="interactive-label" onclick="openModal()">Componentes ℹ️</label>
+                            <input type="text" id="elementsB4" value="">
+                        </div>
+                        <div id="inputsB4"></div>
+                        <div id="errorB4" class="error-msg" style="display:none;"></div>
+                        <div id="warningB4" class="warning-msg" style="display:none;"></div>
+                    </div>
+
+                    <div class="config-card card-b5" id="cardB5">
+                        <div class="card-header">Rama 5</div>
+                        <div class="input-group">
+                            <label class="interactive-label" onclick="openModal()">Componentes ℹ️</label>
+                            <input type="text" id="elementsB5" value="">
+                        </div>
+                        <div id="inputsB5"></div>
+                        <div id="errorB5" class="error-msg" style="display:none;"></div>
+                        <div id="warningB5" class="warning-msg" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </details>
+        
+        <div class="output-section">
+            <div class="canvas-container">
+                <canvas id="circuitCanvas" width="1400" height="900"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="codesModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3>Guía de Componentes</h3>
+            <div class="code-grid">
+                <div><b>Resistencia:</b><br><code>r</code>, <code>resistencia</code></div>
+                <div><b>Diodo Si:</b><br><code>si</code>, <code>diodosi</code></div>
+                <div><b>Diodo Ge:</b><br><code>ge</code>, <code>diodoge</code></div>
+                <div><b>LED Rojo:</b><br><code>lr</code>, <code>led rojo</code></div>
+                <div><b>LED Verde:</b><br><code>lg</code>, <code>led verde</code></div>
+                <div><b>LED Amarillo:</b><br><code>ly</code>, <code>led amarillo</code></div>
+                <div><b>LED Naranja:</b><br><code>lo</code>, <code>led naranja</code></div>
+                <div><b>LED Azul:</b><br><code>lb</code>, <code>led azul</code></div>
+                <div><b>LED Violeta:</b><br><code>lv</code>, <code>led violeta</code></div>
+                <div><b>LED Blanco:</b><br><code>lw</code>, <code>led blanco</code></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const exactAliases = {
+            'diodosi': 'diodosi', 'diodo si': 'diodosi', 'si': 'diodosi',
+            'diodoge': 'diodoge', 'diodo ge': 'diodoge', 'ge': 'diodoge',
+            'led rojo': 'led rojo', 'ledr': 'led rojo', 'lr': 'led rojo',
+            'led verde': 'led verde', 'ledg': 'led verde', 'lg': 'led verde',
+            'led amarillo': 'led amarillo', 'ledy': 'led amarillo', 'ly': 'led amarillo',
+            'led naranja': 'led naranja', 'ledo': 'led naranja', 'lo': 'led naranja',
+            'led azul': 'led azul', 'ledb': 'led azul', 'lb': 'led azul',
+            'led violeta': 'led violeta', 'ledv': 'led violeta', 'lv': 'led violeta',
+            'led blanco': 'led blanco', 'ledw': 'led blanco', 'lw': 'led blanco',
+            'resistencia': 'resistencia', 'resistor': 'resistencia', 'r': 'resistencia'
+        };
+
+        const componentVoltages = {
+            'diodosi': 0.7, 'diodoge': 0.3,
+            'led rojo': 1.8, 'led verde': 2.1, 'led amarillo': 2.1,
+            'led naranja': 2.0, 'led azul': 3.3, 'led violeta': 3.3, 'led blanco': 3.3
+        };
+        const ledColors = {
+            'led rojo': '#e74c3c', 'led verde': '#2ecc71', 'led amarillo': '#f1c40f',
+            'led naranja': '#e67e22', 'led azul': '#3498db', 'led violeta': '#9b59b6', 'led blanco': '#ecf0f1'
+        };
+
+        let branchesState = [ 
+            { id: 1, components: [], current: 0, valid: true }, 
+            { id: 2, components: [], current: 0, valid: true }, 
+            { id: 3, components: [], current: 0, valid: true },
+            { id: 4, components: [], current: 0, valid: true },
+            { id: 5, components: [], current: 0, valid: true } 
+        ];
+        let updateTimeout = null;
+
+        const inputs = [ 
+            document.getElementById('elementsB1'), 
+            document.getElementById('elementsB2'), 
+            document.getElementById('elementsB3'),
+            document.getElementById('elementsB4'),
+            document.getElementById('elementsB5') 
+        ];
+        const containers = [ 
+            document.getElementById('inputsB1'), 
+            document.getElementById('inputsB2'), 
+            document.getElementById('inputsB3'),
+            document.getElementById('inputsB4'),
+            document.getElementById('inputsB5') 
+        ];
+        const errorMsgs = [ 
+            document.getElementById('errorB1'), 
+            document.getElementById('errorB2'), 
+            document.getElementById('errorB3'),
+            document.getElementById('errorB4'),
+            document.getElementById('errorB5') 
+        ];
+        const warningMsgs = [ 
+            document.getElementById('warningB1'), 
+            document.getElementById('warningB2'), 
+            document.getElementById('warningB3'),
+            document.getElementById('warningB4'),
+            document.getElementById('warningB5') 
+        ];
+        
+        const batteryInput = document.getElementById('batteryVoltage');
+        const branchSelector = document.getElementById('branchSelector');
+        const gridContainer = document.getElementById('gridContainer');
+        const branchCards = [ 
+            document.getElementById('cardB1'), 
+            document.getElementById('cardB2'), 
+            document.getElementById('cardB3'),
+            document.getElementById('cardB4'),
+            document.getElementById('cardB5') 
+        ];
+        const canvas = document.getElementById('circuitCanvas');
+        
+        const modal = document.getElementById('codesModal');
+        window.openModal = function() { modal.style.display = 'flex'; }
+        window.closeModal = function() { modal.style.display = 'none'; }
+        window.onclick = function(event) { if (event.target == modal) closeModal(); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupListeners();
+            refreshAllInputs(); 
+            updateVisibility(); 
+            setTimeout(() => calculateAndDraw(), 100);
+        });
+
+        function setupListeners() {
+            batteryInput.addEventListener('input', scheduleUpdate);
+            branchSelector.addEventListener('change', () => {
+                updateVisibility();
+                scheduleUpdate();
+            });
+            inputs.forEach((input) => {
+                input.addEventListener('input', () => {
+                    refreshAllInputs(); 
+                    scheduleUpdate();
+                });
+            });
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                batteryInput.value = 9;
+                branchSelector.value = "2"; 
+                inputs[0].value = "r, (r, r), r";
+                inputs[1].value = "lg, (r, r)";
+                inputs[2].value = ""; 
+                inputs[3].value = ""; 
+                inputs[4].value = ""; 
+                updateVisibility();
+                refreshAllInputs();
+                scheduleUpdate();
+            });
+        }
+
+        window.downloadCanvas = function(format) {
+            const link = document.createElement('a');
+            const filename = 'diagrama_vi';
+            if (format === 'svg') {
+                const dataUrl = canvas.toDataURL('image/png');
+                const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}"><image href="${dataUrl}" width="${canvas.width}" height="${canvas.height}" /></svg>`;
+                const blob = new Blob([svgContent], {type: 'image/svg+xml;charset=utf-8'});
+                link.href = URL.createObjectURL(blob);
+                link.download = `${filename}.svg`;
+            } else {
+                const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
+                link.href = canvas.toDataURL(mime, 1.0);
+                link.download = `${filename}.${format}`;
+            }
+            link.click();
+        }
+
+        window.downloadData = function(format) {
+            const data = {
+                timestamp: new Date().toLocaleString(),
+                battery_voltage: parseFloat(batteryInput.value),
+                active_branches: parseInt(branchSelector.value),
+                circuit_data: []
+            };
+
+            for (let i = 0; i < data.active_branches; i++) {
+                const branch = branchesState[i];
+                if (!branch.valid) continue;
+                
+                let branchData = {
+                    branch_id: i + 1,
+                    total_current: branch.current,
+                    components: []
+                };
+
+                branch.components.forEach((comp, idx) => {
+                    if (comp.isBlock && comp.type === 'parallel') {
+                        comp.subs.forEach(sub => {
+                            branchData.components.push({
+                                type: sub.type,
+                                name: sub.name,
+                                group: 'Parallel',
+                                value: sub.value,
+                                drop: comp.drop, 
+                                current: sub.current || 0
+                            });
+                        });
+                    } else {
+                        branchData.components.push({
+                            type: comp.type,
+                            name: comp.name,
+                            group: 'Series',
+                            value: comp.value,
+                            drop: comp.drop,
+                            current: branch.current
+                        });
+                    }
+                });
+                data.circuit_data.push(branchData);
+            }
+
+            const filename = 'datos_circuito';
+            const link = document.createElement('a');
+
+            if (format === 'json') {
+                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                link.href = URL.createObjectURL(blob);
+                link.download = `${filename}.json`;
+            } else if (format === 'csv') {
+                let csvContent = `Fecha: ${data.timestamp}\nVoltaje Pila: ${data.battery_voltage}V\n\n`;
+                csvContent += "Rama,Grupo,Componente,Tipo,Valor,Voltaje (Drop),Intensidad (A)\n";
+                
+                data.circuit_data.forEach(branch => {
+                    branch.components.forEach(c => {
+                        csvContent += `${branch.branch_id},${c.group},${c.name},${c.type},${c.value.toFixed(2)},${c.drop.toFixed(3)},${c.current.toFixed(4)}\n`;
+                    });
+                });
+
+                const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+                link.href = URL.createObjectURL(blob);
+                link.download = `${filename}.csv`;
+            }
+            link.click();
+        }
+
+        function updateVisibility() {
+            const count = parseInt(branchSelector.value);
+            gridContainer.className = `columns-container show-${count}`;
+            branchCards.forEach((card, index) => {
+                if (index < count) card.classList.remove('hidden');
+                else card.classList.add('hidden');
+            });
+        }
+
+        function scheduleUpdate() {
+            if (updateTimeout) clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => calculateAndDraw(), 100);
+        }
+
+        function identifyComponent(rawStr) {
+            const cleanStr = rawStr.trim().toLowerCase();
+            if (exactAliases[cleanStr]) return exactAliases[cleanStr];
+            
+            if (cleanStr.startsWith('r') || cleanStr.includes('resistencia')) return 'resistencia';
+            if (cleanStr.includes('led')) {
+                if (cleanStr.includes('roj') || cleanStr.includes('red')) return 'led rojo';
+                if (cleanStr.includes('ver') || cleanStr.includes('gre')) return 'led verde';
+                if (cleanStr.includes('azu') || cleanStr.includes('blu')) return 'led azul';
+                return 'led rojo'; 
+            }
+            if (cleanStr.includes('diodo')) {
+                if(cleanStr.includes('ge')) return 'diodoge';
+                return 'diodosi';
+            }
+            return 'UNKNOWN';
+        }
+
+        function parseSmartSplit(str) {
+            const parts = [];
+            let buffer = "";
+            let depth = 0;
+            for (let char of str) {
+                if (char === '(') { depth++; buffer += char; }
+                else if (char === ')') { depth--; buffer += char; }
+                else if (char === ',' && depth === 0) {
+                    if(buffer.trim()) parts.push(buffer.trim());
+                    buffer = "";
+                } else { buffer += char; }
+            }
+            if(buffer.trim()) parts.push(buffer.trim());
+            return parts;
+        }
+
+        function refreshAllInputs() {
+            let globalResCounter = 0;
+            let globalParallelCounter = 0; 
+            const batV = parseFloat(batteryInput.value) || 9;
+
+            branchesState.forEach((_, index) => {
+                const results = generateBranchInputs(index, globalResCounter, globalParallelCounter, batV);
+                globalResCounter = results.resCounter;
+                globalParallelCounter = results.parallelCounter;
+            });
+        }
+
+        function createComponentHTML(type, baseId, oldValues, oldUnits, counter) {
+            const div = document.createElement('div');
+            
+            if (type === 'UNKNOWN') {
+                div.className = 'component-item unknown';
+                div.innerHTML = `<strong>?</strong> Componente Desconocido`;
+                return div;
+            }
+
+            div.className = type === 'resistencia' ? 'component-item resistance' : 'component-item ' + (type.includes('led') ? 'led' : 'diode');
+            
+            let inputTitle = "";
+            let html = "";
+            
+            if (type === 'resistencia') {
+                inputTitle = `Resistencia ${counter}`;
+                let unit = oldUnits[`${baseId}_unit`] || "1";
+                let val = oldValues[`${baseId}_val`];
+                if(val === undefined) val = 100;
+                let stepVal = (unit === "1") ? "1" : "0.1";
+                
+                html = `
+                    <span class="comp-title">${inputTitle}</span>
+                    <div class="input-row">
+                        <input type="number" id="${baseId}_val" value="${val}" min="0" step="${stepVal}">
+                        <select id="${baseId}_unit">
+                            <option value="1" ${unit==="1"?"selected":""}>Ω</option>
+                            <option value="1000" ${unit==="1000"?"selected":""}>kΩ</option>
+                        </select>
+                    </div>`;
+            } else {
+                if (type === 'diodosi') inputTitle = "DIODO SILICIO";
+                else if (type === 'diodoge') inputTitle = "DIODO GERMANIO";
+                else inputTitle = type.toUpperCase();
+
+                const vDrop = componentVoltages[type] || 0.7;
+                html = `
+                    <span class="comp-title">${inputTitle}</span>
+                    <span class="comp-info">V: ${vDrop}V</span>
+                    <input type="hidden" id="${baseId}_val" value="0">
+                `;
+            }
+            div.innerHTML = html;
+            return div;
+        }
+
+        function generateBranchInputs(branchIndex, currentResCounter, currentParallelCounter, batteryV) {
+            const text = inputs[branchIndex].value.trim();
+            const elements = parseSmartSplit(text); 
+            const container = containers[branchIndex];
+            const errorDiv = errorMsgs[branchIndex];
+            const warningDiv = warningMsgs[branchIndex];
+            
+            errorDiv.style.display = 'none';
+            warningDiv.style.display = 'none';
+            warningDiv.classList.remove('voltage-error');
+            errorDiv.innerText = '';
+            warningDiv.innerText = '';
+            
+            const oldValues = {};
+            container.querySelectorAll('input[type="number"]').forEach(inp => { oldValues[inp.id] = inp.value; });
+            const oldUnits = {};
+            container.querySelectorAll('select').forEach(sel => { oldUnits[sel.id] = sel.value; });
+
+            container.innerHTML = '';
+            
+            if(elements.length === 0) { 
+                container.innerHTML = '<small style="color:#999; display:block; text-align:center;">---</small>'; 
+                branchesState[branchIndex].valid = false;
+                return { resCounter: currentResCounter, parallelCounter: currentParallelCounter }; 
+            }
+
+            let hasResistor = false;
+            let invalidParallel = false;
+            let hasUnknown = false;
+            let totalFixedVoltage = 0;
+
+            elements.forEach((el, compIndex) => {
+                if (el.startsWith('(') && el.endsWith(')')) {
+                    const content = el.substring(1, el.length - 1);
+                    const subElements = content.split(',').map(s => s.trim()).filter(s => s!=='');
+                    
+                    const types = subElements.map(s => identifyComponent(s));
+                    if (types.includes('UNKNOWN')) hasUnknown = true;
+                    const containsNonResistor = types.some(t => t !== 'resistencia' && t !== 'UNKNOWN');
+
+                    if (containsNonResistor) {
+                        invalidParallel = true;
+                        const groupDiv = document.createElement('div');
+                        groupDiv.className = 'parallel-group';
+                        groupDiv.style.borderColor = '#c0392b';
+                        groupDiv.style.backgroundColor = '#fdedec';
+                        groupDiv.innerHTML = `<span class="parallel-legend" style="color:#c0392b">GRUPO INVÁLIDO</span><small>Solo resistencias permitidas.</small>`;
+                        container.appendChild(groupDiv);
+                    } else {
+                        currentParallelCounter++;
+                        const groupDiv = document.createElement('div');
+                        groupDiv.className = 'parallel-group';
+                        groupDiv.innerHTML = `<span class="parallel-legend">GRUPO PARALELO ${currentParallelCounter}</span>`;
+                        
+                        subElements.forEach((subEl, subIndex) => {
+                            const type = identifyComponent(subEl);
+                            if (type === 'resistencia') { hasResistor = true; currentResCounter++; }
+                            const baseId = `b${branchIndex}_c${compIndex}_s${subIndex}`;
+                            const compDiv = createComponentHTML(type, baseId, oldValues, oldUnits, currentResCounter);
+                            groupDiv.appendChild(compDiv);
+                        });
+                        container.appendChild(groupDiv);
+                    }
+                } else {
+                    const type = identifyComponent(el);
+                    if (type === 'UNKNOWN') {
+                        hasUnknown = true;
+                        const baseId = `b${branchIndex}_c${compIndex}`;
+                        const compDiv = createComponentHTML(type, baseId, oldValues, oldUnits, currentResCounter);
+                        container.appendChild(compDiv);
+                    }
+                    else if (type === 'resistencia') { hasResistor = true; currentResCounter++; 
+                        const baseId = `b${branchIndex}_c${compIndex}`;
+                        const compDiv = createComponentHTML(type, baseId, oldValues, oldUnits, currentResCounter);
+                        container.appendChild(compDiv);
+                    }
+                    else {
+                        totalFixedVoltage += (componentVoltages[type] || 0);
+                        const baseId = `b${branchIndex}_c${compIndex}`;
+                        const compDiv = createComponentHTML(type, baseId, oldValues, oldUnits, currentResCounter);
+                        container.appendChild(compDiv);
+                    }
+                }
+            });
+
+            container.querySelectorAll('select').forEach(sel => {
+                sel.addEventListener('change', function() {
+                    const inputVal = this.parentElement.querySelector('input[type="number"]');
+                    let currentVal = parseFloat(inputVal.value) || 0;
+                    if (this.value === "1000") {
+                        inputVal.value = (currentVal / 1000).toFixed(3);
+                        inputVal.step = "0.1"; 
+                    } else {
+                        inputVal.value = Math.round(currentVal * 1000); 
+                        inputVal.step = "1"; 
+                    }
+                    scheduleUpdate();
+                });
+            });
+            container.querySelectorAll('input').forEach(el => el.addEventListener('input', scheduleUpdate));
+
+            if (hasUnknown) {
+                warningDiv.innerText = "⚠️ Componente no reconocido. Revisa la sintaxis.";
+                warningDiv.style.display = 'block';
+                branchesState[branchIndex].valid = false;
+            }
+            else if (invalidParallel) {
+                warningDiv.innerText = "No se pueden poner LEDs ni Diodos en paralelo.";
+                warningDiv.style.display = 'block';
+                branchesState[branchIndex].valid = false;
+            } 
+            else if (totalFixedVoltage >= batteryV) {
+                warningDiv.innerText = `⚠️ ¡Error! LEDs suman ${totalFixedVoltage.toFixed(1)}V, superan Pila (${batteryV.toFixed(1)}V).`;
+                warningDiv.classList.add('voltage-error');
+                warningDiv.style.display = 'block';
+                branchesState[branchIndex].valid = true; 
+            }
+            else if (!hasResistor) {
+                errorDiv.innerText = "¡Falta resistencia!";
+                errorDiv.style.display = 'block';
+                branchesState[branchIndex].valid = false;
+            } 
+            else {
+                branchesState[branchIndex].valid = true;
+            }
+
+            return { resCounter: currentResCounter, parallelCounter: currentParallelCounter }; 
+        }
+
+        const formatI = (amps) => {
+            if (amps >= 1) return amps.toFixed(2) + " A";
+            return (amps * 1000).toFixed(2) + " mA";
+        };
+
+        function calculateAndDraw() {
+            const batteryV = parseFloat(batteryInput.value) || 9;
+            const activeBranchesCount = parseInt(branchSelector.value);
+            let totalCircuitCurrent = 0;
+            let drawingResCounter = 0; 
+            let branchDrawInfo = []; 
+
+            for(let bIndex = 0; bIndex < activeBranchesCount; bIndex++) {
+                const branch = branchesState[bIndex];
+                const warningDiv = warningMsgs[bIndex];
+
+                if(!branch.valid) { 
+                    branch.components = []; branch.current = 0; 
+                    branchDrawInfo.push({ valid: false });
+                    continue; 
+                }
+
+                if (!warningDiv.classList.contains('voltage-error')) {
+                    warningDiv.style.display = 'none';
+                    warningDiv.innerText = '';
+                }
+
+                const text = inputs[bIndex].value.trim();
+                const elements = parseSmartSplit(text);
+                
+                branch.components = [];
+                let branchFixedVoltage = 0;
+                let branchResistance = 0;
+                
+                let hasLED = false;
+                let adjustableElements = []; 
+                let simulationMaxW = 0;
+                let simulationMinW = 0;
+                let currentCursorX = 0;
+
+                elements.forEach(el => {
+                   let w = 20;
+                   if (el.startsWith('(')) {
+                       const content = el.substring(1, el.length - 1);
+                       const subs = content.split(',').length;
+                       w = (subs - 1) * 40;
+                   }
+                   let left = currentCursorX - w/2;
+                   let right = currentCursorX + w/2;
+                   if (left < simulationMinW) simulationMinW = left;
+                   if (right > simulationMaxW) simulationMaxW = right;
+                   currentCursorX += 60;
+                });
+                let opticalCenterOffset = (simulationMinW + simulationMaxW) / 2;
+                
+                elements.forEach((el, cIndex) => {
+                    if (el.startsWith('(') && el.endsWith(')')) {
+                        const subRaw = el.substring(1, el.length - 1).split(',').map(s=>s.trim()).filter(s=>s!=='');
+                        let subComponents = [];
+                        let conductanceTotal = 0;
+
+                        subRaw.forEach((subEl, sIndex) => {
+                            drawingResCounter++;
+                            const displayName = `R${drawingResCounter}`;
+                            const baseId = `b${bIndex}_c${cIndex}_s${sIndex}`;
+                            const valInput = document.getElementById(baseId + `_val`);
+                            const unitInput = document.getElementById(baseId + `_unit`);
+                            
+                            let val = 100;
+                            if (valInput) {
+                                const unitMult = unitInput ? parseInt(unitInput.value) : 1;
+                                val = (parseFloat(valInput.value) || 0.1) * unitMult;
+                            }
+                            if(val <= 0) val = 0.1; 
+                            
+                            conductanceTotal += (1/val);
+                            subComponents.push({ name: displayName, type: 'resistencia', value: val });
+                        });
+
+                        let equivalentR = (conductanceTotal > 0) ? (1 / conductanceTotal) : 0;
+                        branchResistance += equivalentR;
+                        if(equivalentR > 0) adjustableElements.push({ type: 'parallel', index: cIndex });
+                        branch.components.push({ type: 'parallel', subs: subComponents, value: equivalentR, isBlock: true });
+
+                    } else {
+                        const type = identifyComponent(el);
+                        if (type === 'UNKNOWN') return;
+
+                        let val = 0;
+                        let displayName = "";
+                        const baseId = `b${bIndex}_c${cIndex}`;
+
+                        if (type === 'resistencia') {
+                            drawingResCounter++;
+                            displayName = `R${drawingResCounter}`;
+                            const valInput = document.getElementById(baseId + `_val`);
+                            const unitInput = document.getElementById(baseId + `_unit`);
+                            
+                            if (valInput) {
+                                const unitMult = unitInput ? parseInt(unitInput.value) : 1;
+                                val = (parseFloat(valInput.value) || 0) * unitMult;
+                            } else val = 100;
+
+                            branchResistance += val;
+                            adjustableElements.push({ type: 'series', index: cIndex, domIdVal: baseId + `_val`, domIdUnit: baseId + `_unit` });
+                        } else {
+                            val = componentVoltages[type] || 0;
+                            branchFixedVoltage += val;
+                            
+                            if (type === 'diodosi') displayName = "Diodo Si";
+                            else if (type === 'diodoge') displayName = "Diodo Ge";
+                            else displayName = type.toUpperCase().replace('LED ', 'LED ');
+                            
+                            if (type.includes('led')) hasLED = true;
+                        }
+
+                        branch.components.push({ name: displayName, type: type, value: val, isBlock: false });
+                    }
+                });
+
+                let calculatedI = 0;
+                
+                if (branchFixedVoltage >= batteryV) {
+                    branch.current = 0;
+                } else {
+                    if (branchResistance > 0) {
+                        calculatedI = (batteryV - branchFixedVoltage) / branchResistance;
+                    }
+
+                    if (hasLED && calculatedI > 0.02005) {
+                        if (adjustableElements.length > 0) {
+                            const targetI = 0.02; 
+                            const neededTotalR = (batteryV - branchFixedVoltage) / targetI;
+                            const missingR = neededTotalR - branchResistance;
+                            const elementToAdjust = adjustableElements[0];
+                            
+                            if (elementToAdjust.type === 'series') {
+                                const comp = branch.components[elementToAdjust.index];
+                                const inputVal = document.getElementById(elementToAdjust.domIdVal);
+                                const inputUnit = document.getElementById(elementToAdjust.domIdUnit);
+                                if (inputVal) {
+                                    const unitMult = inputUnit ? parseInt(inputUnit.value) : 1;
+                                    const currentRVal = comp.value; 
+                                    const newRVal = currentRVal + missingR;
+                                    const displayVal = newRVal / unitMult;
+                                    if (unitMult === 1) inputVal.value = Math.ceil(displayVal);
+                                    else inputVal.value = displayVal.toFixed(3);
+                                    
+                                    comp.value = newRVal;
+                                    branchResistance = branchResistance - currentRVal + newRVal;
+                                }
+                            } else if (elementToAdjust.type === 'parallel') {
+                                const block = branch.components[elementToAdjust.index];
+                                const currentBlockReq = block.value;
+                                const newBlockReq = currentBlockReq + missingR;
+                                const scaleFactor = newBlockReq / currentBlockReq;
+
+                                block.subs.forEach((sub, sIndex) => {
+                                    if (sub.type === 'resistencia') {
+                                        const newVal = sub.value * scaleFactor;
+                                        sub.value = newVal;
+                                        const baseId = `b${bIndex}_c${elementToAdjust.index}_s${sIndex}`;
+                                        const valInput = document.getElementById(baseId + `_val`);
+                                        const unitInput = document.getElementById(baseId + `_unit`);
+                                        if(valInput) {
+                                            const unitMult = parseInt(unitInput.value);
+                                            const displayVal = newVal / unitMult;
+                                            if (unitMult === 1) valInput.value = Math.ceil(displayVal);
+                                            else valInput.value = displayVal.toFixed(3);
+                                        }
+                                    }
+                                });
+                                block.value = newBlockReq;
+                                branchResistance = branchResistance - currentBlockReq + newBlockReq;
+                            }
+                            calculatedI = targetI;
+                            warningDiv.innerText = "⚠️ Resistencia ajustada (max 20mA).";
+                            warningDiv.style.display = 'block';
+                        } else {
+                            warningDiv.innerText = "⚠️ ¡Cuidado! I > 20mA (Falta R).";
+                            warningDiv.style.display = 'block';
+                        }
+                    }
+                    branch.current = calculatedI;
+                }
+                
+                totalCircuitCurrent += branch.current;
+
+                branch.components.forEach(comp => {
+                    if (branch.current === 0) {
+                        if (branchFixedVoltage >= batteryV) {
+                             if(!comp.isBlock && comp.type !== 'resistencia') comp.drop = comp.value;
+                             else comp.drop = 0;
+                        } else comp.drop = 0;
+                    } else {
+                        if (comp.isBlock && comp.type === 'parallel') {
+                            comp.drop = branch.current * comp.value;
+                            comp.subs.forEach(sub => { sub.current = comp.drop / sub.value; });
+                        } else if (comp.type === 'resistencia') {
+                            comp.drop = branch.current * comp.value;
+                        } else {
+                            comp.drop = comp.value;
+                        }
+                    }
+                });
+
+                let wireSteps = (branch.components.length > 0) ? (branch.components.length - 1) : 0;
+                let wireWidth = wireSteps * 60;
+                let startXOffset = -opticalCenterOffset;
+                
+                branchDrawInfo.push({
+                    valid: true,
+                    startXOffset: startXOffset,
+                    wireEndOffset: startXOffset + wireWidth,
+                    components: branch.components
+                });
+            }
+
+            drawStaircaseDiagram(batteryV, totalCircuitCurrent, activeBranchesCount, branchDrawInfo);
+        }
+
+        function drawStaircaseDiagram(batteryV, totalI, numBranches, branchDrawInfo) {
+            const spacing = 350; 
+            const gap = 300; 
+            const requiredWidth = Math.max(1400, (gap * 2) + ((numBranches - 1) * spacing));
+            
+            if (canvas.width !== requiredWidth) {
+                canvas.width = requiredWidth;
+            }
+
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            const totalWidth = gap + ((numBranches - 1) * spacing);
+            const startX = (w - totalWidth) / 2;
+            const branchStartBase = startX + gap;
+
+            const topRailY = 60;
+            const bottomRailY = h - 60;
+            const chartHeight = (bottomRailY - topRailY) * 0.85; 
+            const scale = chartHeight / (batteryV || 1);
+            const zeroY = topRailY + chartHeight + 20; 
+            const batteryTopY = zeroY - (batteryV * scale);
+
+            // Batería en el extremo izquierdo del circuito
+            const batteryX = startX; 
+            
+            drawSolidBatteryArrow(ctx, batteryX, zeroY, batteryTopY, 8, '#2ecc71');
+            const midBatteryY = (zeroY + batteryTopY) / 2;
+            ctx.fillStyle = '#2c3e50'; ctx.textAlign = 'right'; ctx.font = 'bold 14px Arial';
+            ctx.fillText("Pila", batteryX - 25, midBatteryY - 10);
+            ctx.fillStyle = '#c0392b';
+            ctx.fillText(`${batteryV.toFixed(1)}V`, batteryX - 25, midBatteryY + 10);
+            ctx.textAlign = 'left'; ctx.fillStyle = '#2980b9';
+            ctx.fillText(formatI(totalI), batteryX + 25, midBatteryY + 5);
+
+            let lastValidIndex = -1;
+            for(let i=numBranches-1; i>=0; i--) {
+                if (branchDrawInfo[i] && branchDrawInfo[i].valid) {
+                    lastValidIndex = i;
+                    break;
+                }
+            }
+
+            let finalTopX = batteryX;
+            let finalBottomX = batteryX;
+
+            if (lastValidIndex !== -1) {
+                const info = branchDrawInfo[lastValidIndex];
+                const origin = branchStartBase + (lastValidIndex * spacing);
+                finalTopX = origin + info.startXOffset;
+                finalBottomX = origin + info.wireEndOffset;
+            }
+
+            ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(batteryX, batteryTopY); ctx.lineTo(finalTopX, batteryTopY); ctx.stroke(); 
+            ctx.strokeStyle = '#555';
+            ctx.beginPath(); ctx.moveTo(batteryX, zeroY); ctx.lineTo(finalBottomX, zeroY); ctx.stroke(); 
+            
+            ctx.beginPath(); ctx.arc(batteryX, batteryTopY, 5, 0, Math.PI*2); ctx.fillStyle = '#3498db'; ctx.fill();
+            ctx.beginPath(); ctx.arc(batteryX, zeroY, 5, 0, Math.PI*2); ctx.fillStyle = '#555'; ctx.fill();
+
+            for(let bIndex = 0; bIndex < numBranches; bIndex++) {
+                const branch = branchesState[bIndex];
+                const origin = branchStartBase + (bIndex * spacing); 
+                const info = branchDrawInfo[bIndex];
+
+                if(!info || !info.valid) {
+                     ctx.fillStyle = '#c0392b'; ctx.textAlign = 'center'; ctx.font = 'italic 12px Arial';
+                     ctx.fillText("Sin Circuito / Error", origin, (zeroY + batteryTopY)/2);
+                     continue;
+                }
+
+                let currentX = origin + info.startXOffset;
+                let currentY = batteryTopY;
+
+                ctx.beginPath(); ctx.arc(currentX, batteryTopY, 5, 0, Math.PI*2); ctx.fillStyle = '#3498db'; ctx.fill();
+
+                branch.components.forEach((comp, cIndex) => {
+                    const dropPx = comp.drop * scale;
+                    let endY = currentY + dropPx;
+                    
+                    if (branch.current > 0 && cIndex === branch.components.length - 1) {
+                        endY = zeroY;
+                    }
+
+                    const midY = (currentY + endY) / 2;
+
+                    if (comp.isBlock && comp.type === 'parallel') {
+                        const numSubs = comp.subs.length;
+                        const subSpacing = 40; 
+                        const blockWidth = (numSubs - 1) * subSpacing;
+                        let subX = currentX - (blockWidth/2);
+                        
+                        ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2;
+                        ctx.beginPath(); ctx.moveTo(currentX, currentY); ctx.lineTo(subX, currentY); ctx.lineTo(subX + blockWidth, currentY); ctx.stroke();
+                        
+                        comp.subs.forEach((sub, sIdx) => {
+                            let sX = subX + (sIdx * subSpacing);
+                            drawComponentArrow(ctx, sX, currentY, endY, 4, '#8B4513');
+                            
+                            let zigzagOffset = (numSubs > 1) ? ((sIdx % 2 === 0) ? -15 : 15) : 0;
+                            
+                            ctx.save();
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'; 
+                            const boxW = 38; 
+                            const boxH = 36;
+                            ctx.fillRect(sX - boxW/2, midY + zigzagOffset - 18, boxW, boxH);
+                            
+                            ctx.fillStyle = '#555'; ctx.font = 'italic 9px Arial'; ctx.textAlign = 'center';
+                            ctx.fillText(sub.name, sX, midY + zigzagOffset - 10);
+
+                            ctx.fillStyle = '#2980b9'; ctx.font = 'bold 9px Arial';
+                            if(sub.current !== undefined) ctx.fillText(formatI(sub.current), sX, midY + zigzagOffset + 0);
+
+                            ctx.fillStyle = '#c0392b'; ctx.font = 'bold 9px Arial';
+                            ctx.fillText(`${comp.drop.toFixed(2)}V`, sX, midY + zigzagOffset + 10);
+                            
+                            ctx.restore();
+                        });
+
+                        ctx.strokeStyle = '#95a5a6';
+                        ctx.beginPath(); ctx.moveTo(subX, endY); ctx.lineTo(subX + blockWidth, endY); ctx.lineTo(currentX, endY); ctx.stroke();
+
+                    } else {
+                        let color = '#8B4513'; 
+                        if(comp.type.includes('diodo')) color = '#f39c12';
+                        if(comp.type.includes('led')) color = ledColors[comp.type] || '#9b59b6';
+
+                        drawComponentArrow(ctx, currentX, currentY, endY, 6, color);
+
+                        ctx.fillStyle = '#555'; ctx.textAlign = 'right'; ctx.font = 'italic 11px Arial';
+                        ctx.fillText(comp.name, currentX - 10, midY - 6);
+                        ctx.fillStyle = '#c0392b'; ctx.font = 'bold 12px Arial';
+                        ctx.fillText(`${comp.drop.toFixed(2)}V`, currentX - 10, midY + 9);
+                        ctx.fillStyle = '#2980b9'; ctx.textAlign = 'left'; ctx.font = '12px Arial';
+                        ctx.fillText(formatI(branch.current), currentX + 10, midY + 4);
+                    }
+
+                    const nextY = endY;
+                    let nextX = currentX;
+                    if (cIndex < branch.components.length - 1) {
+                        nextX = currentX + 60; 
+                        ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2;
+                        ctx.beginPath(); ctx.moveTo(currentX, nextY); ctx.lineTo(nextX, nextY); ctx.stroke();
+                    } else {
+                        if (branch.current === 0 && endY > zeroY + 0.1) {
+                            ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3; 
+                            ctx.beginPath(); ctx.moveTo(currentX, nextY); ctx.lineTo(currentX, zeroY); ctx.stroke();
+                            
+                            ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center';
+                            ctx.fillText("VOLTAJE INSUFICIENTE", currentX, zeroY + 14);
+                        } else {
+                            if (Math.abs(nextY - zeroY) > 1) {
+                                ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2;
+                                ctx.beginPath(); ctx.moveTo(currentX, nextY); ctx.lineTo(currentX, zeroY); ctx.stroke();
+                            }
+                        }
+                    }
+                    currentX = nextX; currentY = nextY;
+                });
+                
+                ctx.beginPath(); ctx.arc(currentX, zeroY, 5, 0, Math.PI*2); ctx.fillStyle = '#555'; ctx.fill();
+                ctx.fillStyle = '#2c3e50'; ctx.textAlign = 'center'; ctx.font = 'bold 14px Arial';
+                ctx.fillText(`RAMA ${bIndex + 1}`, origin, zeroY + 35);
+            }
+        }
+
+        function drawSolidBatteryArrow(ctx, x, startY, endY, width, color) {
+            const tipH = 12; 
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 1;
+            ctx.moveTo(x - width/2, startY);
+            ctx.lineTo(x - width/2, endY + tipH);
+            ctx.lineTo(x - width - 4, endY + tipH);
+            ctx.lineTo(x, endY);
+            ctx.lineTo(x + width + 4, endY + tipH);
+            ctx.lineTo(x + width/2, endY + tipH);
+            ctx.lineTo(x + width/2, startY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function drawComponentArrow(ctx, x, startY, endY, width, color) {
+            const height = endY - startY; 
+            const tipH = 8;
+            ctx.fillStyle = color;
+            if (height < tipH) { ctx.fillRect(x - width/2, startY, width, height); return; }
+            ctx.fillRect(x - width/2, startY, width, height - tipH);
+            ctx.beginPath();
+            ctx.moveTo(x - width - 3, endY - tipH); ctx.lineTo(x + width + 3, endY - tipH); ctx.lineTo(x, endY);
+            ctx.fill();
+        }
+    </script>
+</body>
+</html>
