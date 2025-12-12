@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#2c3e50">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="Diagramas V/I">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<link rel="apple-touch-icon" href="icon-192.png">
+	<link rel="manifest" href="manifest.json">
     <title>Diagramas V/I</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -1110,6 +1117,16 @@
             ctx.moveTo(x - width - 3, endY - tipH); ctx.lineTo(x + width + 3, endY - tipH); ctx.lineTo(x, endY);
             ctx.fill();
         }
+		
+		
+		// Registro del Service Worker
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('./sw.js')
+					.then(reg => console.log('PWA: Service Worker registrado con éxito.'))
+					.catch(err => console.log('PWA: Error al registrar el Service Worker:', err));
+			});
+		}
     </script>
 </body>
 </html>
