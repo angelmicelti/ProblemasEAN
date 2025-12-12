@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagramas V/I</title>
+    <title>Diagramas V/I (Espaciado Dinámico)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f0f2f5; color: #333; line-height: 1.6; padding: 20px; }
@@ -52,6 +52,9 @@
 
         input[type="text"], input[type="number"], select.main-select { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; }
         
+        /* Range Input */
+        input[type="range"] { width: 100%; cursor: pointer; }
+
         .input-row { display: flex; gap: 5px; align-items: center; }
         .input-row input { flex: 2; }
         .input-row select { flex: 1; min-width: 60px; padding: 8px 4px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
@@ -101,8 +104,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Diagramas Tensión / Intensidad</h1>
-			<h2>Simulación hasta 5 ramas</h2>
+            <h1>Diagramas V/I (Final)</h1>
         </header>
         
         <details class="main-config" open>
@@ -136,6 +138,11 @@
                         <div class="download-row">
                             <button class="download-btn data-btn" onclick="downloadData('json')">DATOS .JSON</button>
                             <button class="download-btn data-btn" onclick="downloadData('csv')">DATOS .CSV</button>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                            <label class="normal-label">Tamaño Etiquetas: <span id="fontSizeDisplay">14px</span></label>
+                            <input type="range" id="fontSlider" min="10" max="30" value="14" step="1">
                         </div>
                     </div>
 
@@ -296,6 +303,8 @@
             document.getElementById('cardB5') 
         ];
         const canvas = document.getElementById('circuitCanvas');
+        const fontSlider = document.getElementById('fontSlider');
+        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
         
         const modal = document.getElementById('codesModal');
         window.openModal = function() { modal.style.display = 'flex'; }
@@ -331,6 +340,11 @@
                 inputs[4].value = ""; 
                 updateVisibility();
                 refreshAllInputs();
+                scheduleUpdate();
+            });
+            
+            fontSlider.addEventListener('input', (e) => {
+                fontSizeDisplay.innerText = e.target.value + "px";
                 scheduleUpdate();
             });
         }
@@ -665,6 +679,7 @@
             const activeBranchesCount = parseInt(branchSelector.value);
             let totalCircuitCurrent = 0;
             let drawingResCounter = 0; 
+            
             let branchDrawInfo = []; 
 
             for(let bIndex = 0; bIndex < activeBranchesCount; bIndex++) {
@@ -892,6 +907,13 @@
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, w, h);
 
+            // LOGICA FUENTES
+            const fontBase = parseInt(fontSlider.value);
+            const fontLarge = `bold ${Math.round(fontBase * 1.1)}px Arial`;
+            const fontNormal = `bold ${fontBase}px Arial`;
+            const fontSmall = `italic ${Math.round(fontBase * 0.85)}px Arial`;
+            const fontTiny = `bold ${Math.round(fontBase * 0.7)}px Arial`;
+
             const totalWidth = gap + ((numBranches - 1) * spacing);
             const startX = (w - totalWidth) / 2;
             const branchStartBase = startX + gap;
@@ -903,12 +925,12 @@
             const zeroY = topRailY + chartHeight + 20; 
             const batteryTopY = zeroY - (batteryV * scale);
 
-            // Batería en el extremo izquierdo del circuito
             const batteryX = startX; 
             
             drawSolidBatteryArrow(ctx, batteryX, zeroY, batteryTopY, 8, '#2ecc71');
             const midBatteryY = (zeroY + batteryTopY) / 2;
-            ctx.fillStyle = '#2c3e50'; ctx.textAlign = 'right'; ctx.font = 'bold 14px Arial';
+            
+            ctx.fillStyle = '#2c3e50'; ctx.textAlign = 'right'; ctx.font = fontNormal;
             ctx.fillText("Pila", batteryX - 25, midBatteryY - 10);
             ctx.fillStyle = '#c0392b';
             ctx.fillText(`${batteryV.toFixed(1)}V`, batteryX - 25, midBatteryY + 10);
@@ -947,7 +969,7 @@
                 const info = branchDrawInfo[bIndex];
 
                 if(!info || !info.valid) {
-                     ctx.fillStyle = '#c0392b'; ctx.textAlign = 'center'; ctx.font = 'italic 12px Arial';
+                     ctx.fillStyle = '#c0392b'; ctx.textAlign = 'center'; ctx.font = fontSmall;
                      ctx.fillText("Sin Circuito / Error", origin, (zeroY + batteryTopY)/2);
                      continue;
                 }
@@ -967,6 +989,9 @@
 
                     const midY = (currentY + endY) / 2;
 
+                    // ALTURA DE LINEA DINÁMICA
+                    const lh = fontBase * 1.1; 
+
                     if (comp.isBlock && comp.type === 'parallel') {
                         const numSubs = comp.subs.length;
                         const subSpacing = 40; 
@@ -980,22 +1005,28 @@
                             let sX = subX + (sIdx * subSpacing);
                             drawComponentArrow(ctx, sX, currentY, endY, 4, '#8B4513');
                             
-                            let zigzagOffset = (numSubs > 1) ? ((sIdx % 2 === 0) ? -15 : 15) : 0;
+                            // OFFSET DINÁMICO
+                            let dynamicOffset = Math.max(15, fontBase * 1.8);
+                            let zigzagOffset = (numSubs > 1) ? ((sIdx % 2 === 0) ? -dynamicOffset : dynamicOffset) : 0;
                             
                             ctx.save();
-                            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'; 
-                            const boxW = 38; 
-                            const boxH = 36;
-                            ctx.fillRect(sX - boxW/2, midY + zigzagOffset - 18, boxW, boxH);
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; 
+                            // CAJA DINÁMICA
+                            const boxW = Math.max(40, fontBase * 3.5); 
+                            const boxH = Math.max(40, fontBase * 3.5);
+                            ctx.fillRect(sX - boxW/2, midY + zigzagOffset - (boxH/2), boxW, boxH);
                             
-                            ctx.fillStyle = '#555'; ctx.font = 'italic 9px Arial'; ctx.textAlign = 'center';
-                            ctx.fillText(sub.name, sX, midY + zigzagOffset - 10);
+                            // Name
+                            ctx.fillStyle = '#555'; ctx.font = fontSmall; ctx.textAlign = 'center';
+                            ctx.fillText(sub.name, sX, midY + zigzagOffset - lh);
 
-                            ctx.fillStyle = '#2980b9'; ctx.font = 'bold 9px Arial';
-                            if(sub.current !== undefined) ctx.fillText(formatI(sub.current), sX, midY + zigzagOffset + 0);
+                            // Current
+                            ctx.fillStyle = '#2980b9'; ctx.font = fontTiny;
+                            if(sub.current !== undefined) ctx.fillText(formatI(sub.current), sX, midY + zigzagOffset);
 
-                            ctx.fillStyle = '#c0392b'; ctx.font = 'bold 9px Arial';
-                            ctx.fillText(`${comp.drop.toFixed(2)}V`, sX, midY + zigzagOffset + 10);
+                            // Voltage
+                            ctx.fillStyle = '#c0392b'; ctx.font = fontTiny;
+                            ctx.fillText(`${comp.drop.toFixed(2)}V`, sX, midY + zigzagOffset + lh);
                             
                             ctx.restore();
                         });
@@ -1010,12 +1041,15 @@
 
                         drawComponentArrow(ctx, currentX, currentY, endY, 6, color);
 
-                        ctx.fillStyle = '#555'; ctx.textAlign = 'right'; ctx.font = 'italic 11px Arial';
-                        ctx.fillText(comp.name, currentX - 10, midY - 6);
-                        ctx.fillStyle = '#c0392b'; ctx.font = 'bold 12px Arial';
-                        ctx.fillText(`${comp.drop.toFixed(2)}V`, currentX - 10, midY + 9);
-                        ctx.fillStyle = '#2980b9'; ctx.textAlign = 'left'; ctx.font = '12px Arial';
-                        ctx.fillText(formatI(branch.current), currentX + 10, midY + 4);
+                        ctx.fillStyle = '#555'; ctx.textAlign = 'right'; ctx.font = fontSmall;
+                        // Espaciado Serie Dinámico
+                        ctx.fillText(comp.name, currentX - 10, midY - (lh * 0.8));
+                        
+                        ctx.fillStyle = '#c0392b'; ctx.font = fontNormal;
+                        ctx.fillText(`${comp.drop.toFixed(2)}V`, currentX - 10, midY + (lh * 1.2));
+                        
+                        ctx.fillStyle = '#2980b9'; ctx.textAlign = 'left'; ctx.font = fontNormal;
+                        ctx.fillText(formatI(branch.current), currentX + 10, midY + (lh * 0.3));
                     }
 
                     const nextY = endY;
@@ -1029,8 +1063,8 @@
                             ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3; 
                             ctx.beginPath(); ctx.moveTo(currentX, nextY); ctx.lineTo(currentX, zeroY); ctx.stroke();
                             
-                            ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center';
-                            ctx.fillText("VOLTAJE INSUFICIENTE", currentX, zeroY + 14);
+                            ctx.fillStyle = '#e74c3c'; ctx.font = fontNormal; ctx.textAlign = 'center';
+                            ctx.fillText("VOLTAJE INSUFICIENTE", currentX, zeroY + fontBase + 5);
                         } else {
                             if (Math.abs(nextY - zeroY) > 1) {
                                 ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2;
@@ -1042,8 +1076,8 @@
                 });
                 
                 ctx.beginPath(); ctx.arc(currentX, zeroY, 5, 0, Math.PI*2); ctx.fillStyle = '#555'; ctx.fill();
-                ctx.fillStyle = '#2c3e50'; ctx.textAlign = 'center'; ctx.font = 'bold 14px Arial';
-                ctx.fillText(`RAMA ${bIndex + 1}`, origin, zeroY + 35);
+                ctx.fillStyle = '#2c3e50'; ctx.textAlign = 'center'; ctx.font = fontLarge;
+                ctx.fillText(`RAMA ${bIndex + 1}`, origin, zeroY + (fontBase * 3));
             }
         }
 
