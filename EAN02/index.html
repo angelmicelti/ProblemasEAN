@@ -3,128 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrenador Pro - Código de Colores</title>
+    <title>Te reto con las resistencias</title>
     <style>
         :root {
-            --primary-color: #34495e;
+            --primary-color: #2c3e50;
             --accent-color: #007bff;
-            --bg-color: #f0f2f5;
+            --bg-color: #f4f6f9;
             --card-bg: #ffffff;
             --success-color: #28a745;
+            --success-bg: #d4edda;
             --error-color: #dc3545;
+            --error-bg: #ffeef0;
+            --warning-color: #fd7e14;
         }
 
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background-color: var(--bg-color); 
-            color: #333; 
-            line-height: 1.6;
+            margin: 0; padding: 20px; background-color: var(--bg-color); color: #333; line-height: 1.6;
         }
 
         .container { 
-            max-width: 1100px; 
-            width: 100%;
-            margin: auto; 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-            box-sizing: border-box;
+            max-width: 1100px; width: 100%; margin: auto; background: var(--card-bg); 
+            padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box;
         }
 
         h1 { 
-            color: #2c3e50; 
-            text-align: center; 
-            border-bottom: 2px solid #eee; 
-            padding-bottom: 15px; 
-            margin-bottom: 20px; 
-            font-size: 1.8rem;
+            color: var(--primary-color); text-align: center; border-bottom: 2px solid #eee; 
+            padding-bottom: 15px; margin-bottom: 20px; font-size: 1.8rem;
         }
         
         /* --- CONTROLES --- */
         .controls { 
-            background: #e9ecef; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 25px; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 15px; 
-            border: 1px solid #dee2e6; 
+            background: #e9ecef; padding: 20px; border-radius: 10px; margin-bottom: 25px; 
+            text-align: center; display: flex; flex-direction: column; align-items: center; 
+            gap: 15px; border: 1px solid #dee2e6; 
         }
 
         .radio-group { 
-            background: white; 
-            padding: 10px 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
+            background: white; padding: 10px 20px; border-radius: 20px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; 
+            justify-content: center; gap: 10px;
         }
-
-        .radio-group label { 
-            margin: 0 5px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 1rem; 
-            color: #495057; 
-            display: flex;
-            align-items: center;
-        }
-
-        input[type="radio"] { 
-            transform: scale(1.3); 
-            margin-right: 8px; 
-            cursor: pointer; 
-        }
+        .radio-group label { margin: 0 5px; font-weight: bold; cursor: pointer; color: #495057; display: flex; align-items: center; }
+        input[type="radio"] { transform: scale(1.3); margin-right: 8px; cursor: pointer; }
 
         .btn-report {
-            background-color: #2c3e50; 
-            color: white; 
-            border: none; 
-            padding: 12px 25px;
-            border-radius: 25px; 
-            cursor: pointer; 
-            font-size: 1rem; 
-            font-weight: bold;
-            transition: all 0.2s; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 300px;
+            background-color: var(--primary-color); color: white; border: none; padding: 12px 25px;
+            border-radius: 25px; cursor: pointer; font-size: 1rem; font-weight: bold;
+            transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 300px;
         }
         .btn-report:hover { background-color: #1a252f; transform: translateY(-2px); }
 
-        /* --- TABLA & RESPONSIVE GRID --- */
+        /* --- TABLA --- */
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         
         th { 
-            background-color: var(--primary-color); 
-            color: white; 
-            padding: 15px; 
-            position: sticky; 
-            top: 0; 
-            z-index: 10; 
-            font-weight: 600; 
-            letter-spacing: 0.5px; 
+            background-color: var(--primary-color); color: white; padding: 15px; position: sticky; 
+            top: 0; z-index: 10; font-weight: 600; letter-spacing: 0.5px; 
         }
         th:first-child { border-top-left-radius: 8px; }
         th:last-child { border-top-right-radius: 8px; }
         
         td { 
-            border-bottom: 1px solid #dee2e6; 
-            padding: 12px 8px; 
-            text-align: center; 
-            vertical-align: middle; 
-            background: #fff; 
+            border-bottom: 1px solid #dee2e6; padding: 12px 8px; text-align: center; 
+            vertical-align: middle; background: #fff; transition: background 0.3s;
         }
-
         tr:hover td { background-color: #f8f9fa; }
+
+        /* ESTILOS DE ESTADO DE FILA */
+        tr.row-cheated td { background-color: #fff3cd; } 
+        tr.row-failed td { background-color: var(--error-bg); } 
+        tr.row-solved td { background-color: var(--success-bg); }
 
         /* --- RESISTENCIA GRÁFICA --- */
         .resistor-graphic { display: flex; align-items: center; justify-content: center; width: 100%; }
@@ -143,165 +92,100 @@
 
         /* --- INTERACCIÓN --- */
         select, input[type="number"] {
-            padding: 8px; 
-            border: 1px solid #ced4da; 
-            border-radius: 4px; 
-            margin: 2px; 
-            font-size: 16px; 
+            padding: 8px; border: 1px solid #ced4da; border-radius: 4px; margin: 2px; font-size: 16px; 
         }
         input[type="number"] { width: 80px; text-align: right; }
-        .color-select { width: 90px; }
         
-        .interactive-area {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
+        .color-select { width: auto; min-width: 80px; } 
+        
+        .interactive-area { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px; }
 
         .btn-check {
-            background-color: var(--accent-color); 
-            color: white; 
-            border: none; 
-            padding: 8px 16px;
-            border-radius: 4px; 
-            cursor: pointer; 
-            margin-left: 5px; 
-            font-size: 0.95em; 
-            font-weight: 600;
+            background-color: var(--accent-color); color: white; border: none; padding: 8px 16px;
+            border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 0.95em; font-weight: 600;
         }
-        .btn-check:hover { background-color: #0056b3; }
+        .btn-check:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn-check:hover:not(:disabled) { background-color: #0056b3; }
         
-        /* --- FEEDBACK --- */
-        .feedback-container { height: 20px; margin-top: 6px; width: 100%; text-align: center; }
-        .feedback { font-weight: bold; font-size: 0.9em; transition: opacity 0.5s; opacity: 1; }
+        /* Feedback */
+        .feedback-container { min-height: 24px; margin-top: 6px; width: 100%; text-align: center; display: block; }
+        .feedback { font-weight: bold; font-size: 0.9em; transition: opacity 0.5s; opacity: 1; display: inline-block; }
+        
         .correct { color: var(--success-color); }
         .incorrect { color: var(--error-color); }
-        .fade-out { opacity: 0; }
+        .info { color: var(--error-color); } 
+        
+        .viewed-msg { color: var(--warning-color); font-size: 0.85em; font-weight: bold; }
 
+        .fade-out { opacity: 0; }
         .hidden { display: none !important; }
+
         .val-text { font-weight: bold; color: #0056b3; font-size: 1.2em; }
         .current-text { color: var(--success-color); font-weight: bold; font-family: monospace; font-size: 1.1em; }
-        input[type="checkbox"].sol-check { transform: scale(1.5); cursor: pointer; accent-color: var(--success-color); }
+        
+        input[type="checkbox"].sol-check { transform: scale(1.5); cursor: pointer; accent-color: var(--warning-color); }
+        input[type="checkbox"].sol-check.solved { accent-color: var(--success-color); pointer-events: none; }
+        input[type="checkbox"].sol-check.failed { accent-color: var(--error-color); cursor: not-allowed; opacity: 0.6; }
 
-        /* --- MEDIA QUERIES (RESPONSIVE) --- */
+        /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 15px; }
             h1 { font-size: 1.5rem; }
-
-            /* Tabla a Tarjetas */
             thead { display: none; }
             tr {
-                display: flex;
-                flex-direction: column;
-                background: white;
-                margin-bottom: 20px;
-                border: 1px solid #e0e0e0;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-                padding: 15px;
+                display: flex; flex-direction: column; background: white; margin-bottom: 20px;
+                border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 15px;
             }
-            td {
-                display: block;
-                width: 100%;
-                box-sizing: border-box;
-                padding: 10px 0;
-                text-align: center;
-                border-bottom: none;
-            }
-
-            td:nth-of-type(1) { 
-                border-bottom: 1px solid #f0f0f0; 
-                margin-bottom: 10px; 
-                font-weight: bold;
-                color: #888;
-            }
+            td { display: block; width: 100%; box-sizing: border-box; padding: 10px 0; text-align: center; border-bottom: none; }
+            td:nth-of-type(1) { border-bottom: 1px solid #f0f0f0; margin-bottom: 10px; font-weight: bold; color: #888; }
             td:nth-of-type(1)::before { content: "Ejercicio #"; }
-
-            td:nth-of-type(2)::before { 
-                content: "Valor:"; 
-                display: block; font-weight: bold; color: #555; margin-bottom: 5px; font-size: 0.9em; 
-            }
-
-            td:nth-of-type(3)::before { 
-                content: "Bandas de Color:"; 
-                display: block; font-weight: bold; color: #555; margin-bottom: 8px; font-size: 0.9em; 
-            }
-
+            td:nth-of-type(2)::before { content: "Valor:"; display: block; font-weight: bold; color: #555; margin-bottom: 5px; font-size: 0.9em; }
+            td:nth-of-type(3)::before { content: "Bandas de Color:"; display: block; font-weight: bold; color: #555; margin-bottom: 8px; font-size: 0.9em; }
             .interactive-area { flex-direction: column; width: 100%; }
             select, input[type="number"], .btn-check { width: 90%; max-width: 100%; margin: 5px 0; }
             .color-select { width: 90%; }
-            
-            td:nth-of-type(5) { 
-                border-top: 1px solid #f0f0f0; 
-                padding-top: 15px; 
-                margin-top: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-            }
-            td:nth-of-type(5)::before { content: "Ver Solución:"; font-weight: bold; color: #333; }
-            
-            td:nth-of-type(4) { 
-                order: 6; 
-                padding-top: 0;
-            }
+            td:nth-of-type(5) { border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+            td:nth-of-type(5)::before { content: "Solución:"; font-weight: bold; color: #333; }
+            td:nth-of-type(4) { order: 6; padding-top: 0; }
         }
 
         /* --- MODAL INFORME --- */
-        #reportModal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px);
-            padding: 20px; box-sizing: border-box;
-        }
-        .modal-content {
-            background-color: white; padding: 0; border-radius: 15px; width: 100%; max-width: 450px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; animation: slideIn 0.3s ease-out;
-        }
+        #reportModal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px); padding: 20px; box-sizing: border-box; }
+        .modal-content { background-color: white; padding: 0; border-radius: 15px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .modal-header { background: #34495e; color: white; padding: 20px; }
-        .modal-header h2 { margin: 0; font-size: 1.4em; }
+        .modal-header { background: var(--primary-color); color: white; padding: 20px; }
         .modal-body { padding: 25px; }
-
         .stat-row { margin-bottom: 20px; text-align: left; }
         .stat-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 0.9em; }
         .progress-bg { background: #e9ecef; height: 12px; border-radius: 6px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--success-color); width: 0%; transition: width 1s ease-in-out; }
-        .bar-accuracy { background: var(--accent-color); }
+        .bar-cheated { background: var(--warning-color); }
+        .bar-failed { background: var(--error-color); }
         
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
         .mini-stat { background: #f8f9fa; padding: 10px; border-radius: 8px; }
         .mini-stat .num { display: block; font-size: 1.4em; font-weight: bold; color: #333; }
         .mini-stat .desc { font-size: 0.8em; color: #666; }
-
-        .close-btn { 
-            margin: 0 0 25px 0; background: #6c757d; color: white; border: none; padding: 12px 30px; 
-            border-radius: 20px; cursor: pointer; font-size: 1em; transition: background 0.2s;
-            width: 80%;
-        }
+        .close-btn { margin: 0 0 25px 0; background: #6c757d; color: white; border: none; padding: 12px 30px; border-radius: 20px; cursor: pointer; width: 80%; }
         .close-btn:hover { background: #5a6268; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>⚡ Código de colores de las resistencias</h1>
-	
+    <h1>⚡ Te reto con las resistencias</h1>
     
     <div class="controls">
         <div class="radio-group">
-            <label><input type="radio" name="mode" value="colores" id="modeCol" checked onchange="handleModeChange()"> Adivinar Colores</label>
-            <label><input type="radio" name="mode" value="resistencia" id="modeRes" onchange="handleModeChange()"> Adivinar Valores</label>
+            <label><input type="radio" name="mode" value="colores" id="modeCol" checked onchange="handleModeChange()"> Adivinar colores</label>
+            <label><input type="radio" name="mode" value="resistencia" id="modeRes" onchange="handleModeChange()"> Adivinar valores</label>
         </div>
         
         <button class="btn-report" onclick="showReport()">📊 Ver Informe de Progreso</button>
 
-        <p style="margin: 5px 0 0 0; color:#666; font-size:0.9em;">
-            <em>Completa los <strong>84 retos</strong> disponibles (42 en cada modo). El orden es aleatorio.</em>
+        <p style="margin: 5px 0 0 0; color:#666; font-size:0.85em;">
+            <em><strong>Nota:</strong> Solo tienes 1 intento. El progreso se conserva para cada resistencia.</em>
         </p>
     </div>
 
@@ -328,21 +212,29 @@
         <div class="modal-body">
             <div class="stat-row">
                 <div class="stat-label">
-                    <span>Progreso Total (84 retos)</span>
-                    <span id="txt-progress">0%</span>
+                    <span>Aciertos</span>
+                    <span id="txt-progress">0/0</span>
                 </div>
                 <div class="progress-bg">
                     <div class="progress-bar" id="bar-progress"></div>
                 </div>
             </div>
-
-            <div class="stat-row">
+             <div class="stat-row">
                 <div class="stat-label">
-                    <span>Precisión (Aciertos/Intentos)</span>
-                    <span id="txt-accuracy">0%</span>
+                    <span>Fallados (Incorrectos)</span>
+                    <span id="txt-failed">0</span>
                 </div>
                 <div class="progress-bg">
-                    <div class="progress-bar bar-accuracy" id="bar-accuracy"></div>
+                    <div class="progress-bar bar-failed" id="bar-failed" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">
+                    <span>Vistos (Sin intentar)</span>
+                    <span id="txt-cheated">0</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-bar bar-cheated" id="bar-cheated" style="width: 0%"></div>
                 </div>
             </div>
 
@@ -352,15 +244,15 @@
                     <span class="desc">Aciertos</span>
                 </div>
                 <div class="mini-stat">
-                    <span class="num" id="val-attempts" style="color: var(--accent-color);">0</span>
-                    <span class="desc">Intentos</span>
-                </div>
-                <div class="mini-stat">
                     <span class="num" id="val-failed" style="color: var(--error-color);">0</span>
                     <span class="desc">Fallos</span>
                 </div>
                 <div class="mini-stat">
-                    <span class="num" id="val-pending" style="color: #6c757d;">84</span>
+                    <span class="num" id="val-viewed" style="color: var(--warning-color);">0</span>
+                    <span class="desc">Vistos</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="num" id="val-pending" style="color: #6c757d;">0</span>
                     <span class="desc">Pendientes</span>
                 </div>
             </div>
@@ -370,53 +262,62 @@
 </div>
 
 <script>
-// --- DATOS ---
+/* DATOS SERIE E6 */
 const exercises = [
-    { v: "1.50 K", r: 1500, b: ["MARRÓN", "VERDE", "ROJO"] },
-    { v: "22.00 ", r: 22, b: ["ROJO", "ROJO", "NEGRO"] },
-    { v: "15.00 ", r: 15, b: ["MARRÓN", "VERDE", "NEGRO"] },
-    { v: "3.30 ", r: 3.3, b: ["NARANJA", "NARANJA", "ORO"] },
-    { v: "10.00 K", r: 10000, b: ["MARRÓN", "NEGRO", "NARANJA"] },
-    { v: "150.00 ", r: 150, b: ["MARRÓN", "VERDE", "MARRÓN"] },
-    { v: "220.00 ", r: 220, b: ["ROJO", "ROJO", "MARRÓN"] },
-    { v: "47.00 ", r: 47, b: ["AMARILLO", "VIOLETA", "NEGRO"] },
-    { v: "3.30 K", r: 3300, b: ["NARANJA", "NARANJA", "ROJO"] },
-    { v: "2.20 K", r: 2200, b: ["ROJO", "ROJO", "ROJO"] },
-    { v: "100.00 ", r: 100, b: ["MARRÓN", "NEGRO", "MARRÓN"] },
-    { v: "680.00 ", r: 680, b: ["AZUL", "GRIS", "MARRÓN"] },
-    { v: "22.00 K", r: 22000, b: ["ROJO", "ROJO", "NARANJA"] },
-    { v: "100.00 K", r: 100000, b: ["MARRÓN", "NEGRO", "AMARILLO"] },
-    { v: "1.00 ", r: 1.0, b: ["MARRÓN", "NEGRO", "ORO"] },
-    { v: "68.00 K", r: 68000, b: ["AZUL", "GRIS", "NARANJA"] },
-    { v: "680.00 K", r: 680000, b: ["AZUL", "GRIS", "AMARILLO"] },
-    { v: "3.30 M", r: 3300000, b: ["NARANJA", "NARANJA", "VERDE"] },
-    { v: "4.70 M", r: 4700000, b: ["AMARILLO", "VIOLETA", "VERDE"] },
-    { v: "4.70 K", r: 4700, b: ["AMARILLO", "VIOLETA", "ROJO"] },
-    { v: "2.20 ", r: 2.2, b: ["ROJO", "ROJO", "ORO"] },
-    { v: "10.00 ", r: 10, b: ["MARRÓN", "NEGRO", "NEGRO"] },
-    { v: "2.20 M", r: 2200000, b: ["ROJO", "ROJO", "VERDE"] },
-    { v: "15.00 K", r: 15000, b: ["MARRÓN", "VERDE", "NARANJA"] },
-    { v: "330.00 K", r: 330000, b: ["NARANJA", "NARANJA", "AMARILLO"] },
-    { v: "4.70 ", r: 4.7, b: ["AMARILLO", "VIOLETA", "ORO"] },
-    { v: "470.00 ", r: 470, b: ["AMARILLO", "VIOLETA", "MARRÓN"] },
-    { v: "47.00 K", r: 47000, b: ["AMARILLO", "VIOLETA", "NARANJA"] },
-    { v: "33.00 ", r: 33, b: ["NARANJA", "NARANJA", "NEGRO"] },
-    { v: "150.00 K", r: 150000, b: ["MARRÓN", "VERDE", "AMARILLO"] },
-    { v: "68.00 ", r: 68, b: ["AZUL", "GRIS", "NEGRO"] },
-    { v: "1.00 M", r: 1000000, b: ["MARRÓN", "NEGRO", "VERDE"] },
-    { v: "6.80 K", r: 6800, b: ["AZUL", "GRIS", "ROJO"] },
-    { v: "220.00 K", r: 220000, b: ["ROJO", "ROJO", "AMARILLO"] },
-    { v: "6.80 M", r: 6800000, b: ["AZUL", "GRIS", "VERDE"] },
-    { v: "1.00 K", r: 1000, b: ["MARRÓN", "NEGRO", "ROJO"] },
-    { v: "1.50 ", r: 1.5, b: ["MARRÓN", "VERDE", "ORO"] },
-    { v: "1.50 M", r: 1500000, b: ["MARRÓN", "VERDE", "VERDE"] },
-    { v: "6.80 ", r: 6.8, b: ["AZUL", "GRIS", "ORO"] },
-    { v: "330.00 ", r: 330, b: ["NARANJA", "NARANJA", "MARRÓN"] },
-    { v: "33.00 K", r: 33000, b: ["NARANJA", "NARANJA", "NARANJA"] },
-    { v: "470.00 K", r: 470000, b: ["AMARILLO", "VIOLETA", "AMARILLO"] }
+    { v: "10", r: 10, b: ["MArrón", "NEgro", "NEgro"] },
+    { v: "15", r: 15, b: ["MArrón", "VERde", "NEgro"] },
+    { v: "22", r: 22, b: ["ROjo", "ROjo", "NEgro"] },
+    { v: "33", r: 33, b: ["NAranja", "NAranja", "NEgro"] },
+    { v: "47", r: 47, b: ["AMarillo", "VIOleta", "NEgro"] },
+    { v: "68", r: 68, b: ["AZul", "GRIs", "NEgro"] },
+    { v: "100", r: 100, b: ["MArrón", "NEgro", "MArrón"] },
+    { v: "150", r: 150, b: ["MArrón", "VERde", "MArrón"] },
+    { v: "220", r: 220, b: ["ROjo", "ROjo", "MArrón"] },
+    { v: "330", r: 330, b: ["NAranja", "NAranja", "MArrón"] },
+    { v: "470", r: 470, b: ["AMarillo", "VIOleta", "MArrón"] },
+    { v: "680", r: 680, b: ["AZul", "GRIs", "MArrón"] },
+    { v: "1 K", r: 1000, b: ["MArrón", "NEgro", "ROjo"] },
+    { v: "1.5 K", r: 1500, b: ["MArrón", "VERde", "ROjo"] },
+    { v: "2.2 K", r: 2200, b: ["ROjo", "ROjo", "ROjo"] },
+    { v: "3.3 K", r: 3300, b: ["NAranja", "NAranja", "ROjo"] },
+    { v: "4.7 K", r: 4700, b: ["AMarillo", "VIOleta", "ROjo"] },
+    { v: "6.8 K", r: 6800, b: ["AZul", "GRIs", "ROjo"] },
+    { v: "10 K", r: 10000, b: ["MArrón", "NEgro", "NAranja"] },
+    { v: "15 K", r: 15000, b: ["MArrón", "VERde", "NAranja"] },
+    { v: "22 K", r: 22000, b: ["ROjo", "ROjo", "NAranja"] },
+    { v: "33 K", r: 33000, b: ["NAranja", "NAranja", "NAranja"] },
+    { v: "47 K", r: 47000, b: ["AMarillo", "VIOleta", "NAranja"] },
+    { v: "68 K", r: 68000, b: ["AZul", "GRIs", "NAranja"] },
+    { v: "100 K", r: 100000, b: ["MArrón", "NEgro", "AMarillo"] },
+    { v: "150 K", r: 150000, b: ["MArrón", "VERde", "AMarillo"] },
+    { v: "220 K", r: 220000, b: ["ROjo", "ROjo", "AMarillo"] },
+    { v: "330 K", r: 330000, b: ["NAranja", "NAranja", "AMarillo"] },
+    { v: "470 K", r: 470000, b: ["AMarillo", "VIOleta", "AMarillo"] },
+    { v: "680 K", r: 680000, b: ["AZul", "GRIs", "AMarillo"] },
+    { v: "1 M", r: 1000000, b: ["MArrón", "NEgro", "VERde"] },
+    { v: "1.5 M", r: 1500000, b: ["MArrón", "VERde", "VERde"] },
+    { v: "2.2 M", r: 2200000, b: ["ROjo", "ROjo", "VERde"] },
+    { v: "3.3 M", r: 3300000, b: ["NAranja", "NAranja", "VERde"] },
+    { v: "4.7 M", r: 4700000, b: ["AMarillo", "VIOleta", "VERde"] },
+    { v: "6.8 M", r: 6800000, b: ["AZul", "GRIs", "VERde"] },
+    { v: "10 M", r: 10000000, b: ["MArrón", "NEgro", "AZul"] },
+    { v: "15 M", r: 15000000, b: ["MArrón", "VERde", "AZul"] },
+    { v: "22 M", r: 22000000, b: ["ROjo", "ROjo", "AZul"] },
+    { v: "33 M", r: 33000000, b: ["NAranja", "NAranja", "AZul"] },
+    { v: "1 K", r: 1000, b: ["MArrón", "NEgro", "ROjo"] },
+    { v: "10 K", r: 10000, b: ["MArrón", "NEgro", "NAranja"] },
+    { v: "100", r: 100, b: ["MArrón", "NEgro", "MArrón"] },
+    { v: "220", r: 220, b: ["ROjo", "ROjo", "MArrón"] },
+    { v: "4.7 K", r: 4700, b: ["AMarillo", "VIOleta", "ROjo"] },
+    { v: "330", r: 330, b: ["NAranja", "NAranja", "MArrón"] },
+    { v: "1 M", r: 1000000, b: ["MArrón", "NEgro", "VERde"] },
+    { v: "10", r: 10, b: ["MArrón", "NEgro", "NEgro"] },
+    { v: "2.2 K", r: 2200, b: ["ROjo", "ROjo", "ROjo"] },
+    { v: "470 K", r: 470000, b: ["AMarillo", "VIOleta", "AMarillo"] }
 ];
 
-// --- FUNCIÓN DE BARAJADO (Fisher-Yates) ---
+exercises.forEach((ex, i) => ex.id = i);
+
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -424,32 +325,41 @@ function shuffle(array) {
   }
   return array;
 }
-
-// Barajar las resistencias al iniciar
 shuffle(exercises);
 
-const colorList = ["NEGRO", "MARRÓN", "ROJO", "NARANJA", "AMARILLO", "VERDE", "AZUL", "VIOLETA", "GRIS", "BLANCO", "ORO", "PLATA"];
+const colorList = ["NEgro", "MArrón", "ROjo", "NAranja", "AMarillo", "VERde", "AZul", "VIOleta", "GRIs", "BLAnco", "ORO", "PLATA"];
 const colorMap = {
-    "NEGRO": "#000000", "MARRÓN": "#8B4513", "ROJO": "#DC143C", "NARANJA": "#FF8C00", 
-    "AMARILLO": "#FFD700", "VERDE": "#228B22", "AZUL": "#0000CD", "VIOLETA": "#8A2BE2", 
-    "GRIS": "#808080", "BLANCO": "#F5F5F5", "ORO": "#D4AF37", "PLATA": "#C0C0C0"
+    "NEgro": "#000000", "MArrón": "#8B4513", "ROjo": "#DC143C", "NAranja": "#FF8C00", 
+    "AMarillo": "#FFD700", "VERde": "#228B22", "AZul": "#0000CD", "VIOleta": "#8A2BE2", 
+    "GRIs": "#808080", "BLAnco": "#F5F5F5", "ORO": "#D4AF37", "PLATA": "#C0C0C0"
 };
 
 let stats = {
     totalClicks: 0,
     successfulClicks: 0,
     solvedTasks: new Set(), 
+    viewedTasks: new Set(),
+    failedTasks: new Set(),
     attemptedTasks: new Set()
 };
 
-const TOTAL_TASKS = exercises.length * 2; 
+const TOTAL_TASKS = exercises.length; 
 
 function getCurrentMode() {
     return document.querySelector('input[name="mode"]:checked').value;
 }
 
 function handleModeChange() {
+    shuffle(exercises);
     renderTable();
+}
+
+function formatCurrent(r) {
+    const volts = 9;
+    const amps = volts / r;
+    if (amps < 0.000001) return (amps * 1000000000).toFixed(2) + " nA";
+    else if (amps < 0.001) return (amps * 1000000).toFixed(2) + " μA";
+    else return (amps * 1000).toFixed(2) + " mA";
 }
 
 function renderTable() {
@@ -459,39 +369,52 @@ function renderTable() {
 
     exercises.forEach((ex, i) => {
         const tr = document.createElement('tr');
-        // Usamos una clave única basada en las propiedades del ejercicio, no solo en el índice,
-        // porque el índice 'i' cambia si volviéramos a barajar (aunque aquí solo barajamos una vez al inicio).
-        // Sin embargo, para esta sesión, el índice 'i' es estable tras el barajado inicial.
-        const taskKey = `${i}-${mode}`;
+        
+        const taskKey = ex.id; 
+        
         const isSolved = stats.solvedTasks.has(taskKey);
+        const isViewed = stats.viewedTasks.has(taskKey);
+        const isFailed = stats.failedTasks.has(taskKey);
+        
+        if(isViewed) tr.classList.add('row-cheated');
+        if(isFailed) tr.classList.add('row-failed'); 
+        if(isSolved) tr.classList.add('row-solved'); 
 
-        // --- VALORES ---
+        const showSolutionStatic = isSolved || isViewed || isFailed;
+        const inputDisabled = showSolutionStatic ? 'disabled' : '';
+        const feedbackId = `fb-${i}`; 
+
         let valContent = '';
         if (mode === 'resistencia') {
-            if (!isSolved) {
+            if (!showSolutionStatic) {
                 valContent = `
                     <div class="interactive-area" id="input-val-${i}">
-                        <input type="number" id="user-num-${i}" step="0.01" placeholder="Valor">
-                        <select id="user-unit-${i}">
+                        <input type="number" id="user-num-${i}" step="0.01" placeholder="Valor" ${inputDisabled}>
+                        <select id="user-unit-${i}" ${inputDisabled}>
                             <option value="1">Ω</option>
                             <option value="1000">KΩ</option>
                             <option value="1000000">MΩ</option>
                         </select>
                         <button class="btn-check" onclick="checkValue(${i})">Comprobar</button>
                     </div>
-                    <div class="static-area hidden" id="static-val-${i}"><span class="val-text">${ex.v}</span></div>
-                    <div class="feedback-container">
-                        <span class="feedback" id="feedback-val-${i}"></span>
-                    </div>
+                    <div class="feedback-container"><span class="feedback" id="${feedbackId}"></span></div>
                 `;
             } else {
-                valContent = `<span class="val-text">${ex.v}</span>`;
+                let feedbackText = "";
+                let feedbackClass = "";
+                if (isViewed) { feedbackText = "(Vista Solución)"; feedbackClass = "viewed-msg"; }
+                
+                valContent = `
+                    <span class="val-text">${ex.v}</span> 
+                    <div class="feedback-container">
+                        <span class="feedback ${feedbackClass}" id="${feedbackId}">${feedbackText}</span>
+                    </div>
+                `;
             }
         } else {
             valContent = `<span class="val-text">${ex.v}</span>`;
         }
 
-        // --- COLORES ---
         let colContent = '';
         let bandsHtml = `<div class="wire"></div>`;
         ex.b.forEach((c, idx) => bandsHtml += `<div class="color-box" style="background-color:${colorMap[c]}" title="Banda ${idx+1}: ${c}"></div>`);
@@ -499,176 +422,207 @@ function renderTable() {
         const staticResistor = `<div class="resistor-graphic"><div class="band-container">${bandsHtml}</div></div>`;
 
         if (mode === 'colores') {
-            if (!isSolved) {
-                let dropdowns = '';
+            if (!showSolutionStatic) {
+                 let dropdowns = '';
                 for(let b=0; b<3; b++) {
-                    let options = `<option value="">-</option>` + colorList.slice(0,10).map(c => `<option value="${c}">${c}</option>`).join('');
-                    dropdowns += `<select class="color-select" id="user-col-${i}-${b}">${options}</select>`;
+                    let limit = (b === 2) ? 7 : 10; 
+                    let options = `<option value="">-</option>` + colorList.slice(0,limit).map(c => `<option value="${c}">${c}</option>`).join('');
+                    dropdowns += `<select class="color-select" id="user-col-${i}-${b}" ${inputDisabled}>${options}</select>`;
                 }
                 colContent = `
                     <div class="interactive-area" id="input-col-${i}">
                         ${dropdowns} <button class="btn-check" onclick="checkColors(${i})">Comprobar</button>
                     </div>
-                    <div class="static-area hidden" id="static-col-${i}">${staticResistor}</div>
-                    <div class="feedback-container">
-                        <span class="feedback" id="feedback-col-${i}"></span>
-                    </div>
+                    <div class="feedback-container"><span class="feedback" id="${feedbackId}"></span></div>
                 `;
             } else {
-                colContent = staticResistor;
+                let feedbackText = "";
+                let feedbackClass = "";
+                if (isViewed) { feedbackText = "(Vista Solución)"; feedbackClass = "viewed-msg"; }
+
+                colContent = `
+                    ${staticResistor} 
+                    <div class="feedback-container">
+                        <span class="feedback ${feedbackClass}" id="${feedbackId}">${feedbackText}</span>
+                    </div>
+                `;
             }
         } else {
             colContent = staticResistor;
         }
 
-        const checkState = isSolved ? 'checked' : '';
-        const currClass = isSolved ? 'current-text' : 'current-text hidden';
-        const currVal = calculateI(ex.r);
+        let checkState = '';
+        let checkClass = 'sol-check';
+        let checkOnChange = `onchange="toggleManualSolution(${i})"`;
+        
+        if (isSolved) {
+            checkState = 'checked disabled'; 
+            checkClass += ' solved';
+        } else if (isFailed) {
+            checkState = 'disabled';
+            checkClass += ' failed';
+        } else if (isViewed) {
+            checkState = 'checked';
+        }
+
+        const showCurrent = (isSolved || isViewed || isFailed);
+        const currClass = showCurrent ? 'current-text' : 'current-text hidden';
+        const currVal = formatCurrent(ex.r);
 
         tr.innerHTML = `
             <td>${i + 1}</td>
             <td>${valContent}</td>
             <td>${colContent}</td>
             <td><span class="${currClass}" id="curr-${i}">${currVal}</span></td>
-            <td><input type="checkbox" class="sol-check" id="check-${i}" ${checkState} onchange="toggleManualSolution(${i})"></td>
+            <td><input type="checkbox" class="${checkClass}" id="check-${i}" ${checkState} ${checkOnChange}></td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-function calculateI(r) { return ((9/r)*1000).toFixed(2) + " mA"; }
+function registerAction(exerciseId, resultType) {
+    const taskKey = exerciseId; 
+    
+    if (stats.solvedTasks.has(taskKey) || stats.failedTasks.has(taskKey) || stats.viewedTasks.has(taskKey)) return;
 
-function registerAction(idx, isSuccess) {
-    const mode = getCurrentMode();
-    const taskKey = `${idx}-${mode}`;
     stats.totalClicks++;
     stats.attemptedTasks.add(taskKey);
-    if (isSuccess) {
+
+    if (resultType === 'success') {
         stats.successfulClicks++;
         stats.solvedTasks.add(taskKey);
+    } else if (resultType === 'failure') {
+        stats.failedTasks.add(taskKey); 
     }
 }
 
-// Validación VALORES
+function toggleManualSolution(idx) {
+    const exerciseId = exercises[idx].id;
+    const checkbox = document.getElementById(`check-${idx}`);
+    const taskKey = exerciseId;
+
+    if (checkbox.checked) {
+        if (!stats.solvedTasks.has(taskKey) && !stats.failedTasks.has(taskKey)) {
+            stats.viewedTasks.add(taskKey);
+            stats.attemptedTasks.add(taskKey); 
+            renderTable();
+        } 
+    } else {
+        renderTable(); 
+    }
+}
+
 function checkValue(idx) {
-    const userNum = parseFloat(document.getElementById(`user-num-${idx}`).value);
+    const exerciseId = exercises[idx].id;
+    const valInput = document.getElementById(`user-num-${idx}`);
     const userUnit = parseFloat(document.getElementById(`user-unit-${idx}`).value);
-    const feedback = document.getElementById(`feedback-val-${idx}`);
-    
+    const feedbackElem = document.getElementById(`fb-${idx}`);
+
+    if (!valInput.value || valInput.value.trim() === "") { 
+        showFeedback(feedbackElem, "Introduce un valor", "info", 2000); 
+        return; 
+    }
+    const userNum = parseFloat(valInput.value);
     if (isNaN(userNum)) {
-        showFeedback(feedback, "Introduce un número", false);
-        return;
+         showFeedback(feedbackElem, "Valor no válido", "info", 2000);
+         return;
     }
 
     const userTotal = userNum * userUnit;
     const target = exercises[idx].r;
     
-    // Margen 0.1
-    if (Math.abs(userTotal - target) <= 0.1) {
-        registerAction(idx, true);
-        showSuccess(idx, feedback);
+    if (Math.abs(userTotal - target) <= 0.05 * target + 0.1) { 
+        registerAction(exerciseId, 'success');
+        renderTable(); 
+        showFeedback(document.getElementById(`fb-${idx}`), "¡Correcto!", "success", 3000);
     } else {
-        registerAction(idx, false);
-        showFeedback(feedback, "Incorrecto. Inténtalo otra vez.", false);
+        registerAction(exerciseId, 'failure');
+        renderTable(); 
+        showFeedback(document.getElementById(`fb-${idx}`), "Incorrecto", "error", 3000);
     }
 }
 
-// Validación COLORES
 function checkColors(idx) {
+    const exerciseId = exercises[idx].id;
     const targetBands = exercises[idx].b;
-    const feedback = document.getElementById(`feedback-col-${idx}`);
-    let isCorrect = true;
+    const feedbackElem = document.getElementById(`fb-${idx}`);
+    
+    let missingCount = 0;
+    let selectedValues = [];
 
     for (let b = 0; b < 3; b++) {
-        const userColor = document.getElementById(`user-col-${idx}-${b}`).value;
-        if (!userColor || userColor !== targetBands[b]) {
-            isCorrect = false;
-            break;
-        }
+        const val = document.getElementById(`user-col-${idx}-${b}`).value;
+        if (!val) missingCount++;
+        selectedValues.push(val);
+    }
+
+    if (missingCount > 0) {
+        const msg = (missingCount === 3) ? "Faltan los 3 colores" :
+                    (missingCount === 2) ? "Faltan 2 colores" : 
+                    "Falta 1 color";
+        showFeedback(feedbackElem, msg, "info", 2000);
+        return;
+    }
+
+    let isCorrect = true;
+    for (let b = 0; b < 3; b++) {
+        if (selectedValues[b] !== targetBands[b]) { isCorrect = false; break; }
     }
 
     if (isCorrect) {
-        registerAction(idx, true);
-        showSuccess(idx, feedback);
+        registerAction(exerciseId, 'success');
+        renderTable();
+        showFeedback(document.getElementById(`fb-${idx}`), "¡Correcto!", "success", 3000);
     } else {
-        registerAction(idx, false);
-        showFeedback(feedback, "Incorrecto. Inténtalo otra vez.", false);
+        registerAction(exerciseId, 'failure');
+        renderTable();
+        showFeedback(document.getElementById(`fb-${idx}`), "Incorrecto", "error", 3000);
     }
 }
 
-function showSuccess(idx, feedbackElem) {
-    showFeedback(feedbackElem, "¡Correcto!", true, 3000);
-    
-    // Activar solución
-    const solCheck = document.getElementById(`check-${idx}`);
-    if (solCheck && !solCheck.checked) {
-        solCheck.checked = true;
-        toggleSolutionVisuals(idx, true);
-    }
-}
-
-function showFeedback(elem, text, isSuccess, duration = 0) {
+function showFeedback(elem, text, type, duration) {
+    if(!elem) return;
     elem.innerHTML = text;
-    elem.className = isSuccess ? "feedback correct" : "feedback incorrect";
+    if(type === 'success') elem.className = "feedback correct";
+    else if(type === 'error') elem.className = "feedback incorrect";
+    else elem.className = "feedback info";
     elem.classList.remove('fade-out'); 
-
-    if (duration > 0) {
-        setTimeout(() => {
-            elem.classList.add('fade-out'); 
-            setTimeout(() => { elem.innerHTML = ""; elem.className = "feedback"; }, 500); 
-        }, duration);
-    }
-}
-
-function toggleManualSolution(idx) {
-    const checkbox = document.getElementById(`check-${idx}`);
-    toggleSolutionVisuals(idx, checkbox.checked);
-}
-
-function toggleSolutionVisuals(idx, showSolution) {
-    const mode = getCurrentMode();
-    const currSpan = document.getElementById(`curr-${idx}`);
     
-    const inputArea = document.getElementById(mode === 'resistencia' ? `input-val-${idx}` : `input-col-${idx}`);
-    const staticArea = document.getElementById(mode === 'resistencia' ? `static-val-${idx}` : `static-col-${idx}`);
-
-    if (showSolution) {
-        currSpan.classList.remove('hidden');
-        if(inputArea) inputArea.classList.add('hidden');
-        if(staticArea) staticArea.classList.remove('hidden');
-    } else {
-        currSpan.classList.add('hidden');
-        if(inputArea) inputArea.classList.remove('hidden');
-        if(staticArea) staticArea.classList.add('hidden');
-    }
+    setTimeout(() => {
+        elem.classList.add('fade-out'); 
+        setTimeout(() => { elem.innerHTML = ""; elem.className = "feedback"; }, 500); 
+    }, duration);
 }
 
 function showReport() {
     const modal = document.getElementById('reportModal');
-    
     const totalSolved = stats.solvedTasks.size;
+    const totalViewed = stats.viewedTasks.size;
+    const totalFailed = stats.failedTasks.size;
+    const totalPending = TOTAL_TASKS - stats.attemptedTasks.size;
+    
     const progressPct = Math.round((totalSolved / TOTAL_TASKS) * 100);
-    const totalAttempts = stats.totalClicks;
-    const successAttempts = stats.successfulClicks;
-    const failedAttempts = totalAttempts - successAttempts;
-    const accuracyPct = totalAttempts > 0 ? Math.round((successAttempts / totalAttempts) * 100) : 0;
-    const pending = TOTAL_TASKS - stats.attemptedTasks.size;
+    const viewedPct = Math.round((totalViewed / TOTAL_TASKS) * 100);
+    const failedPct = Math.round((totalFailed / TOTAL_TASKS) * 100);
 
-    document.getElementById('txt-progress').innerText = `${totalSolved} / ${TOTAL_TASKS} (${progressPct}%)`;
+    document.getElementById('txt-progress').innerText = `${totalSolved}/${TOTAL_TASKS}`;
     document.getElementById('bar-progress').style.width = `${progressPct}%`;
-    document.getElementById('txt-accuracy').innerText = `${accuracyPct}%`;
-    document.getElementById('bar-accuracy').style.width = `${accuracyPct}%`;
+    
+    document.getElementById('txt-cheated').innerText = totalViewed;
+    document.getElementById('bar-cheated').style.width = `${viewedPct}%`;
+
+    document.getElementById('txt-failed').innerText = totalFailed;
+    document.getElementById('bar-failed').style.width = `${failedPct}%`;
+
     document.getElementById('val-completed').innerText = totalSolved;
-    document.getElementById('val-attempts').innerText = totalAttempts;
-    document.getElementById('val-failed').innerText = failedAttempts;
-    document.getElementById('val-pending').innerText = pending;
+    document.getElementById('val-viewed').innerText = totalViewed;
+    document.getElementById('val-failed').innerText = totalFailed;
+    document.getElementById('val-pending').innerText = totalPending;
 
     modal.style.display = 'flex';
 }
 
-function closeReport() {
-    document.getElementById('reportModal').style.display = 'none';
-}
+function closeReport() { document.getElementById('reportModal').style.display = 'none'; }
 
 window.onload = renderTable;
 </script>
