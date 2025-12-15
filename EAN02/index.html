@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Entrenador Código de Colores - EAN2</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        
+        /* Controles */
+        .controls { background: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .radio-group { font-size: 1.1em; display: inline-block; text-align: left; }
+        .radio-group label { margin-left: 10px; cursor: pointer; }
+        .radio-group input { transform: scale(1.2); cursor: pointer; }
+
+        /* Tabla */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95em; }
+        th { background-color: #343a40; color: white; padding: 12px; position: sticky; top: 0; z-index: 10; }
+        td { border-bottom: 1px solid #dee2e6; padding: 10px; text-align: center; vertical-align: middle; }
+        tr:hover { background-color: #f1f1f1; }
+
+        /* --- ESTILOS DE LA RESISTENCIA MEJORADOS --- */
+        .resistor-graphic {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .band-container { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 12px; /* Separación clara entre bandas */
+            background: #e8cc8d; /* Color cuerpo resistencia (beige/crema) */
+            padding: 5px 15px; 
+            border-radius: 25px; /* Forma redondeada del cuerpo */
+            border: 2px solid #c9b078;
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.1); /* Efecto volumen */
+        }
+
+        .color-box { 
+            width: 14px; 
+            height: 40px; /* Bandas más altas */
+            display: inline-block; 
+            border-top: 1px solid rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(0,0,0,0.3);
+            cursor: help; /* Cursor de ayuda al pasar el ratón */
+            transition: transform 0.1s;
+        }
+        
+        .color-box:hover {
+            transform: scale(1.1); /* Ligero efecto pop-up al pasar el ratón */
+            z-index: 2;
+        }
+
+        .wire { 
+            display: inline-block; 
+            width: 25px; 
+            height: 4px; 
+            background: #999; 
+            vertical-align: middle; 
+        }
+        
+        /* Utilidades de visibilidad */
+        .hidden { visibility: hidden; opacity: 0; transition: opacity 0.2s; }
+        .visible { visibility: visible; opacity: 1; }
+        
+        .val-text { font-weight: bold; color: #0056b3; font-size: 1.1em; }
+        .current-text { color: #28a745; font-weight: bold; }
+        
+        input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ejercicio de Resistencias: Serie E6</h1>
+    
+    <div class="controls">
+        <p><strong>Selecciona el modo de práctica:</strong></p>
+        <div class="radio-group">
+            <div>
+                <input type="radio" name="mode" value="resistencia" id="modeRes" checked onclick="updateView()"> 
+                <label for="modeRes"><strong>Adivinar Resistencia</strong> (Veo colores &rarr; Adivino valor)</label>
+            </div>
+            <div style="margin-top: 10px;">
+                <input type="radio" name="mode" value="colores" id="modeCol" onclick="updateView()"> 
+                <label for="modeCol"><strong>Adivinar Colores</strong> (Veo valor &rarr; Adivino colores)</label>
+            </div>
+        </div>
+    </div>
+
+    <table id="exerciseTable">
+        <thead>
+            <tr>
+                <th width="5%">#</th>
+                <th width="20%">Valor Nominal (&#x3A9;)</th>
+                <th width="40%">Código de Colores</th>
+                <th width="20%">Corriente (9V)</th>
+                <th width="15%">¿Solución?</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
+</div>
+
+<script>
+// Base de datos de ejercicios (Total 42 elementos derivados de las tablas)
+const exercises = [
+    // --- TABLA IZQUIERDA ---
+    { v: "1.50 K", r: 1500, b: ["MARRÓN", "VERDE", "ROJO"] },
+    { v: "22.00 ", r: 22, b: ["ROJO", "ROJO", "NEGRO"] },
+    { v: "15.00 ", r: 15, b: ["MARRÓN", "VERDE", "NEGRO"] },
+    { v: "3.30 ", r: 3.3, b: ["NARANJA", "NARANJA", "ORO"] },
+    { v: "10.00 K", r: 10000, b: ["MARRÓN", "NEGRO", "NARANJA"] },
+    { v: "150.00 ", r: 150, b: ["MARRÓN", "VERDE", "MARRÓN"] },
+    { v: "220.00 ", r: 220, b: ["ROJO", "ROJO", "MARRÓN"] },
+    { v: "47.00 ", r: 47, b: ["AMARILLO", "VIOLETA", "NEGRO"] },
+    { v: "3.30 K", r: 3300, b: ["NARANJA", "NARANJA", "ROJO"] },
+    { v: "2.20 K", r: 2200, b: ["ROJO", "ROJO", "ROJO"] },
+    { v: "100.00 ", r: 100, b: ["MARRÓN", "NEGRO", "MARRÓN"] },
+    { v: "680.00 ", r: 680, b: ["AZUL", "GRIS", "MARRÓN"] },
+    { v: "22.00 K", r: 22000, b: ["ROJO", "ROJO", "NARANJA"] },
+    { v: "100.00 K", r: 100000, b: ["MARRÓN", "NEGRO", "AMARILLO"] },
+    { v: "1.00 ", r: 1.0, b: ["MARRÓN", "NEGRO", "ORO"] },
+    { v: "68.00 K", r: 68000, b: ["AZUL", "GRIS", "NARANJA"] },
+    { v: "680.00 K", r: 680000, b: ["AZUL", "GRIS", "AMARILLO"] },
+    { v: "3.30 M", r: 3300000, b: ["NARANJA", "NARANJA", "VERDE"] },
+    { v: "4.70 M", r: 4700000, b: ["AMARILLO", "VIOLETA", "VERDE"] },
+    { v: "4.70 K", r: 4700, b: ["AMARILLO", "VIOLETA", "ROJO"] },
+
+    // --- TABLA DERECHA ---
+    { v: "2.20 ", r: 2.2, b: ["ROJO", "ROJO", "ORO"] },
+    { v: "10.00 ", r: 10, b: ["MARRÓN", "NEGRO", "NEGRO"] },
+    { v: "2.20 M", r: 2200000, b: ["ROJO", "ROJO", "VERDE"] },
+    { v: "15.00 K", r: 15000, b: ["MARRÓN", "VERDE", "NARANJA"] },
+    { v: "330.00 K", r: 330000, b: ["NARANJA", "NARANJA", "AMARILLO"] },
+    { v: "4.70 ", r: 4.7, b: ["AMARILLO", "VIOLETA", "ORO"] },
+    { v: "470.00 ", r: 470, b: ["AMARILLO", "VIOLETA", "MARRÓN"] },
+    { v: "47.00 K", r: 47000, b: ["AMARILLO", "VIOLETA", "NARANJA"] },
+    { v: "33.00 ", r: 33, b: ["NARANJA", "NARANJA", "NEGRO"] },
+    { v: "150.00 K", r: 150000, b: ["MARRÓN", "VERDE", "AMARILLO"] },
+    { v: "68.00 ", r: 68, b: ["AZUL", "GRIS", "NEGRO"] },
+    { v: "1.00 M", r: 1000000, b: ["MARRÓN", "NEGRO", "VERDE"] },
+    { v: "6.80 K", r: 6800, b: ["AZUL", "GRIS", "ROJO"] },
+    
+    // --- ADICIONALES PARA COMPLETAR LISTA ---
+    { v: "220.00 K", r: 220000, b: ["ROJO", "ROJO", "AMARILLO"] },
+    { v: "6.80 M", r: 6800000, b: ["AZUL", "GRIS", "VERDE"] },
+    { v: "1.00 K", r: 1000, b: ["MARRÓN", "NEGRO", "ROJO"] },
+    { v: "1.50 ", r: 1.5, b: ["MARRÓN", "VERDE", "ORO"] },
+    { v: "1.50 M", r: 1500000, b: ["MARRÓN", "VERDE", "VERDE"] },
+    { v: "6.80 ", r: 6.8, b: ["AZUL", "GRIS", "ORO"] },
+    { v: "330.00 ", r: 330, b: ["NARANJA", "NARANJA", "MARRÓN"] },
+    { v: "33.00 K", r: 33000, b: ["NARANJA", "NARANJA", "NARANJA"] },
+    { v: "470.00 K", r: 470000, b: ["AMARILLO", "VIOLETA", "AMARILLO"] }
+];
+
+const colorMap = {
+    "NEGRO": "#000000", "MARRÓN": "#8B4513", "MARRON": "#8B4513", 
+    "ROJO": "#DC143C", "NARANJA": "#FF8C00", "AMARILLO": "#FFD700", 
+    "VERDE": "#228B22", "AZUL": "#0000CD", "VIOLETA": "#8A2BE2", 
+    "GRIS": "#808080", "BLANCO": "#F5F5F5", "ORO": "#D4AF37", "PLATA": "#C0C0C0"
+};
+
+function calculateI(r) {
+    let i = (9 / r) * 1000;
+    return i.toFixed(2) + " mA";
+}
+
+function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    exercises.forEach((ex, i) => {
+        const tr = document.createElement('tr');
+        
+        let bandsHtml = `<div class="wire"></div>`;
+        
+        // Renderizar Bandas Principales con Tooltip
+        ex.b.forEach((color, index) => {
+            bandsHtml += `<div class="color-box" 
+                            style="background-color: ${colorMap[color]};" 
+                            title="Banda ${index+1}: ${color}"></div>`;
+        });
+        
+        // Renderizar Banda Tolerancia (ORO) con Tooltip
+        bandsHtml += `<div class="color-box" 
+                        style="background-color: ${colorMap["ORO"]}; margin-left:8px;" 
+                        title="Tolerancia: ORO (±5%)"></div>`;
+                        
+        bandsHtml += `<div class="wire"></div>`;
+
+        tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td><span class="val-text target-val">${ex.v}</span></td>
+            <td>
+                <div class="resistor-graphic target-col">
+                    <div class="band-container">
+                        ${bandsHtml}
+                    </div>
+                </div>
+            </td>
+            <td><span class="current-text target-curr hidden">${calculateI(ex.r)}</span></td>
+            <td><input type="checkbox" onchange="toggleRow(this)"></td>
+        `;
+        tbody.appendChild(tr);
+    });
+    updateView();
+}
+
+function updateView() {
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    const rows = document.querySelectorAll('#tableBody tr');
+
+    rows.forEach(row => {
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        if (checkbox.checked) return; // Si ya se reveló, no hacer nada
+
+        const valSpan = row.querySelector('.target-val');
+        const colDiv = row.querySelector('.target-col');
+        const currSpan = row.querySelector('.target-curr');
+
+        currSpan.classList.add('hidden');
+        currSpan.classList.remove('visible');
+
+        if (mode === 'resistencia') {
+            // Adivinar resistencia: Se ven los colores, se oculta el valor
+            colDiv.classList.remove('hidden');
+            valSpan.classList.add('hidden');
+        } else {
+            // Adivinar colores: Se ve el valor, se ocultan los colores
+            valSpan.classList.remove('hidden');
+            colDiv.classList.add('hidden');
+        }
+    });
+}
+
+function toggleRow(checkbox) {
+    const row = checkbox.closest('tr');
+    const valSpan = row.querySelector('.target-val');
+    const colDiv = row.querySelector('.target-col');
+    const currSpan = row.querySelector('.target-curr');
+
+    if (checkbox.checked) {
+        valSpan.classList.remove('hidden');
+        colDiv.classList.remove('hidden');
+        currSpan.classList.remove('hidden');
+        currSpan.classList.add('visible');
+    } else {
+        updateView();
+    }
+}
+
+window.onload = renderTable;
+</script>
+
+</body>
+</html>
