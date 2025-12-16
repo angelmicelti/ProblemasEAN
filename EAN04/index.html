@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAN4 - Ley de Ohm</title>
+    <style>
+        :root {
+            /* Mismos colores que el original para consistencia */
+            --primary: #4f46e5; 
+            --secondary: #4338ca;
+            --accent: #ec4899; 
+            --light: #fdfbf7; 
+            --dark: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .problem-card h3 {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .problem-statement {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Estilo para placeholder de imágenes (ya que no tenemos los JPGs) */
+        .img-placeholder {
+            width: 100%;
+            height: 250px;
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-weight: 600;
+            flex-direction: column;
+        }
+        
+        .img-placeholder span {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-board {
+            background: var(--dark);
+            width: 100%;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-board:hover {
+            background: #334155;
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .btn-back:hover {
+            background: #cbd5e1;
+            transform: none;
+        }
+
+        /* Pizarra Styles */
+        .board-mode {
+            background: #333;
+            border-radius: var(--border-radius);
+            padding: 0;
+            margin-top: 1rem;
+            overflow: hidden;
+            border: 4px solid #475569;
+            display: none;
+        }
+
+        .board-mode.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 2000px; }
+        }
+
+        .board-header {
+            background: #1e293b;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #475569;
+        }
+
+        .board-content {
+            padding: 2rem;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--accent);
+        }
+
+        .step h4 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .math-block {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        .result-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .result-highlight h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .key-value {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 10px; }
+            .problem-container { padding: 1.5rem; }
+            .home-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Boletín EAN4: Ley de Ohm</h1>
+        <p class="subtitle">Análisis de Circuitos, Pulsadores y Cálculo de Intensidades</p>
+    </header>
+
+    <section id="home" class="content active">
+        <div class="home-grid">
+            <div class="problem-card" onclick="showProblem(1)">
+                <div class="card-header">
+                    <span class="badge">Análisis Lógico</span>
+                </div>
+                <h3>Ejercicio 1: Pulsador</h3>
+                <p>Lectura de amperímetro y voltímetro con pulsador accionado y en reposo.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Ver Teoría</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(2)">
+                <div class="card-header">
+                    <span class="badge" style="background:#e0f2fe; color:#0284c7">Diagramas V/I</span>
+                </div>
+                <h3>Ejercicio 2 y 4: Esquemas</h3>
+                <p>Dibujar esquema abierto y diagrama V/I según posición del interruptor.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Ver Teoría</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(3)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fce7f3; color:var(--accent)">Topología</span>
+                </div>
+                <h3>Ejercicio 3: Serie/Paralelo</h3>
+                <p>Identificación del tipo de circuito y lectura de aparatos de medida.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Ver Teoría</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(4)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:var(--warning)">Cálculo I</span>
+                </div>
+                <h3>Circuitos 1, 2 y 3</h3>
+                <p>Cálculo de intensidad consumida en los primeros tres circuitos básicos.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(5)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:var(--warning)">Cálculo II</span>
+                </div>
+                <h3>Circuitos 4, 5 y 6</h3>
+                <p>Cálculo de intensidad para el segundo bloque de circuitos.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(6)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fee2e2; color:var(--danger)">Cálculo III</span>
+                </div>
+                <h3>Circuitos 7 y 8</h3>
+                <p>Reto final: Cálculo de intensidad en los circuitos más complejos.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem1" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 1: Lecturas con Pulsador</h2>
+            
+            <div class="img-placeholder">
+                <span>⚡</span>
+                <p>Imagen del Circuito con Pulsador</p>
+                <small>(Consultar documento original)</small>
+            </div>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Calcula la lectura del amperímetro y del voltímetro cuando:<br>
+                a) Se mantiene el pulsador como está (reposo).<br>
+                b) Se acciona el pulsador.<br>
+                <strong>Extra:</strong> Dibuja el esquema abierto del montaje y el diagrama de tensiones/intensidades[cite: 1, 2, 3].
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(1)">✏️ Abrir Pizarra de Teoría</button>
+
+            <div id="board1" class="board-mode">
+                <div class="board-header">Pizarra de Análisis - Lógica de Pulsadores</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>Caso A: Circuito Abierto (Pulsador en reposo)</h4>
+                        <p>Si el pulsador está en serie y normalmente abierto:</p>
+                        <div class="math-block">
+                            Resistencia Total ≈ ∞ (Infinito)<br>
+                            Intensidad (A) = 0 A<br>
+                            Voltaje en la carga = 0 V
+                        </div>
+                        <p>El voltímetro, si está en paralelo al pulsador abierto, medirá la tensión de fuente (Vcc). Si está en la carga, medirá 0V.</p>
+                    </div>
+                    <div class="step">
+                        <h4>Caso B: Circuito Cerrado (Pulsador accionado)</h4>
+                        <p>La corriente fluye libremente según la Ley de Ohm.</p>
+                        <div class="math-block">
+                            I = V_fuente / R_total<br>
+                            V_carga = I · R_carga
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Concepto Clave</h3>
+                        <p>Un circuito abierto no tiene corriente (I=0), pero tiene toda la tensión (V=Vcc) en los extremos del corte.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showHome()">Menú</button>
+                <button class="btn" onclick="showProblem(2)">Siguiente →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem2" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 2 y 4: Esquemas y Diagramas V/I</h2>
+            
+            <div class="img-placeholder">
+                <span>📝</span>
+                <p>Esquemas de Interruptores</p>
+            </div>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Dibuja el esquema abierto de estos circuitos. Dibuja el diagrama V/I (Tensión/Intensidad) para las dos situaciones posibles del interruptor[cite: 4, 7, 8].
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(2)">✏️ Ver Explicación Gráfica</button>
+
+            <div id="board2" class="board-mode">
+                <div class="board-header">Pizarra - Diagramas V/I</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>¿Qué es un esquema abierto?</h4>
+                        <p>Es redibujar el circuito sustituyendo la fuente por sus terminales (+ y -) y mostrando el camino de la corriente sin la "caja" de la pila, simplificando la visualización.</p>
+                    </div>
+                    <div class="step">
+                        <h4>Diagrama V/I (Tensión vs Intensidad)</h4>
+                        <p>Se representa cómo cae el voltaje a lo largo del circuito.</p>
+                        <ul style="list-style: disc; margin-left: 20px;">
+                            <li><strong>Eje Y (Vertical):</strong> Voltaje (V). Empieza en Vcc y termina en 0V (GND).</li>
+                            <li><strong>Eje X (Horizontal):</strong> Componentes o distancia.</li>
+                        </ul>
+                    </div>
+                    <div class="math-block">
+                        Ejemplo Interruptor Abierto:<br>
+                        El voltaje se mantiene en Vcc hasta llegar al interruptor.<br>
+                        Después del interruptor cae a 0V inmediatamente.
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(1)">← Anterior</button>
+                <button class="btn" onclick="showProblem(3)">Siguiente →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem3" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 3: Serie o Paralelo</h2>
+            
+            <div class="img-placeholder">
+                <span>⚡ ║ ⚡</span>
+                <p>Imagen del Circuito 3</p>
+            </div>
+            
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> El siguiente circuito, ¿de qué tipo es, serie o paralelo? Dibuja su esquema abierto y calcula la lectura de los aparatos[cite: 5, 6].
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(3)">✏️ Análisis Topológico</button>
+
+            <div id="board3" class="board-mode">
+                <div class="board-header">Pizarra - Identificación de Circuitos</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>Criterio de Identificación</h4>
+                        <p><strong>Serie:</strong> La corriente solo tiene UN camino. Si quitas un componente, todo se apaga.</p>
+                        <p><strong>Paralelo:</strong> La corriente se divide en nudos. Si quitas una rama, las otras siguen funcionando.</p>
+                    </div>
+                    <div class="step">
+                        <h4>Cálculos Básicos</h4>
+                        <div class="math-block">
+                            R_serie = R1 + R2 + ...<br>
+                            1/R_paralelo = 1/R1 + 1/R2 + ...
+                        </div>
+                        <p>Una vez obtenida la R_total, usa la Ley de Ohm:</p>
+                        <div class="math-block">
+                            I_total = V_total / R_total
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(2)">← Anterior</button>
+                <button class="btn" onclick="showProblem(4)">Siguiente (Cálculos) →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem4" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Cálculo de Intensidades: Bloque 1</h2>
+            
+            <div class="img-placeholder">
+                <span>1️⃣ 2️⃣ 3️⃣</span>
+                <p>Circuitos 1, 2 y 3</p>
+            </div>
+            
+            <div class="problem-statement">
+                <strong>Objetivo:</strong> Calcular la intensidad consumida en los circuitos 1, 2 y 3.<br>
+                Revisa los valores de resistencias y voltaje en tu hoja de enunciados.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(4)">✏️ Ver Soluciones [cite: 11]</button>
+
+            <div id="board4" class="board-mode">
+                <div class="board-header">Solucionario - Circuitos Básicos</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>Circuito 1</h4>
+                        <p>Aplicando Ley de Ohm directa (I = V/R).</p>
+                        <div class="result-highlight">
+                            <div class="key-value">I = 1,25 mA</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>Circuito 2</h4>
+                        <p>Resolviendo la asociación de resistencias correspondiente.</p>
+                        <div class="result-highlight" style="border-color: var(--secondary);">
+                            <div class="key-value">I = 1,01 mA</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>Circuito 3</h4>
+                        <div class="result-highlight" style="border-color: var(--accent);">
+                            <div class="key-value">I = 0,75 mA</div>
+                        </div>
+                    </div>
+                    <p style="text-align: right; color: #94a3b8; font-size: 0.8rem;">Fuente: Tabla de soluciones del documento original [cite: 11]</p>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(3)">← Anterior</button>
+                <button class="btn" onclick="showProblem(5)">Siguiente Bloque →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem5" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Cálculo de Intensidades: Bloque 2</h2>
+            
+            <div class="img-placeholder">
+                <span>4️⃣ 5️⃣ 6️⃣</span>
+                <p>Circuitos 4, 5 y 6</p>
+            </div>
+            
+            <div class="problem-statement">
+                <strong>Objetivo:</strong> Calcular la intensidad total para los circuitos 4, 5 y 6.<br>
+                Estos circuitos pueden incluir combinaciones mixtas.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(5)">✏️ Ver Soluciones [cite: 12]</button>
+
+            <div id="board5" class="board-mode">
+                <div class="board-header">Solucionario - Circuitos Intermedios</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>Circuito 4</h4>
+                        <div class="result-highlight">
+                            <div class="key-value">I = 2,02 mA</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>Circuito 5</h4>
+                        <div class="result-highlight" style="border-color: var(--secondary);">
+                            <div class="key-value">I = 3,92 mA</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>Circuito 6</h4>
+                        <div class="result-highlight" style="border-color: var(--accent);">
+                            <div class="key-value">I = 14,29 mA</div>
+                        </div>
+                    </div>
+                    <p style="text-align: right; color: #94a3b8; font-size: 0.8rem;">Fuente: Tabla de soluciones del documento original [cite: 12]</p>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(4)">← Anterior</button>
+                <button class="btn" onclick="showProblem(6)">Siguiente Bloque →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="problem6" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Cálculo de Intensidades: Bloque 3</h2>
+            
+            <div class="img-placeholder">
+                <span>7️⃣ 8️⃣</span>
+                <p>Circuitos 7 y 8</p>
+            </div>
+            
+            <div class="problem-statement">
+                <strong>Objetivo:</strong> Determinar la corriente en los últimos dos ejercicios.<br>
+                Probablemente requieran simplificación de resistencias en paralelo y serie.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(6)">✏️ Ver Soluciones [cite: 13]</button>
+
+            <div id="board6" class="board-mode">
+                <div class="board-header">Solucionario - Circuitos Avanzados</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>Circuito 7</h4>
+                        <div class="result-highlight">
+                            <div class="key-value">I = 12 mA</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>Circuito 8</h4>
+                        <div class="result-highlight" style="border-color: var(--secondary);">
+                            <div class="key-value">I = 22,58 mA</div>
+                        </div>
+                    </div>
+                    <p style="text-align: right; color: #94a3b8; font-size: 0.8rem;">Fuente: Tabla de soluciones del documento original [cite: 13]</p>
+                </div>
+            </div>
+             <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(5)">← Anterior</button>
+                <button class="btn" onclick="showHome()">Volver al Inicio</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // Lógica de Navegación idéntica a la original
+    function showHome() {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('home').classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function showProblem(id) {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('problem' + id).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function toggleBoard(id) {
+        const board = document.getElementById('board' + id);
+        board.classList.toggle('active');
+        const btn = event.target;
+        // Cambio de estilo del botón al alternar
+        if (board.classList.contains('active')) {
+            btn.textContent = '✖ Cerrar Pizarra';
+            btn.style.background = '#ef4444';
+        } else {
+            // Restaurar texto según el contexto
+            if(id >= 4) {
+                 btn.textContent = '✏️ Ver Soluciones';
+            } else {
+                 btn.textContent = '✏️ Ver Teoría / Explicación';
+            }
+            btn.style.background = '#1e293b';
+        }
+    }
+</script>
+
+</body>
+</html>
+</html>
