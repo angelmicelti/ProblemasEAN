@@ -6,7 +6,7 @@
  * @version 1.0.0
  */
 
-const CACHE_NAME = 'ean-cache-v1';
+const CACHE_NAME = 'ean-cache-v2';
 const STATIC_CACHE_NAME = 'ean-static-v1';
 const DYNAMIC_CACHE_NAME = 'ean-dynamic-v1';
 
