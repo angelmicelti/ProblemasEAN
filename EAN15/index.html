@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boletin EAN15: Temporizador 555</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1d4ed8;
+            --accent: #f59e0b;
+            --accent2: #10b981;
+            --light: #f0f9ff;
+            --dark: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .badge-opamp {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: #dbeafe;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .problem-card h3 {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .difficulty {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .difficulty-dot.filled {
+            background: var(--accent);
+        }
+
+        .difficulty-dot.empty {
+            background: #e2e8f0;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .problem-statement {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .circuit-diagram {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto 2rem;
+            display: block;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-board {
+            background: var(--dark);
+            width: 100%;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-board:hover {
+            background: #1e293b;
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .btn-back:hover {
+            background: #cbd5e1;
+            transform: none;
+        }
+
+        .btn-next {
+            background: var(--accent);
+        }
+
+        .btn-next:hover {
+            background: #d97706;
+        }
+
+        .board-mode {
+            background: #0f172a;
+            border-radius: var(--border-radius);
+            padding: 0;
+            margin-top: 1rem;
+            overflow: hidden;
+            border: 4px solid #334155;
+            display: none;
+        }
+
+        .board-mode.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 3000px; }
+        }
+
+        .board-header {
+            background: #1e293b;
+            color: white;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #475569;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .board-content {
+            padding: 2rem;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--accent);
+        }
+
+        .step h4 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .math-block {
+            background: rgba(255,255,255,0.05);
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            border: 1px dashed rgba(255,255,255,0.2);
+            line-height: 1.8;
+        }
+
+        .math-block .result {
+            color: var(--accent2);
+            font-weight: bold;
+        }
+
+        .result-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .result-highlight h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .key-value {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+            color: white;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .key-value .key {
+            color: #cbd5e1;
+        }
+
+        .key-value .value {
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .formula-ref {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+        }
+        .formula-ref h4 {
+            color: #92400e;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+        .formula-ref .math-block {
+            background: rgba(255,255,255,0.6);
+            border-color: #fbbf24;
+            color: #0f172a;
+            font-size: 0.95rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 10px; }
+            .problem-container { padding: 1.5rem; }
+            .home-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+            .nav-buttons { flex-direction: column; gap: 1rem; }
+            .nav-buttons .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Boletin EAN15: Temporizador 555</h1>
+        <p class="subtitle">Ejercicios de Electronica Analogica - Multivibrador Astable con NE555</p>
+        <div class="badge-opamp">Temporizador 555</div>
+    </header>
+
+    <section id="home" class="content active">
+        <div class="home-grid">
+            <div class="problem-card" onclick="showProblem(1)">
+                <div class="card-header">
+                    <span class="badge">Ejercicio 1</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>T<sub>ON</sub> - Tiempo Encendido LED</h3>
+                <p>Figura 1 (D.C. &gt; 50%). Calcula el tiempo que el LED permanece encendido.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(2)">
+                <div class="card-header">
+                    <span class="badge">Ejercicio 2</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>T<sub>OFF</sub> - Tiempo Apagado LED</h3>
+                <p>Figura 1. Calcula el tiempo que el LED esta apagado.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(3)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:#92400e">Ejercicio 3</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Frecuencia del Circuito</h3>
+                <p>Figura 1. Calcula la frecuencia del circuito con los valores indicados.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(4)">
+                <div class="card-header">
+                    <span class="badge" style="background:#dbeafe; color:#1e40af">Ejercicio 4</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Duty Cycle (Ciclo de Trabajo)</h3>
+                <p>Figura 1. Calcula el duty cycle con los valores indicados.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(5)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fce7f3; color:#9d174d">Ejercicio 5</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Potenciometro al 100%</h3>
+                <p>Figura 1. Potenciometro al 100% (10 K). Calcula T<sub>ON</sub>, T<sub>OFF</sub> y D.C.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(6)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:#92400e">Ejercicio 6</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>D.C. = 60%</h3>
+                <p>Figura 1. Posicion del potenciometro para D.C. del 60%.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(7)">
+                <div class="card-header">
+                    <span class="badge">Ejercicio 7</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Figura 2: T<sub>ON</sub> y T<sub>OFF</sub></h3>
+                <p>Figura 2 (D.C. 0-100%). Calcula T<sub>ON</sub> y T<sub>OFF</sub> del LED.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(8)">
+                <div class="card-header">
+                    <span class="badge">Ejercicio 8</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Figura 2: Frecuencia</h3>
+                <p>Figura 2. Calcula la frecuencia del circuito.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(9)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fce7f3; color:#9d174d">Ejercicio 9</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>Figura 2: Potenciometro y D.C.</h3>
+                <p>Figura 2. Valor del potenciometro para D.C. = 20% y D.C. = 65%.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(10)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:#92400e">Ejercicio 10</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Maximo D.C. del Montaje 2</h3>
+                <p>Figura 2. Cual es el maximo duty cycle posible?</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 1 ==================== -->
+    <section id="problem1" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 1: Tiempo de Encendido del LED (T<sub>ON</sub>)</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 1: MV Astable con D.C. &gt; 50%</h4>
+                <div class="math-block">
+                    T<sub>ON</sub> = 0,693 · (R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub><br>
+                    T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub><br>
+                    f = 1,44 / ((R<sub>A</sub> + 2·R<sub>B</sub>) · C<sub>1</sub>)<br>
+                    D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito1.png" alt="Circuito Figura 1 - MV Astable D.C. > 50%" title="Figura 1: MV Astable con D.C. > 50%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> En el circuito de la figura 1, calcula el tiempo que el LED permanece encendido, con los valores indicados.<br>
+                <strong>Solucion:</strong> 0,693 s.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(1)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board1" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 1</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Identificar la formula aplicable</h4>
+                        <p>Para la Figura 1 (MV Astable con D.C. &gt; 50%, sin diodo), el tiempo que el LED permanece encendido corresponde al tiempo de carga del condensador. Durante la carga, la corriente fluye desde V<sub>CC</sub> a traves de R<sub>A</sub> y R<sub>B</sub> en serie hasta el condensador C<sub>1</sub>:</p>
+                        <div class="math-block">
+                            T<sub>ON</sub> = 0,693 · (R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub>
+                        </div>
+                        <p>La constante 0,693 proviene de ln(2), ya que el condensador se carga desde 1/3 hasta 2/3 de V<sub>CC</sub>.</p>
+                    </div>
+                    <div class="step">
+                        <h4>2. Identificar los valores del circuito</h4>
+                        <p>Del diagrama de la Figura 1, con el potenciometro en su posicion inicial (50%):</p>
+                        <div class="math-block">
+                            R<sub>A</sub> = Potenciometro a 50% = 5 kΩ = 5 × 10<sup>3</sup> Ω<br>
+                            R<sub>B</sub> = 5 kΩ = 5 × 10<sup>3</sup> Ω<br>
+                            C<sub>1</sub> = 100 µF = 100 × 10<sup>-6</sup> F
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Sustituir en la formula</h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = 0,693 · (R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub><br>
+                            T<sub>ON</sub> = 0,693 · (5 kΩ + 5 kΩ) · 100 µF<br>
+                            T<sub>ON</sub> = 0,693 · 10 kΩ · 100 µF<br>
+                            T<sub>ON</sub> = 0,693 · 10 × 10<sup>3</sup> · 100 × 10<sup>-6</sup><br>
+                            T<sub>ON</sub> = 0,693 · 10<sup>4</sup> × 10<sup>-4</sup><br>
+                            T<sub>ON</sub> = 0,693 · 1<br>
+                            T<sub>ON</sub> = <span class="result">0,693 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Interpretacion del resultado</h4>
+                        <p>El LED permanece encendido durante aproximadamente 0,693 segundos en cada ciclo completo de oscilacion. Este tiempo corresponde a la fase de carga del condensador C<sub>1</sub> a traves de R<sub>A</sub> + R<sub>B</sub>, durante la cual la salida del 555 (pin 3) se encuentra en estado alto (HIGH), alimentando al LED a traves de la resistencia de 1 kΩ.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">T<sub>ON</sub>:</span> <span class="value">0,693 s</span></div>
+                        <div class="key-value">El LED esta encendido durante <strong>693 ms</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+                <button class="btn btn-next" onclick="showProblem(2)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 2 ==================== -->
+    <section id="problem2" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 2: Tiempo de Apagado del LED (T<sub>OFF</sub>)</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 1: MV Astable con D.C. &gt; 50%</h4>
+                <div class="math-block">
+                    T<sub>ON</sub> = 0,693 · (R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub><br>
+                    T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub><br>
+                    f = 1,44 / ((R<sub>A</sub> + 2·R<sub>B</sub>) · C<sub>1</sub>)<br>
+                    D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito1.png" alt="Circuito Figura 1" title="Figura 1: MV Astable con D.C. > 50%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> En el caso anterior, calcula el tiempo que el LED esta apagado.<br>
+                <strong>Solucion:</strong> 0,347 s.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(2)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board2" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 2</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Identificar la formula aplicable</h4>
+                        <p>Para la Figura 1, el tiempo que el LED permanece apagado corresponde al tiempo de descarga del condensador. Durante la descarga, el transistor interno del pin 7 del 555 se satura, conectando la union R<sub>A</sub>-R<sub>B</sub> a masa a traves del pin 7. La corriente de descarga solo pasa a traves de R<sub>B</sub>:</p>
+                        <div class="math-block">
+                            T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub>
+                        </div>
+                        <p>Nótese que R<sub>A</sub> no interviene en la descarga, ya que el transistor interno del pin 7 corta el camino de corriente a traves de R<sub>A</sub> durante esta fase.</p>
+                    </div>
+                    <div class="step">
+                        <h4>2. Identificar los valores del circuito</h4>
+                        <div class="math-block">
+                            R<sub>B</sub> = 5 kΩ = 5 × 10<sup>3</sup> Ω<br>
+                            C<sub>1</sub> = 100 µF = 100 × 10<sup>-6</sup> F
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Sustituir en la formula</h4>
+                        <div class="math-block">
+                            T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub><br>
+                            T<sub>OFF</sub> = 0,693 · 5 kΩ · 100 µF<br>
+                            T<sub>OFF</sub> = 0,693 · 5 × 10<sup>3</sup> · 100 × 10<sup>-6</sup><br>
+                            T<sub>OFF</sub> = 0,693 · 5 × 10<sup>-1</sup><br>
+                            T<sub>OFF</sub> = 0,693 · 0,5<br>
+                            T<sub>OFF</sub> = <span class="result">0,347 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Interpretacion del resultado</h4>
+                        <p>El LED permanece apagado durante aproximadamente 0,347 segundos. Este tiempo corresponde a la fase de descarga del condensador C<sub>1</sub> unicamente a traves de R<sub>B</sub>. La salida (pin 3) esta en estado bajo (LOW) durante este periodo, por lo que el LED no recibe corriente y permanece apagado.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">T<sub>OFF</sub>:</span> <span class="value">0,347 s</span></div>
+                        <div class="key-value">El LED esta apagado durante <strong>347 ms</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(1)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(3)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 3 ==================== -->
+    <section id="problem3" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 3: Frecuencia del Circuito</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 1: MV Astable con D.C. &gt; 50%</h4>
+                <div class="math-block">
+                    T = T<sub>ON</sub> + T<sub>OFF</sub><br>
+                    f = 1 / T = 1,44 / ((R<sub>A</sub> + 2·R<sub>B</sub>) · C<sub>1</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito1.png" alt="Circuito Figura 1" title="Figura 1: MV Astable con D.C. > 50%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> En el caso de la figura 1, con los valores indicados, calcula la frecuencia del circuito.<br>
+                <strong>Solucion:</strong> 0,96 Hz.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(3)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board3" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 3</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Formula de frecuencia para la Figura 1</h4>
+                        <p>La frecuencia del multivibrador astable con el 555 en la configuracion de la Figura 1 (sin diodo) se obtiene a partir del periodo total T = T<sub>ON</sub> + T<sub>OFF</sub>:</p>
+                        <div class="math-block">
+                            T = 0,693·(R<sub>A</sub>+R<sub>B</sub>)·C<sub>1</sub> + 0,693·R<sub>B</sub>·C<sub>1</sub><br>
+                            T = 0,693·(R<sub>A</sub> + 2R<sub>B</sub>)·C<sub>1</sub><br>
+                            f = 1/T = 1 / [0,693·(R<sub>A</sub> + 2R<sub>B</sub>)·C<sub>1</sub>]<br>
+                            f = <span class="result">1,44 / ((R<sub>A</sub> + 2·R<sub>B</sub>) · C<sub>1</sub>)</span>
+                        </div>
+                        <p>El factor 1,44 es igual a 1/0,693, y aparece frecuentemente en las formulas del 555.</p>
+                    </div>
+                    <div class="step">
+                        <h4>2. Valores del circuito</h4>
+                        <div class="math-block">
+                            R<sub>A</sub> = 5 kΩ (potenciometro al 50%)<br>
+                            R<sub>B</sub> = 5 kΩ<br>
+                            C<sub>1</sub> = 100 µF
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Calculo de la frecuencia</h4>
+                        <div class="math-block">
+                            f = 1,44 / ((R<sub>A</sub> + 2·R<sub>B</sub>) · C<sub>1</sub>)<br>
+                            f = 1,44 / ((5 kΩ + 2 × 5 kΩ) · 100 µF)<br>
+                            f = 1,44 / ((5 + 10) kΩ · 100 µF)<br>
+                            f = 1,44 / (15 kΩ · 100 µF)<br>
+                            f = 1,44 / (15 × 10<sup>3</sup> × 100 × 10<sup>-6</sup>)<br>
+                            f = 1,44 / (15 × 10<sup>-1</sup>)<br>
+                            f = 1,44 / 1,5<br>
+                            f = <span class="result">0,96 Hz</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Interpretacion del resultado</h4>
+                        <p>El circuito oscila a una frecuencia de 0,96 Hz, lo que significa que completa un ciclo completo (encendido + apagado del LED) aproximadamente una vez por segundo. Esto produce un parpadeo visible del LED a un ritmo ligeramente inferior a 1 parpadeo por segundo, ideal para aplicaciones como alarmas visuales o luces intermitentes de baja frecuencia.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">f:</span> <span class="value">0,96 Hz</span></div>
+                        <div class="key-value">El LED parpadea <strong>aprox. 1 vez por segundo</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(2)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(4)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 4 ==================== -->
+    <section id="problem4" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 4: Duty Cycle (Ciclo de Trabajo)</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 1: MV Astable con D.C. &gt; 50%</h4>
+                <div class="math-block">
+                    D = T<sub>ON</sub> / T = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito1.png" alt="Circuito Figura 1" title="Figura 1: MV Astable con D.C. > 50%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> En el mismo caso del ejercicio 1, calcula el duty cycle.<br>
+                <strong>Solucion:</strong> 66,7%.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(4)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board4" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 4</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Formula del Duty Cycle para la Figura 1</h4>
+                        <p>El duty cycle (ciclo de trabajo) es la fraccion del periodo total en la que la salida esta en estado alto. Se define como D = T<sub>ON</sub> / T, donde T = T<sub>ON</sub> + T<sub>OFF</sub>. Sustituyendo las expresiones del 555:</p>
+                        <div class="math-block">
+                            D = 0,693·(R<sub>A</sub>+R<sub>B</sub>)·C<sub>1</sub> / [0,693·(R<sub>A</sub>+R<sub>B</sub>)·C<sub>1</sub> + 0,693·R<sub>B</sub>·C<sub>1</sub>]<br>
+                            D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + R<sub>B</sub> + R<sub>B</sub>)<br>
+                            D = <span class="result">(R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Valores del circuito</h4>
+                        <div class="math-block">
+                            R<sub>A</sub> = 5 kΩ (potenciometro al 50%)<br>
+                            R<sub>B</sub> = 5 kΩ
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Calculo del Duty Cycle</h4>
+                        <div class="math-block">
+                            D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)<br>
+                            D = (5 kΩ + 5 kΩ) / (5 kΩ + 2 × 5 kΩ)<br>
+                            D = 10 kΩ / (5 kΩ + 10 kΩ)<br>
+                            D = 10 / 15<br>
+                            D = 2/3<br>
+                            D = 0,6667 = <span class="result">66,7%</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Interpretacion del resultado</h4>
+                        <p>El duty cycle es del 66,7%, lo que significa que el LED esta encendido durante dos tercios del ciclo total y apagado durante un tercio. Esto es coherente con la denominacion de la Figura 1 como "MV Astable con D.C. &gt; 50%": en esta configuracion (sin diodo), el duty cycle siempre sera mayor del 50% porque T<sub>ON</sub> siempre incluye la carga a traves de R<sub>A</sub> + R<sub>B</sub>, mientras que T<sub>OFF</sub> solo implica la descarga a traves de R<sub>B</sub>. El minimo teorico de D.C. se obtiene cuando R<sub>A</sub> tiende a 0, dando D = R<sub>B</sub> / (2R<sub>B</sub>) = 50%.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">D.C.:</span> <span class="value">66,7%</span></div>
+                        <div class="key-value">El LED esta encendido <strong>2/3 del tiempo</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(3)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(5)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 5 ==================== -->
+    <section id="problem5" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 5: Potenciometro al 100% (10 kΩ)</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 1: MV Astable con D.C. &gt; 50%</h4>
+                <div class="math-block">
+                    T<sub>ON</sub> = 0,693 · (R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub><br>
+                    T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub><br>
+                    D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito1.png" alt="Circuito Figura 1" title="Figura 1: MV Astable con D.C. > 50%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Subimos el potenciometro al 100%, es decir, a 10 K. Calcula: a) el tiempo de encendido del LED; b) el tiempo de apagado; c) el duty cycle.<br>
+                <strong>Solucion:</strong> a) 1,04 s; b) 0,347 s; c) D = 75%.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(5)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board5" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 5</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Nuevo valor del potenciometro</h4>
+                        <p>Al subir el potenciometro al 100%, su resistencia pasa de 5 kΩ a su valor maximo:</p>
+                        <div class="math-block">
+                            R<sub>A</sub> = Potenciometro al 100% = <span class="result">10 kΩ</span><br>
+                            R<sub>B</sub> = 5 kΩ (no cambia)<br>
+                            C<sub>1</sub> = 100 µF (no cambia)
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Calculo de T<sub>ON</sub> (tiempo de encendido)</h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = 0,693 · (R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub><br>
+                            T<sub>ON</sub> = 0,693 · (10 kΩ + 5 kΩ) · 100 µF<br>
+                            T<sub>ON</sub> = 0,693 · 15 kΩ · 100 µF<br>
+                            T<sub>ON</sub> = 0,693 · 15 × 10<sup>3</sup> × 100 × 10<sup>-6</sup><br>
+                            T<sub>ON</sub> = 0,693 · 1,5<br>
+                            T<sub>ON</sub> = <span class="result">1,04 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Calculo de T<sub>OFF</sub> (tiempo de apagado)</h4>
+                        <div class="math-block">
+                            T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub><br>
+                            T<sub>OFF</sub> = 0,693 · 5 kΩ · 100 µF<br>
+                            T<sub>OFF</sub> = 0,693 · 0,5<br>
+                            T<sub>OFF</sub> = <span class="result">0,347 s</span>
+                        </div>
+                        <p>El tiempo de apagado no cambia, ya que R<sub>B</sub> no se ha modificado y T<sub>OFF</sub> solo depende de R<sub>B</sub> y C<sub>1</sub>.</p>
+                    </div>
+                    <div class="step">
+                        <h4>4. Calculo del Duty Cycle</h4>
+                        <div class="math-block">
+                            D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)<br>
+                            D = (10 kΩ + 5 kΩ) / (10 kΩ + 2 × 5 kΩ)<br>
+                            D = 15 / 20<br>
+                            D = 0,75 = <span class="result">75%</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>5. Interpretacion</h4>
+                        <p>Al aumentar el potenciometro al 100%, el LED permanece encendido mas tiempo (1,04 s frente a 0,693 s), mientras que el tiempo de apagado se mantiene constante en 0,347 s. Esto eleva el duty cycle del 66,7% al 75%, haciendo que el LED parezca estar encendido la mayor parte del tiempo con parpadeos cortos de apagado.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">T<sub>ON</sub>:</span> <span class="value">1,04 s</span></div>
+                        <div class="key-value"><span class="key">T<sub>OFF</sub>:</span> <span class="value">0,347 s</span></div>
+                        <div class="key-value"><span class="key">D.C.:</span> <span class="value">75%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(4)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(6)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 6 ==================== -->
+    <section id="problem6" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 6: Potenciometro para D.C. = 60%</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 1: MV Astable con D.C. &gt; 50%</h4>
+                <div class="math-block">
+                    D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito1.png" alt="Circuito Figura 1" title="Figura 1: MV Astable con D.C. > 50%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Calcula en que posicion hay que colocar el potenciometro para que el duty cycle sea del 60%.<br>
+                <strong>Solucion:</strong> 2K5 (2,5 kΩ).
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(6)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board6" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 6</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Planteamiento de la ecuacion</h4>
+                        <p>Queremos encontrar el valor de R<sub>A</sub> (el potenciometro) para que el duty cycle sea del 60%. Partimos de la formula:</p>
+                        <div class="math-block">
+                            D = (R<sub>A</sub> + R<sub>B</sub>) / (R<sub>A</sub> + 2·R<sub>B</sub>) = 0,60
+                        </div>
+                        <p>Donde R<sub>B</sub> = 5 kΩ (fijo) y R<sub>A</sub> es la incognita (potenciometro).</p>
+                    </div>
+                    <div class="step">
+                        <h4>2. Despeje de R<sub>A</sub></h4>
+                        <div class="math-block">
+                            (R<sub>A</sub> + 5) / (R<sub>A</sub> + 10) = 0,60<br>
+                            R<sub>A</sub> + 5 = 0,60 · (R<sub>A</sub> + 10)<br>
+                            R<sub>A</sub> + 5 = 0,60·R<sub>A</sub> + 6<br>
+                            R<sub>A</sub> - 0,60·R<sub>A</sub> = 6 - 5<br>
+                            0,40·R<sub>A</sub> = 1<br>
+                            R<sub>A</sub> = 1 / 0,40<br>
+                            R<sub>A</sub> = <span class="result">2,5 kΩ</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Verificacion</h4>
+                        <div class="math-block">
+                            D = (2,5 + 5) / (2,5 + 10) = 7,5 / 12,5 = 0,60 = <span class="result">60% ✓</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Interpretacion</h4>
+                        <p>El potenciometro debe colocarse en la posicion que corresponda a 2,5 kΩ. Dado que el potenciometro tiene un valor maximo de 10 kΩ, esto representa el 25% de su recorrido total (2,5/10 = 0,25). A medida que giramos el potenciometro hacia valores mas altos de R<sub>A</sub>, el duty cycle aumenta progresivamente, ya que se incrementa el tiempo de carga (T<sub>ON</sub>) sin afectar al tiempo de descarga (T<sub>OFF</sub>).</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">R<sub>A</sub>:</span> <span class="value">2,5 kΩ</span></div>
+                        <div class="key-value">Posicion del potenciometro: <strong>25% del recorrido</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(5)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(7)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 7 ==================== -->
+    <section id="problem7" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 7: Figura 2 - T<sub>ON</sub> y T<sub>OFF</sub> del LED</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 2: MV Astable con D.C. entre 0 y 100%</h4>
+                <p style="color:#92400e; font-size:0.9rem; margin-top:0.5rem;">Este montaje incluye un diodo en paralelo con R<sub>B</sub>. Durante la carga, el diodo conduce y la corriente bypassa R<sub>B</sub>, pasando unicamente por R<sub>A</sub>.</p>
+                <div class="math-block">
+                    T<sub>ON</sub> = 0,693 · R<sub>A</sub> · C<sub>1</sub><br>
+                    T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub><br>
+                    f = 1,44 / ((R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub>)<br>
+                    D = R<sub>A</sub> / (R<sub>A</sub> + R<sub>B</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito2.png" alt="Circuito Figura 2 - MV Astable D.C. entre 0 y 100%" title="Figura 2: MV Astable con D.C. entre 0 y 100%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> En el circuito de la figura 2, calcula el tiempo que permanece el LED en el estado encendido y en el estado apagado, con los valores indicados.<br>
+                <strong>Solucion:</strong> T<sub>ON</sub> = 0,347 s; T<sub>OFF</sub> = 0,347 s.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(7)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board7" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 7</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Diferencia clave de la Figura 2</h4>
+                        <p>La Figura 2 incorpora un diodo en paralelo con R<sub>B</sub>. Durante la carga del condensador, el diodo conduce y la corriente bypassa R<sub>B</sub>, pasando unicamente por R<sub>A</sub> (desde V<sub>CC</sub> a traves de R<sub>A</sub>, a traves del diodo y al condensador). Por tanto, las formulas cambian respecto a la Figura 1:</p>
+                        <div class="math-block">
+                            T<sub>ON</sub> = 0,693 · R<sub>A</sub> · C<sub>1</sub>  (solo R<sub>A</sub>, no R<sub>A</sub>+R<sub>B</sub>)<br>
+                            T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub>  (igual que la Figura 1)
+                        </div>
+                        <p>Esta configuracion permite obtener un duty cycle desde valores cercanos al 0% hasta casi 100%, a diferencia de la Figura 1 que siempre tiene D.C. &gt; 50%.</p>
+                    </div>
+                    <div class="step">
+                        <h4>2. Valores del circuito (potenciometro al 50%)</h4>
+                        <div class="math-block">
+                            R<sub>A</sub> = Potenciometro a 50% = 5 kΩ<br>
+                            R<sub>B</sub> = 5 kΩ<br>
+                            C<sub>1</sub> = 100 µF
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Calculo de T<sub>ON</sub></h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = 0,693 · R<sub>A</sub> · C<sub>1</sub><br>
+                            T<sub>ON</sub> = 0,693 · 5 kΩ · 100 µF<br>
+                            T<sub>ON</sub> = 0,693 · 5 × 10<sup>3</sup> × 100 × 10<sup>-6</sup><br>
+                            T<sub>ON</sub> = 0,693 · 0,5<br>
+                            T<sub>ON</sub> = <span class="result">0,347 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Calculo de T<sub>OFF</sub></h4>
+                        <div class="math-block">
+                            T<sub>OFF</sub> = 0,693 · R<sub>B</sub> · C<sub>1</sub><br>
+                            T<sub>OFF</sub> = 0,693 · 5 kΩ · 100 µF<br>
+                            T<sub>OFF</sub> = <span class="result">0,347 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>5. Interpretacion</h4>
+                        <p>Como R<sub>A</sub> = R<sub>B</sub> = 5 kΩ, los tiempos de encendido y apagado son iguales (0,347 s cada uno), lo que produce un duty cycle del 50%. Esta simetria es posible gracias al diodo que permite independizar completamente los caminos de carga y descarga, algo imposible en la Figura 1.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">T<sub>ON</sub>:</span> <span class="value">0,347 s</span></div>
+                        <div class="key-value"><span class="key">T<sub>OFF</sub>:</span> <span class="value">0,347 s</span></div>
+                        <div class="key-value">D.C. resultante: <strong>50%</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(6)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(8)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 8 ==================== -->
+    <section id="problem8" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 8: Figura 2 - Frecuencia</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 2: MV Astable con D.C. entre 0 y 100%</h4>
+                <div class="math-block">
+                    f = 1,44 / ((R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub>)
+                </div>
+            </div>
+
+            <img src="img/Circuito2.png" alt="Circuito Figura 2" title="Figura 2: MV Astable con D.C. entre 0 y 100%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Calcula la frecuencia del circuito 2, con los valores indicados.<br>
+                <strong>Solucion:</strong> 1,44 Hz.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(8)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board8" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 8</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Formula de frecuencia para la Figura 2</h4>
+                        <p>Con el diodo en paralelo con R<sub>B</sub>, el periodo total del ciclo es T = T<sub>ON</sub> + T<sub>OFF</sub> = 0,693·R<sub>A</sub>·C<sub>1</sub> + 0,693·R<sub>B</sub>·C<sub>1</sub> = 0,693·(R<sub>A</sub>+R<sub>B</sub>)·C<sub>1</sub>. Por tanto:</p>
+                        <div class="math-block">
+                            f = 1 / T = 1 / [0,693 · (R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub>]<br>
+                            f = <span class="result">1,44 / ((R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub>)</span>
+                        </div>
+                        <p>La diferencia clave con la Figura 1 es el denominador: aqui es (R<sub>A</sub> + R<sub>B</sub>) en vez de (R<sub>A</sub> + 2R<sub>B</sub>), lo que resulta en frecuencias mas altas para los mismos valores de componentes.</p>
+                    </div>
+                    <div class="step">
+                        <h4>2. Valores del circuito</h4>
+                        <div class="math-block">
+                            R<sub>A</sub> = 5 kΩ (potenciometro al 50%)<br>
+                            R<sub>B</sub> = 5 kΩ<br>
+                            C<sub>1</sub> = 100 µF
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Calculo</h4>
+                        <div class="math-block">
+                            f = 1,44 / ((R<sub>A</sub> + R<sub>B</sub>) · C<sub>1</sub>)<br>
+                            f = 1,44 / ((5 kΩ + 5 kΩ) · 100 µF)<br>
+                            f = 1,44 / (10 kΩ · 100 µF)<br>
+                            f = 1,44 / (10 × 10<sup>3</sup> × 100 × 10<sup>-6</sup>)<br>
+                            f = 1,44 / (10 × 10<sup>-1</sup>)<br>
+                            f = 1,44 / 1<br>
+                            f = <span class="result">1,44 Hz</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Comparacion con la Figura 1</h4>
+                        <p>Con los mismos valores de componentes (R<sub>A</sub> = R<sub>B</sub> = 5 kΩ, C<sub>1</sub> = 100 µF), la Figura 2 produce una frecuencia mayor (1,44 Hz frente a 0,96 Hz de la Figura 1). Esto se debe a que el diodo elimina R<sub>B</sub> del camino de carga, reduciendo el tiempo total del ciclo y por tanto aumentando la frecuencia de oscilacion.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">f:</span> <span class="value">1,44 Hz</span></div>
+                        <div class="key-value">El LED parpadea <strong>1,44 veces por segundo</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(7)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(9)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 9 ==================== -->
+    <section id="problem9" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 9: Figura 2 - Potenciometro y Duty Cycle</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 2: MV Astable con D.C. entre 0 y 100%</h4>
+                <div class="math-block">
+                    D = R<sub>A</sub> / (R<sub>A</sub> + R<sub>B</sub>)<br>
+                    Despejando: R<sub>A</sub> = D · R<sub>B</sub> / (1 - D)
+                </div>
+            </div>
+
+            <img src="img/Circuito2.png" alt="Circuito Figura 2" title="Figura 2: MV Astable con D.C. entre 0 y 100%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Calcula el valor del potenciometro del circuito 2 para que el duty cycle sea: a) 20%; b) 65%.<br>
+                <strong>Solucion:</strong> a) 1,25 kΩ; b) 9,29 kΩ.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(9)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board9" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 9</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Planteamiento general</h4>
+                        <p>Para la Figura 2, el duty cycle es directamente proporcional a R<sub>A</sub>:</p>
+                        <div class="math-block">
+                            D = R<sub>A</sub> / (R<sub>A</sub> + R<sub>B</sub>)
+                        </div>
+                        <p>Donde R<sub>B</sub> = 5 kΩ es fijo y R<sub>A</sub> (el potenciometro) es la incognita. Despejamos R<sub>A</sub>:</p>
+                        <div class="math-block">
+                            D · (R<sub>A</sub> + R<sub>B</sub>) = R<sub>A</sub><br>
+                            D·R<sub>A</sub> + D·R<sub>B</sub> = R<sub>A</sub><br>
+                            R<sub>A</sub> - D·R<sub>A</sub> = D·R<sub>B</sub><br>
+                            R<sub>A</sub> · (1 - D) = D · R<sub>B</sub><br>
+                            R<sub>A</sub> = <span class="result">D · R<sub>B</sub> / (1 - D)</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Apartado a) D = 20% = 0,20</h4>
+                        <div class="math-block">
+                            R<sub>A</sub> = 0,20 · 5 kΩ / (1 - 0,20)<br>
+                            R<sub>A</sub> = 1 / 0,80<br>
+                            R<sub>A</sub> = <span class="result">1,25 kΩ</span>
+                        </div>
+                        <p>Verificacion: D = 1,25 / (1,25 + 5) = 1,25 / 6,25 = 0,20 = 20% ✓</p>
+                    </div>
+                    <div class="step">
+                        <h4>3. Apartado b) D = 65% = 0,65</h4>
+                        <div class="math-block">
+                            R<sub>A</sub> = 0,65 · 5 kΩ / (1 - 0,65)<br>
+                            R<sub>A</sub> = 3,25 / 0,35<br>
+                            R<sub>A</sub> = <span class="result">9,29 kΩ</span>
+                        </div>
+                        <p>Verificacion: D = 9,29 / (9,29 + 5) = 9,29 / 14,29 = 0,65 = 65% ✓</p>
+                    </div>
+                    <div class="step">
+                        <h4>4. Interpretacion</h4>
+                        <p>Para obtener un duty cycle bajo (20%), necesitamos un R<sub>A</sub> pequeno (1,25 kΩ), lo que reduce drasticamente el tiempo de carga frente al de descarga. Para un duty cycle alto (65%), necesitamos un R<sub>A</sub> grande (9,29 kΩ), lo que prolonga el tiempo de carga. La ventaja de la Figura 2 frente a la Figura 1 es que podemos alcanzar cualquier valor de duty cycle entre 0% y casi 100% simplemente ajustando el potenciometro, gracias al diodo que independiza los caminos de carga y descarga.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">a) R<sub>A</sub> para D=20%:</span> <span class="value">1,25 kΩ</span></div>
+                        <div class="key-value"><span class="key">b) R<sub>A</sub> para D=65%:</span> <span class="value">9,29 kΩ</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(8)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(10)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EJERCICIO 10 ==================== -->
+    <section id="problem10" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menu</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 10: Maximo D.C. del Montaje 2</h2>
+
+            <div class="formula-ref">
+                <h4>Formulas - Figura 2: MV Astable con D.C. entre 0 y 100%</h4>
+                <div class="math-block">
+                    D = R<sub>A</sub> / (R<sub>A</sub> + R<sub>B</sub>)<br>
+                    D<sub>max</sub> se obtiene cuando R<sub>A</sub> es maximo (potenciometro al 100%)
+                </div>
+            </div>
+
+            <img src="img/Circuito2.png" alt="Circuito Figura 2" title="Figura 2: MV Astable con D.C. entre 0 y 100%" class="circuit-diagram">
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Cual es el maximo D.C. del montaje 2?<br>
+                <strong>Solucion:</strong> 66,7%.
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(10)">✏️ Abrir Pizarra y Ver Resolucion</button>
+
+            <div id="board10" class="board-mode">
+                <div class="board-header">Pizarra de Resolucion - Ejercicio 10</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Condicion de maximo D.C.</h4>
+                        <p>El duty cycle de la Figura 2 es D = R<sub>A</sub> / (R<sub>A</sub> + R<sub>B</sub>). Para maximizar D, necesitamos maximizar R<sub>A</sub>. El valor maximo del potenciometro es 10 kΩ.</p>
+                        <div class="math-block">
+                            R<sub>A(max)</sub> = 10 kΩ (potenciometro al 100%)<br>
+                            R<sub>B</sub> = 5 kΩ (fijo)
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Calculo del D.C. maximo</h4>
+                        <div class="math-block">
+                            D<sub>max</sub> = R<sub>A(max)</sub> / (R<sub>A(max)</sub> + R<sub>B</sub>)<br>
+                            D<sub>max</sub> = 10 kΩ / (10 kΩ + 5 kΩ)<br>
+                            D<sub>max</sub> = 10 / 15<br>
+                            D<sub>max</sub> = 2/3<br>
+                            D<sub>max</sub> = 0,6667 = <span class="result">66,7%</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Analisis del limite teorico</h4>
+                        <p>Teoricamente, la formula D = R<sub>A</sub> / (R<sub>A</sub> + R<sub>B</sub>) permite que el D.C. tienda al 100% si R<sub>A</sub> tiende a infinito. Sin embargo, con un potenciometro de 10 kΩ y R<sub>B</sub> fijo de 5 kΩ, el maximo duty cycle alcanzable es del 66,7%. Para obtener un D.C. mayor, se necesitaria un potenciometro de mayor valor o una R<sub>B</sub> mas pequena. Por ejemplo, con un potenciometro de 50 kΩ y R<sub>B</sub> = 5 kΩ, el D.C. maximo seria del 90,9%.</p>
+                    </div>
+                    <div class="step">
+                        <h4>4. Comparacion entre montajes</h4>
+                        <div class="math-block">
+                            Figura 1 (sin diodo): D.C. siempre &gt; 50%, con estos componentes: 66,7% a 75%<br>
+                            Figura 2 (con diodo): D.C. entre ~0% y 66,7% (limitado por R<sub>A(max)</sub> = 10 kΩ)
+                        </div>
+                        <p>Ambos montajes comparten el mismo valor maximo de D.C. (66,7%) con este potenciometro, pero la Figura 2 ofrece un rango mucho mas amplio de ajuste, pudiendo bajar el duty cycle por debajo del 50% hasta valores cercanos al 0%.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solucion Final</h3>
+                        <div class="key-value"><span class="key">D.C.<sub>max</sub>:</span> <span class="value">66,7%</span></div>
+                        <div class="key-value">Limitado por <strong>R<sub>A(max)</sub> = 10 kΩ</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(9)">← Anterior</button>
+                <button class="btn" onclick="showHome()">Volver al Inicio</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-note">
+        <p>LE.S. Virgen de Villadiego (Penaflor, Sevilla) - Departamento de Tecnologia</p>
+    </div>
+
+</div>
+
+<script>
+    function showHome() {{
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('home').classList.add('active');
+        window.scrollTo(0, 0);
+        document.querySelectorAll('.board-mode').forEach(board => {{
+            board.classList.remove('active');
+        }});
+        document.querySelectorAll('.btn-board').forEach(btn => {{
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolucion';
+            btn.style.background = '';
+        }});
+    }}
+
+    function showProblem(id) {{
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('problem' + id).classList.add('active');
+        window.scrollTo(0, 0);
+        document.querySelectorAll('.board-mode').forEach(board => {{
+            board.classList.remove('active');
+        }});
+        document.querySelectorAll('.btn-board').forEach(btn => {{
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolucion';
+            btn.style.background = '';
+        }});
+    }}
+
+    function toggleBoard(id) {{
+        const board = document.getElementById('board' + id);
+        const isActive = board.classList.contains('active');
+        document.querySelectorAll('.board-mode').forEach(board => {{
+            board.classList.remove('active');
+        }});
+        document.querySelectorAll('.btn-board').forEach(btn => {{
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolucion';
+            btn.style.background = '';
+        }});
+        if (!isActive) {{
+            board.classList.add('active');
+            const btn = event.target;
+            btn.textContent = '✖ Cerrar Pizarra';
+            btn.style.background = '#ef4444';
+        }}
+    }}
+</script>
+
+</body>
+</html>
