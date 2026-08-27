@@ -993,7 +993,168 @@
                         <div class="math-block">
                             DC = (Valor / (2<sup>8</sup> - 1)) × 100<br>
                             DC = (138 / 255) × 100<br>
-                            DC = 0,54118 × 100 = <span class="result">54,12% ≈ 53,3%</span>
+                            DC = 0,54118 × 100 = <span class="result">54,12% ≈ 54,1%</span>
                         </div>
                     </div>
-                    <div class=
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">Duty-Cycle:</span> <span class="value">54,12% ≈ 54,1%</span></div>
+                        <div class="key-value">El valor 10001010<sub>2</sub> (138<sub>10</sub>) produce un <strong>54,1% de duty-cycle</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(5)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(7)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== EJERCICIO 7 ===================== -->
+    <section id="problem7" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 7: PWM de 16 bits (Hexadecimal)</h2>
+            
+            <svg viewBox="0 0 700 240" class="pwm-diagram" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="240" fill="#fefefe"/>
+                <text x="20" y="25" font-size="14" fill="#64748b" font-weight="600">Señal PWM de 16 bits - Valor: 0xF0</text>
+                <line x1="60" y1="50" x2="60" y2="190" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="60" y1="190" x2="680" y2="190" stroke="#94a3b8" stroke-width="1"/>
+                <text x="20" y="70" font-size="11" fill="#64748b">65535</text>
+                <text x="30" y="195" font-size="12" fill="#64748b">0</text>
+                <g transform="translate(80, 205)">
+                    <text x="0" y="15" font-size="11" fill="#64748b" font-weight="600">Valor hexadecimal:</text>
+                    <rect x="130" y="0" width="30" height="22" fill="#3b82f6" rx="3"/><text x="145" y="16" font-size="12" fill="white" text-anchor="middle" font-weight="700">F</text>
+                    <rect x="163" y="0" width="30" height="22" fill="#3b82f6" rx="3"/><text x="178" y="16" font-size="12" fill="white" text-anchor="middle" font-weight="700">0</text>
+                    <text x="210" y="16" font-size="12" fill="#64748b">= 240 (decimal)</text>
+                </g>
+                <rect x="60" y="52" width="6" height="138" fill="#3b82f6" opacity="0.15"/>
+                <rect x="60" y="52" width="6" height="138" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                <rect x="66" y="52" width="614" height="138" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6"/>
+                <line x1="66" y1="190" x2="680" y2="190" stroke="#ef4444" stroke-width="2"/>
+                <text x="50" y="130" font-size="11" fill="#1d4ed8" font-weight="700">T<tspan font-size="8" dy="3">ON</tspan><tspan dy="-3"></tspan></text>
+                <text x="350" y="175" font-size="13" fill="#ef4444" font-weight="700">T<tspan font-size="9" dy="3">OFF</tspan><tspan dy="-3"> (muy grande)</tspan></text>
+                <text x="560" y="25" font-size="12" fill="#f59e0b" font-weight="700">DC = 0,366%</text>
+            </svg>
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Una señal PWM de 16 bits se coloca a 0xF0 (hexadecimal). Calcula su duty-cycle.<br>
+                <strong>Solución:</strong> 0,366%
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(7)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board7" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 7</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Fórmula para PWM de N bits</h4>
+                        <p>Para un PWM digital de N bits, el duty-cycle se calcula así:</p>
+                        <div class="math-block">
+                            DC (%) = (Valor_decimal / (2<sup>N</sup> - 1)) × 100<br><br>
+                            Donde:<br>
+                            Valor_decimal = valor del registro PWM en decimal<br>
+                            2<sup>N</sup> - 1 = valor máximo representable con N bits
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Conversión de hexadecimal a decimal</h4>
+                        <p>El valor 0xF0 está en hexadecimal. Lo convertimos a decimal:</p>
+                        <div class="math-block">
+                            0xF0 = F × 16<sup>1</sup> + 0 × 16<sup>0</sup><br>
+                            0xF0 = 15 × 16 + 0 × 1<br>
+                            0xF0 = 240 + 0 = <span class="result">240</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Valores límites para 16 bits</h4>
+                        <div class="math-block">
+                            Número de bits: 16<br>
+                            Valor máximo: 2<sup>16</sup> - 1 = 65536 - 1 = <span class="result">65535</span><br>
+                            Valor mínimo: 0 (0% de duty-cycle)<br>
+                            Valor máximo: 65535 (100% de duty-cycle)
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo del Duty-Cycle</h4>
+                        <div class="math-block">
+                            DC = (Valor / (2<sup>16</sup> - 1)) × 100<br>
+                            DC = (240 / 65535) × 100<br>
+                            DC = 0,003662 × 100 = <span class="result">0,366%</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>5. Observación</h4>
+                        <p>Con 16 bits de resolución, el valor 0xF0 (240) representa una fracción muy pequeña del rango total. Esto demuestra la alta precisión que ofrece un PWM de 16 bits frente a uno de 8 bits, donde el mismo valor 240 produciría un duty-cycle de 240/255 = 94,1%.</p>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">Duty-Cycle:</span> <span class="value">0,366%</span></div>
+                        <div class="key-value">El valor 0xF0 (240<sub>10</sub>) en 16 bits produce un <strong>0,366% de duty-cycle</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(6)">← Anterior</button>
+                <button class="btn" onclick="showHome()">Menú</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-note">
+        <p>LE.S. Virgen de Villadiego (Peñaflor, Sevilla) - Departamento de Tecnología</p>
+    </div>
+
+</div>
+
+<script>
+    function showHome() {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('home').classList.add('active');
+        window.scrollTo(0, 0);
+        document.querySelectorAll('.board-mode').forEach(board => {
+            board.classList.remove('active');
+        });
+        document.querySelectorAll('.btn-board').forEach(btn => {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '';
+        });
+    }
+
+    function showProblem(id) {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById('problem' + id).classList.add('active');
+        window.scrollTo(0, 0);
+        document.querySelectorAll('.board-mode').forEach(board => {
+            board.classList.remove('active');
+        });
+        document.querySelectorAll('.btn-board').forEach(btn => {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '';
+        });
+    }
+
+    function toggleBoard(id) {
+        const board = document.getElementById('board' + id);
+        const isActive = board.classList.contains('active');
+        document.querySelectorAll('.board-mode').forEach(board => {
+            board.classList.remove('active');
+        });
+        document.querySelectorAll('.btn-board').forEach(btn => {
+            btn.textContent = '✏️ Abrir Pizarra y Ver Resolución';
+            btn.style.background = '';
+        });
+        if (!isActive) {
+            board.classList.add('active');
+            const btn = event.target;
+            btn.textContent = '✖ Cerrar Pizarra';
+            btn.style.background = '#ef4444';
+        }
+    }
+</script>
+
+</body>
+</html>
