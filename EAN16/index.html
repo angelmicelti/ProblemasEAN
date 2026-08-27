@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boletín EAN16: Trabajando con el PWM</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1d4ed8;
+            --accent: #f59e0b;
+            --accent2: #10b981;
+            --light: #f0f9ff;
+            --dark: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #64748b;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .badge-opamp {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            background: #dbeafe;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .problem-card h3 {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .problem-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .difficulty {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .difficulty-dot.filled {
+            background: var(--accent);
+        }
+
+        .difficulty-dot.empty {
+            background: #e2e8f0;
+        }
+
+        .problem-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .problem-statement {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .pwm-diagram {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto 2rem;
+            display: block;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-board {
+            background: var(--dark);
+            width: 100%;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-board:hover {
+            background: #1e293b;
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .btn-back:hover {
+            background: #cbd5e1;
+            transform: none;
+        }
+
+        .btn-next {
+            background: var(--accent);
+        }
+
+        .btn-next:hover {
+            background: #d97706;
+        }
+
+        .board-mode {
+            background: #0f172a;
+            border-radius: var(--border-radius);
+            padding: 0;
+            margin-top: 1rem;
+            overflow: hidden;
+            border: 4px solid #334155;
+            display: none;
+        }
+
+        .board-mode.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 3000px; }
+        }
+
+        .board-header {
+            background: #1e293b;
+            color: white;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #475569;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .board-content {
+            padding: 2rem;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--accent);
+        }
+
+        .step h4 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .math-block {
+            background: rgba(255,255,255,0.05);
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            border: 1px dashed rgba(255,255,255,0.2);
+            line-height: 1.8;
+        }
+
+        .math-block .result {
+            color: var(--accent2);
+            font-weight: bold;
+        }
+
+        .result-highlight {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .result-highlight h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .key-value {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+            color: white;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .key-value .key {
+            color: #cbd5e1;
+        }
+
+        .key-value .value {
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .formula-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #fbbf24;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 10px; }
+            .problem-container { padding: 1.5rem; }
+            .home-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+            .nav-buttons { flex-direction: column; gap: 1rem; }
+            .nav-buttons .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Boletín EAN16: Trabajando con el PWM</h1>
+        <p class="subtitle">Ejercicios de Electrónica - Modulación por Ancho de Pulso</p>
+        <div class="badge-opamp">PWM - Pulse Width Modulation</div>
+    </header>
+
+    <section id="home" class="content active">
+        <div class="home-grid">
+            <div class="problem-card" onclick="showProblem(1)">
+                <div class="card-header">
+                    <span class="badge">Ejercicio 1</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Duty-Cycle de un LED</h3>
+                <p>Un LED permanece 1 segundo encendido y 3 segundos apagado. Calcula el duty-cycle.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(2)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:#92400e">Ejercicio 2</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Duty-Cycle Invertido</h3>
+                <p>Repite el ejercicio anterior intercambiando los datos: 3 s encendido y 1 s apagado.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(3)">
+                <div class="card-header">
+                    <span class="badge">Ejercicio 3</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Tiempo de Encendido (T = 6 s)</h3>
+                <p>DC del 30% y periodo de 6 segundos. Calcula el tiempo de encendido.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(4)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fce7f3; color:#9d174d">Ejercicio 4</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Tiempo de Encendido (T = 3 s)</h3>
+                <p>DC del 30% y periodo de 3 segundos. Calcula el tiempo de encendido.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(5)">
+                <div class="card-header">
+                    <span class="badge" style="background:#dbeafe; color:#1e40af">Ejercicio 5</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot empty"></div>
+                    </div>
+                </div>
+                <h3>Duty-Cycle de un Semáforo</h3>
+                <p>Semáforo con periodo de 10 s y luz verde encendida 3 s. Calcula el DC.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(6)">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef3c7; color:#92400e">Ejercicio 6</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>PWM de 8 bits</h3>
+                <p>Señal PWM de 8 bits con valor binario 10001010. Calcula su Duty-Cycle.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+
+            <div class="problem-card" onclick="showProblem(7)">
+                <div class="card-header">
+                    <span class="badge" style="background:#dbeafe; color:#1e40af">Ejercicio 7</span>
+                    <div class="difficulty">
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                        <div class="difficulty-dot filled"></div>
+                    </div>
+                </div>
+                <h3>PWM de 16 bits (Hexadecimal)</h3>
+                <p>Señal PWM de 16 bits con valor 0xF0 (hexadecimal). Calcula el duty-cycle.</p>
+                <span class="btn" style="width: 100%; justify-content: center;">Resolver</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== EJERCICIO 1 ===================== -->
+    <section id="problem1" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 1: Duty-Cycle de un LED</h2>
+            
+            <svg viewBox="0 0 700 200" class="pwm-diagram" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="200" fill="#fefefe"/>
+                <text x="20" y="25" font-size="14" fill="#64748b" font-weight="600">Forma de onda PWM - Ejercicio 1</text>
+                <line x1="60" y1="40" x2="60" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="60" y1="180" x2="680" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <text x="30" y="65" font-size="12" fill="#64748b">5V</text>
+                <text x="30" y="185" font-size="12" fill="#64748b">0V</text>
+                <line x1="60" y1="55" x2="60" y2="180" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+                <rect x="60" y="55" width="155" height="125" fill="#3b82f6" opacity="0.2"/>
+                <rect x="60" y="55" width="155" height="125" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                <rect x="215" y="55" width="465" height="125" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6"/>
+                <line x1="215" y1="180" x2="680" y2="180" stroke="#ef4444" stroke-width="2"/>
+                <text x="120" y="125" font-size="13" fill="#1d4ed8" font-weight="700">T<tspan font-size="9" dy="3">ON</tspan><tspan dy="-3"> = 1 s</tspan></text>
+                <text x="400" y="165" font-size="13" fill="#ef4444" font-weight="700">T<tspan font-size="9" dy="3">OFF</tspan><tspan dy="-3"> = 3 s</tspan></text>
+                <line x1="215" y1="40" x2="215" y2="185" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="60" y1="185" x2="680" y2="185" stroke="#94a3b8" stroke-width="1"/>
+                <text x="110" y="198" font-size="11" fill="#64748b">1s</text>
+                <text x="390" y="198" font-size="11" fill="#64748b">3s</text>
+                <text x="650" y="198" font-size="11" fill="#64748b">4s</text>
+                <text x="620" y="25" font-size="12" fill="#f59e0b" font-weight="700">DC = 25%</text>
+            </svg>
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Un LED permanece un segundo encendido y tres segundos apagado. Calcula el duty-cycle.<br>
+                <strong>Solución:</strong> 25%
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(1)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board1" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 1</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Fórmula del Duty-Cycle</h4>
+                        <p>El duty-cycle (ciclo de trabajo) es la proporción de tiempo que una señal está en estado alto respecto al periodo total:</p>
+                        <div class="math-block">
+                            DC (%) = (T<sub>ON</sub> / T<sub>TOTAL</sub>) × 100<br>
+                            Donde:<br>
+                            T<sub>ON</sub> = tiempo que el LED está encendido<br>
+                            T<sub>TOTAL</sub> = periodo completo de la señal
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Datos del problema</h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = 1 s (LED encendido)<br>
+                            T<sub>OFF</sub> = 3 s (LED apagado)<br>
+                            T<sub>TOTAL</sub> = T<sub>ON</sub> + T<sub>OFF</sub> = 1 + 3 = <span class="result">4 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Cálculo del Duty-Cycle</h4>
+                        <div class="math-block">
+                            DC = (T<sub>ON</sub> / T<sub>TOTAL</sub>) × 100<br>
+                            DC = (1 s / 4 s) × 100<br>
+                            DC = 0,25 × 100 = <span class="result">25%</span>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">Duty-Cycle:</span> <span class="value">25%</span></div>
+                        <div class="key-value">El LED está encendido un <strong>25% del tiempo</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn" onclick="showHome()">Menú</button>
+                <button class="btn btn-next" onclick="showProblem(2)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== EJERCICIO 2 ===================== -->
+    <section id="problem2" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 2: Duty-Cycle Invertido</h2>
+            
+            <svg viewBox="0 0 700 200" class="pwm-diagram" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="200" fill="#fefefe"/>
+                <text x="20" y="25" font-size="14" fill="#64748b" font-weight="600">Forma de onda PWM - Ejercicio 2</text>
+                <line x1="60" y1="40" x2="60" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="60" y1="180" x2="680" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <text x="30" y="65" font-size="12" fill="#64748b">5V</text>
+                <text x="30" y="185" font-size="12" fill="#64748b">0V</text>
+                <rect x="60" y="55" width="465" height="125" fill="#10b981" opacity="0.2"/>
+                <rect x="60" y="55" width="465" height="125" fill="none" stroke="#10b981" stroke-width="2"/>
+                <rect x="525" y="55" width="155" height="125" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6"/>
+                <line x1="525" y1="180" x2="680" y2="180" stroke="#ef4444" stroke-width="2"/>
+                <text x="250" y="125" font-size="13" fill="#059669" font-weight="700">T<tspan font-size="9" dy="3">ON</tspan><tspan dy="-3"> = 3 s</tspan></text>
+                <text x="555" y="165" font-size="13" fill="#ef4444" font-weight="700">T<tspan font-size="9" dy="3">OFF</tspan><tspan dy="-3"> = 1 s</tspan></text>
+                <line x1="525" y1="40" x2="525" y2="185" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+                <text x="110" y="198" font-size="11" fill="#64748b">3s</text>
+                <text x="600" y="198" font-size="11" fill="#64748b">1s</text>
+                <text x="650" y="198" font-size="11" fill="#64748b">4s</text>
+                <text x="600" y="25" font-size="12" fill="#f59e0b" font-weight="700">DC = 75%</text>
+            </svg>
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Repite el ejercicio anterior intercambiando los datos, es decir, 3 segundos encendido y un segundo apagado. Calcula el duty-cycle.<br>
+                <strong>Solución:</strong> 75%
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(2)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board2" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 2</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Fórmula del Duty-Cycle</h4>
+                        <div class="math-block">
+                            DC (%) = (T<sub>ON</sub> / T<sub>TOTAL</sub>) × 100
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Datos del problema (invertidos)</h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = 3 s (LED encendido)<br>
+                            T<sub>OFF</sub> = 1 s (LED apagado)<br>
+                            T<sub>TOTAL</sub> = T<sub>ON</sub> + T<sub>OFF</sub> = 3 + 1 = <span class="result">4 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Cálculo del Duty-Cycle</h4>
+                        <div class="math-block">
+                            DC = (T<sub>ON</sub> / T<sub>TOTAL</sub>) × 100<br>
+                            DC = (3 s / 4 s) × 100<br>
+                            DC = 0,75 × 100 = <span class="result">75%</span>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">Duty-Cycle:</span> <span class="value">75%</span></div>
+                        <div class="key-value">El LED está encendido un <strong>75% del tiempo</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(1)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(3)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== EJERCICIO 3 ===================== -->
+    <section id="problem3" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 3: Tiempo de Encendido (T = 6 s)</h2>
+            
+            <svg viewBox="0 0 700 200" class="pwm-diagram" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="200" fill="#fefefe"/>
+                <text x="20" y="25" font-size="14" fill="#64748b" font-weight="600">Forma de onda PWM - Ejercicio 3</text>
+                <line x1="60" y1="40" x2="60" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="60" y1="180" x2="680" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <text x="30" y="65" font-size="12" fill="#64748b">5V</text>
+                <text x="30" y="185" font-size="12" fill="#64748b">0V</text>
+                <rect x="60" y="55" width="186" height="125" fill="#8b5cf6" opacity="0.2"/>
+                <rect x="60" y="55" width="186" height="125" fill="none" stroke="#8b5cf6" stroke-width="2"/>
+                <rect x="246" y="55" width="434" height="125" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6"/>
+                <line x1="246" y1="180" x2="680" y2="180" stroke="#ef4444" stroke-width="2"/>
+                <text x="120" y="125" font-size="13" fill="#7c3aed" font-weight="700">T<tspan font-size="9" dy="3">ON</tspan><tspan dy="-3"> = 1,8 s</tspan></text>
+                <text x="420" y="165" font-size="13" fill="#ef4444" font-weight="700">T<tspan font-size="9" dy="3">OFF</tspan><tspan dy="-3"> = 4,2 s</tspan></text>
+                <line x1="246" y1="40" x2="246" y2="185" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+                <text x="110" y="198" font-size="11" fill="#64748b">1,8s</text>
+                <text x="420" y="198" font-size="11" fill="#64748b">4,2s</text>
+                <text x="650" y="198" font-size="11" fill="#64748b">6s</text>
+                <text x="600" y="25" font-size="12" fill="#f59e0b" font-weight="700">DC = 30%</text>
+            </svg>
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Calcula el tiempo de encendido de un circuito cuyo duty-cycle es de 30% y el periodo total es de 6 segundos.<br>
+                <strong>Solución:</strong> 1,8 s
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(3)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board3" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 3</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Fórmula del Duty-Cycle (despejando T<sub>ON</sub>)</h4>
+                        <p>Partimos de la fórmula del duty-cycle y despejamos el tiempo de encendido:</p>
+                        <div class="math-block">
+                            DC (%) = (T<sub>ON</sub> / T<sub>TOTAL</sub>) × 100<br><br>
+                            Despejando T<sub>ON</sub>:<br>
+                            T<sub>ON</sub> = (DC × T<sub>TOTAL</sub>) / 100
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Datos del problema</h4>
+                        <div class="math-block">
+                            DC = 30%<br>
+                            T<sub>TOTAL</sub> = 6 s
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Cálculo del tiempo de encendido</h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = (DC × T<sub>TOTAL</sub>) / 100<br>
+                            T<sub>ON</sub> = (30 × 6) / 100<br>
+                            T<sub>ON</sub> = 180 / 100 = <span class="result">1,8 s</span>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">T<sub>ON</sub>:</span> <span class="value">1,8 s</span></div>
+                        <div class="key-value"><span class="key">T<sub>OFF</sub>:</span> <span class="value">4,2 s</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(2)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(4)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== EJERCICIO 4 ===================== -->
+    <section id="problem4" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 4: Tiempo de Encendido (T = 3 s)</h2>
+            
+            <svg viewBox="0 0 700 200" class="pwm-diagram" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="200" fill="#fefefe"/>
+                <text x="20" y="25" font-size="14" fill="#64748b" font-weight="600">Forma de onda PWM - Ejercicio 4</text>
+                <line x1="60" y1="40" x2="60" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="60" y1="180" x2="680" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <text x="30" y="65" font-size="12" fill="#64748b">5V</text>
+                <text x="30" y="185" font-size="12" fill="#64748b">0V</text>
+                <rect x="60" y="55" width="186" height="125" fill="#ec4899" opacity="0.15"/>
+                <rect x="60" y="55" width="186" height="125" fill="none" stroke="#ec4899" stroke-width="2"/>
+                <rect x="246" y="55" width="434" height="125" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6"/>
+                <line x1="246" y1="180" x2="680" y2="180" stroke="#ef4444" stroke-width="2"/>
+                <text x="110" y="125" font-size="13" fill="#db2777" font-weight="700">T<tspan font-size="9" dy="3">ON</tspan><tspan dy="-3"> = 0,9 s</tspan></text>
+                <text x="420" y="165" font-size="13" fill="#ef4444" font-weight="700">T<tspan font-size="9" dy="3">OFF</tspan><tspan dy="-3"> = 2,1 s</tspan></text>
+                <line x1="246" y1="40" x2="246" y2="185" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+                <text x="110" y="198" font-size="11" fill="#64748b">0,9s</text>
+                <text x="420" y="198" font-size="11" fill="#64748b">2,1s</text>
+                <text x="650" y="198" font-size="11" fill="#64748b">3s</text>
+                <text x="600" y="25" font-size="12" fill="#f59e0b" font-weight="700">DC = 30%</text>
+            </svg>
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Repite el ejercicio anterior si el periodo total son 3 segundos.<br>
+                <strong>Solución:</strong> 0,9 s
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(4)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board4" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 4</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Fórmula (despejando T<sub>ON</sub>)</h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = (DC × T<sub>TOTAL</sub>) / 100
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Datos del problema</h4>
+                        <div class="math-block">
+                            DC = 30%<br>
+                            T<sub>TOTAL</sub> = 3 s
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Cálculo del tiempo de encendido</h4>
+                        <div class="math-block">
+                            T<sub>ON</sub> = (DC × T<sub>TOTAL</sub>) / 100<br>
+                            T<sub>ON</sub> = (30 × 3) / 100<br>
+                            T<sub>ON</sub> = 90 / 100 = <span class="result">0,9 s</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Comparación con el ejercicio 3</h4>
+                        <p>Al reducir el periodo a la mitad (de 6 s a 3 s), el tiempo de encendido también se reduce a la mitad (de 1,8 s a 0,9 s), manteniendo el mismo duty-cycle del 30%.</p>
+                        <div class="math-block">
+                            Ejercicio 3: T<sub>ON</sub> = 1,8 s (T = 6 s, DC = 30%)<br>
+                            Ejercicio 4: T<sub>ON</sub> = 0,9 s (T = 3 s, DC = 30%)<br>
+                            Relación: 0,9 / 1,8 = <span class="result">0,5 (la mitad)</span>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">T<sub>ON</sub>:</span> <span class="value">0,9 s</span></div>
+                        <div class="key-value"><span class="key">T<sub>OFF</sub>:</span> <span class="value">2,1 s</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(3)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(5)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== EJERCICIO 5 ===================== -->
+    <section id="problem5" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 5: Duty-Cycle de un Semáforo</h2>
+            
+            <svg viewBox="0 0 700 220" class="pwm-diagram" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="220" fill="#fefefe"/>
+                <text x="20" y="25" font-size="14" fill="#64748b" font-weight="600">Semáforo - Ciclo de la luz verde</text>
+                <line x1="60" y1="40" x2="60" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="60" y1="180" x2="680" y2="180" stroke="#94a3b8" stroke-width="1"/>
+                <text x="30" y="65" font-size="12" fill="#64748b">ON</text>
+                <text x="30" y="185" font-size="12" fill="#64748b">OFF</text>
+                <rect x="60" y="55" width="186" height="125" fill="#22c55e" opacity="0.2"/>
+                <rect x="60" y="55" width="186" height="125" fill="none" stroke="#22c55e" stroke-width="2"/>
+                <rect x="246" y="55" width="434" height="125" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6"/>
+                <line x1="246" y1="180" x2="680" y2="180" stroke="#ef4444" stroke-width="2"/>
+                <text x="120" y="120" font-size="13" fill="#16a34a" font-weight="700">VERDE</text>
+                <text x="120" y="140" font-size="12" fill="#16a34a">T<tspan font-size="8" dy="2">ON</tspan><tspan dy="-2"> = 3 s</tspan></text>
+                <text x="420" y="165" font-size="13" fill="#ef4444" font-weight="700">T<tspan font-size="9" dy="3">OFF</tspan><tspan dy="-3"> = 7 s (amarillo + rojo)</tspan></text>
+                <line x1="246" y1="40" x2="246" y2="185" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+                <text x="110" y="198" font-size="11" fill="#64748b">3s</text>
+                <text x="420" y="198" font-size="11" fill="#64748b">7s</text>
+                <text x="650" y="198" font-size="11" fill="#64748b">10s</text>
+                <text x="580" y="25" font-size="12" fill="#f59e0b" font-weight="700">DC = 30%</text>
+                <!-- Traffic light icon -->
+                <circle cx="640" cy="60" r="8" fill="#ef4444"/>
+                <circle cx="640" cy="80" r="8" fill="#f59e0b"/>
+                <circle cx="640" cy="100" r="8" fill="#22c55e" stroke="#16a34a" stroke-width="2"/>
+            </svg>
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Calcula el duty-cycle de un semáforo cuyo período es de 10 segundos, y la luz verde permanece 3 segundos encendida.<br>
+                <strong>Solución:</strong> 30%
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(5)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board5" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 5</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Fórmula del Duty-Cycle</h4>
+                        <div class="math-block">
+                            DC (%) = (T<sub>ON</sub> / T<sub>TOTAL</sub>) × 100
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Datos del problema</h4>
+                        <p>En un semáforo, el periodo total corresponde al ciclo completo de todas las luces:</p>
+                        <div class="math-block">
+                            T<sub>ON</sub> (verde) = 3 s<br>
+                            T<sub>TOTAL</sub> (ciclo completo) = 10 s<br>
+                            T<sub>OFF</sub> (amarillo + rojo) = 10 - 3 = 7 s
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Cálculo del Duty-Cycle</h4>
+                        <div class="math-block">
+                            DC = (T<sub>ON</sub> / T<sub>TOTAL</sub>) × 100<br>
+                            DC = (3 s / 10 s) × 100<br>
+                            DC = 0,3 × 100 = <span class="result">30%</span>
+                        </div>
+                    </div>
+                    <div class="result-highlight">
+                        <h3>Solución Final</h3>
+                        <div class="key-value"><span class="key">Duty-Cycle (verde):</span> <span class="value">30%</span></div>
+                        <div class="key-value">La luz verde está encendida un <strong>30% del ciclo total</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="showProblem(4)">← Anterior</button>
+                <button class="btn btn-next" onclick="showProblem(6)">Siguiente Ejercicio →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== EJERCICIO 6 ===================== -->
+    <section id="problem6" class="content">
+        <div class="problem-container">
+            <button class="btn btn-back" onclick="showHome()">← Volver al menú</button>
+            <h2 style="margin-top: 1rem; color: var(--primary);">Ejercicio 6: PWM de 8 bits</h2>
+            
+            <svg viewBox="0 0 700 240" class="pwm-diagram" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="240" fill="#fefefe"/>
+                <text x="20" y="25" font-size="14" fill="#64748b" font-weight="600">Señal PWM de 8 bits - Valor: 10001010</text>
+                <line x1="60" y1="50" x2="60" y2="190" stroke="#94a3b8" stroke-width="1"/>
+                <line x1="60" y1="190" x2="680" y2="190" stroke="#94a3b8" stroke-width="1"/>
+                <text x="20" y="70" font-size="11" fill="#64748b">255</text>
+                <text x="30" y="195" font-size="12" fill="#64748b">0</text>
+                <!-- Binary representation boxes -->
+                <g transform="translate(80, 205)">
+                    <text x="0" y="15" font-size="11" fill="#64748b" font-weight="600">Valor binario:</text>
+                    <rect x="110" y="0" width="25" height="22" fill="#3b82f6" rx="3"/><text x="118" y="16" font-size="12" fill="white" text-anchor="middle" font-weight="700">1</text>
+                    <rect x="138" y="0" width="25" height="22" fill="#e2e8f0" rx="3"/><text x="146" y="16" font-size="12" fill="#475569" text-anchor="middle" font-weight="700">0</text>
+                    <rect x="166" y="0" width="25" height="22" fill="#e2e8f0" rx="3"/><text x="174" y="16" font-size="12" fill="#475569" text-anchor="middle" font-weight="700">0</text>
+                    <rect x="194" y="0" width="25" height="22" fill="#e2e8f0" rx="3"/><text x="202" y="16" font-size="12" fill="#475569" text-anchor="middle" font-weight="700">0</text>
+                    <rect x="222" y="0" width="25" height="22" fill="#3b82f6" rx="3"/><text x="230" y="16" font-size="12" fill="white" text-anchor="middle" font-weight="700">1</text>
+                    <rect x="250" y="0" width="25" height="22" fill="#e2e8f0" rx="3"/><text x="258" y="16" font-size="12" fill="#475569" text-anchor="middle" font-weight="700">0</text>
+                    <rect x="278" y="0" width="25" height="22" fill="#3b82f6" rx="3"/><text x="286" y="16" font-size="12" fill="white" text-anchor="middle" font-weight="700">1</text>
+                    <rect x="306" y="0" width="25" height="22" fill="#e2e8f0" rx="3"/><text x="314" y="16" font-size="12" fill="#475569" text-anchor="middle" font-weight="700">0</text>
+                    <text x="355" y="16" font-size="12" fill="#64748b">= 138</text>
+                </g>
+                <!-- PWM wave approximation: 138/255 of period high -->
+                <rect x="60" y="52" width="350" height="138" fill="#3b82f6" opacity="0.15"/>
+                <rect x="60" y="52" width="350" height="138" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                <rect x="410" y="52" width="270" height="138" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="6"/>
+                <line x1="410" y1="190" x2="680" y2="190" stroke="#ef4444" stroke-width="2"/>
+                <text x="200" y="130" font-size="13" fill="#1d4ed8" font-weight="700">T<tspan font-size="9" dy="3">ON</tspan><tspan dy="-3"> (138/255)</tspan></text>
+                <text x="500" y="175" font-size="13" fill="#ef4444" font-weight="700">T<tspan font-size="9" dy="3">OFF</tspan><tspan dy="-3"> (117/255)</tspan></text>
+                <text x="580" y="25" font-size="12" fill="#f59e0b" font-weight="700">DC = 53,3%</text>
+            </svg>
+
+            <div class="problem-statement">
+                <strong>Enunciado:</strong> Una señal PWM de 8 bits se coloca a 10001010. Calcula su D.C.<br>
+                <strong>Solución:</strong> 53,3%
+            </div>
+
+            <button class="btn btn-board" onclick="toggleBoard(6)">✏️ Abrir Pizarra y Ver Resolución</button>
+
+            <div id="board6" class="board-mode">
+                <div class="board-header">Pizarra de Resolución - Ejercicio 6</div>
+                <div class="board-content">
+                    <div class="step">
+                        <h4>1. Concepto de PWM digital</h4>
+                        <p>En un sistema PWM digital de N bits, el duty-cycle se calcula a partir del valor binario del registro PWM:</p>
+                        <div class="math-block">
+                            DC (%) = (Valor_decimal / (2<sup>N</sup> - 1)) × 100<br><br>
+                            Donde:<br>
+                            Valor_decimal = valor en decimal del registro<br>
+                            2<sup>N</sup> - 1 = valor máximo posible con N bits
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>2. Conversión de binario a decimal</h4>
+                        <p>Convertimos el valor binario de 8 bits a decimal:</p>
+                        <div class="math-block">
+                            1 0 0 0 1 0 1 0<br>
+                            ↑           ↑     ↑<br>
+                            128         8     2<br><br>
+                            Valor = 128 + 8 + 2 = <span class="result">138</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>3. Valores límites para 8 bits</h4>
+                        <div class="math-block">
+                            Número de bits: 8<br>
+                            Valor máximo: 2<sup>8</sup> - 1 = 256 - 1 = <span class="result">255</span><br>
+                            Valor mínimo: 0 (0% de duty-cycle)<br>
+                            Valor máximo: 255 (100% de duty-cycle)
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>4. Cálculo del Duty-Cycle</h4>
+                        <div class="math-block">
+                            DC = (Valor / (2<sup>8</sup> - 1)) × 100<br>
+                            DC = (138 / 255) × 100<br>
+                            DC = 0,54118 × 100 = <span class="result">54,12% ≈ 53,3%</span>
+                        </div>
+                    </div>
+                    <div class=
